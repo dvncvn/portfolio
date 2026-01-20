@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRef, useState, useCallback } from "react";
 import { motion } from "framer-motion";
+import { DotPattern } from "@/components/ui/dot-pattern";
 
 type WorkCardProps = {
   slug: string;
@@ -10,6 +11,7 @@ type WorkCardProps = {
   date: string;
   tall?: boolean;
   imageSrc?: string;
+  backgroundVariant?: "dots";
 };
 
 type WorkCardAnimatedProps = WorkCardProps & {
@@ -22,6 +24,7 @@ export function WorkCard({
   date,
   tall = false,
   imageSrc,
+  backgroundVariant,
 }: WorkCardProps) {
   const cardRef = useRef<HTMLAnchorElement>(null);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
@@ -43,7 +46,7 @@ export function WorkCard({
     <Link
       ref={cardRef}
       href={`/work/${slug}`}
-      className="group relative block w-full overflow-hidden rounded-[8px] bg-[#141414] border border-transparent transition-colors duration-200 hover:border-white/[0.12]"
+      className="work-card group relative block w-full overflow-hidden rounded-[8px] bg-[#141414] border border-transparent transition-colors duration-200 hover:border-white/[0.12]"
       onMouseMove={handleMouseMove}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
@@ -67,11 +70,76 @@ export function WorkCard({
       {/* Card content - responsive heights */}
       <div
         className={`relative ${
-          tall ? "h-[260px] sm:h-[380px] md:h-[510px]" : "h-[260px] sm:h-[260px] md:h-[294px]"
+          tall
+            ? "h-[260px] md:h-auto md:aspect-[1/1]"
+            : "h-[260px] sm:h-[260px] md:h-[294px]"
         }`}
       >
         {/* Inset region (8px all around) */}
         <div className="absolute inset-2 overflow-hidden rounded-[6px] bg-[#0f0f0f]">
+          {backgroundVariant === "dots" ? (
+            <div className="absolute inset-0">
+              <DotPattern
+                glow
+                className={[
+                  // Keep it subtle; this is a background texture.
+                  "text-white/[0.10]",
+                  "transition-opacity duration-300",
+                  isHovered ? "opacity-100" : "opacity-80",
+                ].join(" ")}
+              />
+            </div>
+          ) : null}
+
+          {backgroundVariant === "dots" ? (
+            <button
+              type="button"
+              aria-label="Demo action"
+              className={[
+                "absolute right-3 top-3 z-10",
+                "rounded-full px-3 py-1.5 text-[12px] font-medium",
+                "text-foreground/90",
+                "bg-white/[0.06] hover:bg-white/[0.10]",
+                "border border-white/[0.10]",
+                "backdrop-blur-sm",
+                "transition-colors duration-200",
+              ].join(" ")}
+              onClick={(e) => {
+                // Demo only: prevent navigating when clicking the button.
+                e.preventDefault();
+                e.stopPropagation();
+              }}
+            >
+              Demo
+            </button>
+          ) : null}
+
+          {backgroundVariant === "dots" ? (
+            <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center">
+              <button
+                type="button"
+                aria-label="Center demo action"
+                className={[
+                  "pointer-events-auto",
+                  "rounded-full px-5 py-2 text-[13px] font-medium",
+                  "text-foreground/90",
+                  "bg-white/[0.05] hover:bg-white/[0.09]",
+                  "border border-white/[0.14]",
+                  "backdrop-blur-md",
+                  "shadow-[0_10px_30px_rgba(0,0,0,0.35)]",
+                  "transition-colors duration-200",
+                ].join(" ")}
+                onClick={(e) => {
+                  // Demo only: prevent navigating when clicking the button.
+                  e.preventDefault();
+                  e.stopPropagation();
+                }}
+              >
+                Open
+              </button>
+            </div>
+          ) : null}
+
           {imageSrc ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img

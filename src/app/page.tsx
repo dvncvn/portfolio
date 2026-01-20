@@ -1,7 +1,6 @@
-import Link from "next/link";
 import { IntroBlock } from "@/components/intro-block";
 import { WorkCard } from "@/components/work-card";
-import { WorkGridAnimated, WorkGridAnimatedItem } from "@/components/work-grid-animated";
+import { BlurFade } from "@/components/ui/blur-fade";
 
 const projects = [
   {
@@ -16,6 +15,7 @@ const projects = [
     title: "Langflow: Agent Experience",
     date: "2024",
     tall: false,
+    backgroundVariant: "dots" as const,
   },
   {
     slug: "astra-streaming",
@@ -32,6 +32,13 @@ const projects = [
 ];
 
 export default function Home() {
+  const delayBySlug: Record<string, number> = {
+    "langflow-platform-redesign": 0.12,
+    "langflow-agent-experience": 0.18,
+    "astra-streaming": 0.24,
+    "astra-db": 0.3,
+  };
+
   return (
     <div className="py-20">
       {/* Hero section */}
@@ -47,34 +54,44 @@ export default function Home() {
           </h2>
         </div>
 
-        <WorkGridAnimated className="flex flex-col gap-6 md:flex-row">
+        <div className="work-grid flex flex-col gap-6 md:flex-row">
           <div className="flex flex-col gap-6 md:flex-1">
             {[projects[0], projects[2]].map((project) => (
-              <WorkGridAnimatedItem key={project.slug}>
+              <BlurFade
+                key={project.slug}
+                delay={delayBySlug[project.slug] ?? 0}
+                className="work-grid-item"
+              >
                 <WorkCard
                   slug={project.slug}
                   title={project.title}
                   date={project.date}
                   tall={project.tall}
                   imageSrc={project.imageSrc}
+                  backgroundVariant={project.backgroundVariant}
                 />
-              </WorkGridAnimatedItem>
+              </BlurFade>
             ))}
           </div>
           <div className="flex flex-col gap-6 md:flex-1">
             {[projects[1], projects[3]].map((project) => (
-              <WorkGridAnimatedItem key={project.slug}>
+              <BlurFade
+                key={project.slug}
+                delay={delayBySlug[project.slug] ?? 0}
+                className="work-grid-item"
+              >
                 <WorkCard
                   slug={project.slug}
                   title={project.title}
                   date={project.date}
                   tall={project.tall}
                   imageSrc={project.imageSrc}
+                  backgroundVariant={project.backgroundVariant}
                 />
-              </WorkGridAnimatedItem>
+              </BlurFade>
             ))}
           </div>
-        </WorkGridAnimated>
+        </div>
       </section>
     </div>
   );

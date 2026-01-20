@@ -67,7 +67,9 @@ export function WorkCard({
       {/* Card content - responsive heights */}
       <div
         className={`relative ${
-          tall ? "h-[260px] sm:h-[380px] md:h-[510px]" : "h-[260px] sm:h-[260px] md:h-[294px]"
+          tall
+            ? "h-[260px] md:h-auto md:aspect-[1/1]"
+            : "h-[260px] sm:h-[260px] md:h-[294px]"
         }`}
       >
         {/* Inset region (8px all around) */}

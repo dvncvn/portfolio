@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useRef, useState, useCallback } from "react";
+import { motion } from "framer-motion";
 
 type WorkCardProps = {
   slug: string;
@@ -9,6 +10,10 @@ type WorkCardProps = {
   date: string;
   tall?: boolean;
   imageSrc?: string;
+};
+
+type WorkCardAnimatedProps = WorkCardProps & {
+  index?: number;
 };
 
 export function WorkCard({
@@ -38,11 +43,14 @@ export function WorkCard({
     <Link
       ref={cardRef}
       href={`/work/${slug}`}
-      className="group relative overflow-hidden rounded-[8px] bg-[#121212] transition-all duration-200 border border-transparent hover:border-border"
+      className="group relative block w-full overflow-hidden rounded-[8px] bg-[#141414] transition-all duration-200 border border-white/[0.10] hover:border-white/[0.14]"
       onMouseMove={handleMouseMove}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
+      {/* Subtle surface sheen so empty cards still read as tiles */}
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-white/[0.05] to-transparent" />
+
       {/* Border glow effect that follows cursor */}
       <div
         className="pointer-events-none absolute -inset-px rounded-[8px] opacity-0 transition-opacity duration-300 group-hover:opacity-100"
@@ -89,5 +97,25 @@ export function WorkCard({
         <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/60 to-transparent" />
       </div>
     </Link>
+  );
+}
+
+export function WorkCardAnimated({
+  index = 0,
+  ...props
+}: WorkCardAnimatedProps) {
+  return (
+    <motion.div
+      // Keep cards visible immediately (show surfaces), but add a subtle "settle" motion.
+      initial={{ opacity: 1, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{
+        duration: 0.35,
+        delay: 0.06 + index * 0.04,
+        ease: [0.25, 0.1, 0.25, 1],
+      }}
+    >
+      <WorkCard {...props} />
+    </motion.div>
   );
 }

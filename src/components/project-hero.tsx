@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { motion } from "framer-motion";
 import { Chip } from "@/components/chip";
 
 type ProjectHeroProps = {
@@ -19,7 +22,15 @@ export function ProjectHero({
   responsibilities,
 }: ProjectHeroProps) {
   return (
-    <header className="space-y-6">
+    <motion.header
+      initial={{ opacity: 1, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{
+        duration: 0.35,
+        ease: [0.25, 0.1, 0.25, 1],
+      }}
+      className="space-y-6"
+    >
       <Link
         href="/"
         className="inline-flex text-[14px] text-muted-foreground transition-colors hover:text-foreground"
@@ -55,7 +66,6 @@ export function ProjectHero({
           </ul>
         ) : null}
       </div>
-    </header>
+    </motion.header>
   );
 }
-

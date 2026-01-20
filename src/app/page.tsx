@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { IntroBlock } from "@/components/intro-block";
-import { WorkCard } from "@/components/work-card";
+import { WorkCardAnimated } from "@/components/work-card";
 
 const projects = [
   {
@@ -52,26 +52,28 @@ export default function Home() {
 
         <div className="flex flex-col gap-6 md:flex-row">
           <div className="flex flex-col gap-6 md:flex-1">
-            {[projects[0], projects[2]].map((project) => (
-              <WorkCard
+            {[projects[0], projects[2]].map((project, idx) => (
+              <WorkCardAnimated
                 key={project.slug}
                 slug={project.slug}
                 title={project.title}
                 date={project.date}
                 tall={project.tall}
                 imageSrc={project.imageSrc}
+                index={idx * 2}
               />
             ))}
           </div>
           <div className="flex flex-col gap-6 md:flex-1">
-            {[projects[1], projects[3]].map((project) => (
-              <WorkCard
+            {[projects[1], projects[3]].map((project, idx) => (
+              <WorkCardAnimated
                 key={project.slug}
                 slug={project.slug}
                 title={project.title}
                 date={project.date}
                 tall={project.tall}
                 imageSrc={project.imageSrc}
+                index={idx * 2 + 1}
               />
             ))}
           </div>

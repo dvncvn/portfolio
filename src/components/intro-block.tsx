@@ -2,12 +2,19 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { motion } from "framer-motion";
 
 export function IntroBlock() {
   const [isHovered, setIsHovered] = useState(false);
 
   return (
-    <div
+    <motion.div
+      initial={{ opacity: 1, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{
+        duration: 0.35,
+        ease: [0.25, 0.1, 0.25, 1],
+      }}
       className="group relative space-y-4"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
@@ -42,6 +49,6 @@ export function IntroBlock() {
           </Link>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }

@@ -1,0 +1,65 @@
+{
+  "slug": "langflow-platform-redesign",
+  "title": "Langflow: Platform Redesign",
+  "shortScope": "Platform redesign",
+  "timeframe": "Nov 2024",
+  "heroAsset": {
+    "type": "image",
+    "src": "/images/langflow-preview.png",
+    "alt": "Langflow platform redesign preview",
+    "width": 1536,
+    "height": 1024
+  },
+  "summary": "A platform-wide redesign to improve clarity, hierarchy, and usability across Langflow’s core surfaces while preserving the product’s speed and flexibility.",
+  "responsibilities": [
+    "Information architecture",
+    "Interaction design",
+    "Visual system",
+    "Prototyping with engineers"
+  ],
+  "sections": [
+    {
+      "heading": "Before → After",
+      "caption": "A tighter hierarchy and calmer layout system across the primary canvas experience.",
+      "layout": "compare",
+      "assets": [
+        {
+          "type": "image",
+          "src": "/images/langflow-preview.png",
+          "alt": "Before",
+          "width": 1536,
+          "height": 1024
+        },
+        {
+          "type": "image",
+          "src": "/images/langflow-preview.png",
+          "alt": "After",
+          "width": 1536,
+          "height": 1024
+        }
+      ]
+    },
+    {
+      "heading": "System building blocks",
+      "caption": "Core components standardized for consistency and speed.",
+      "layout": "split",
+      "assets": [
+        {
+          "type": "image",
+          "src": "/images/langflow-preview.png",
+          "alt": "Component patterns",
+          "width": 1536,
+          "height": 1024
+        },
+        {
+          "type": "image",
+          "src": "/images/langflow-preview.png",
+          "alt": "Component patterns",
+          "width": 1536,
+          "height": 1024
+        }
+      ]
+    }
+  ]
+}
+

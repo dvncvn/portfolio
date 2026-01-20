@@ -1,38 +1,6 @@
 import Link from "next/link";
 import { IntroBlock } from "@/components/intro-block";
-import { EmploymentTable, type EmploymentRow } from "@/components/employment-table";
 import { WorkCard } from "@/components/work-card";
-
-const workHistory: EmploymentRow[] = [
-  {
-    role: "Staff Product Designer",
-    roleFlag: "Acquired",
-    company: "IBM",
-    companyFlag: null,
-    years: "2025 – Now",
-  },
-  {
-    role: "Staff Product Designer",
-    company: "DataStax",
-    roleFlag: "Promoted",
-    companyFlag: null,
-    years: "2024 – 2025",
-  },
-  {
-    role: "Product Design Manager",
-    company: "DataStax",
-    roleFlag: "Promoted",
-    companyFlag: null,
-    years: "2023 – 2024",
-  },
-  {
-    role: "Senior Product Designer",
-    company: "DataStax",
-    roleFlag: null,
-    companyFlag: null,
-    years: "2023 – 2024",
-  },
-];
 
 const projects = [
   {
@@ -66,10 +34,8 @@ export default function Home() {
   return (
     <div className="py-20">
       {/* Hero section */}
-      <section className="grid gap-16 lg:grid-cols-2 lg:gap-24">
+      <section className="grid gap-16 lg:gap-24">
         <IntroBlock />
-
-        <EmploymentTable rows={workHistory} />
       </section>
 
       {/* Work section */}

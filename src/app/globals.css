@@ -24,6 +24,9 @@
   --ring: #A3A3A3;
   --surface: #151413;
   --radius: 0.5rem;
+  /* Fonts (set by next/font in layout.tsx) */
+  --font-sans: var(--font-inter);
+  --font-mono: var(--font-ibm-plex-mono);
   color-scheme: dark;
 }
 
@@ -73,7 +76,6 @@
 body {
   font-family: var(--font-sans), system-ui, -apple-system, sans-serif;
 }
-
 
 @layer base {
   * {

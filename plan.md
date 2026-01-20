@@ -41,14 +41,15 @@ Phase 2: Home page
 - [x] Card hover effects with cursor-following border glow.
 
 Phase 3: Project page template
-- [ ] Build `ProjectHero` (back link, title, chips, summary block, responsibilities).
-- [ ] Build `SectionBlock` + `AssetRenderer` (image, video, compare).
-- [ ] Build `CompareView` (interactive before/after slider).
-- [ ] Ensure support for section layouts (single, split, stacked, compare).
+- [x] Build `ProjectHero` (back link, title, chips, summary block, responsibilities).
+- [x] Build `SectionBlock` + `AssetRenderer` (image + compare for now).
+- [x] Build `CompareView` (interactive before/after slider).
+- [x] Ensure support for section layouts (single, split, stacked, compare).
+- [x] Create `/work/[slug]` route and load content from `content/work/*.json`.
 
 Phase 4: Play page
-- [ ] Build dense `PlayGrid` with thumbnails, titles, and one-line descriptions.
-- [ ] Implement click behavior to open external links in new tabs.
+- [x] Build dense `PlayGrid` with thumbnails, titles, and one-line descriptions.
+- [x] Implement click behavior to open external links in new tabs.
 - [ ] Optionally add `OverlayDialog` for richer item details (v1 optional).
 
 Phase 5: Motion and interaction

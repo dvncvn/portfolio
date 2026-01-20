@@ -27,10 +27,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body
-        className={`${inter.variable} ${ibmPlexMono.variable} antialiased`}
-      >
+    <html lang="en" className={`${inter.variable} ${ibmPlexMono.variable}`}>
+      <body className="antialiased">
         <SiteShell>{children}</SiteShell>
       </body>
     </html>

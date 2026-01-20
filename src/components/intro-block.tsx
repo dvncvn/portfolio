@@ -15,7 +15,7 @@ export function IntroBlock() {
       <h1 className="text-[18px] font-medium leading-tight text-foreground">
         Hi, I&apos;m Simon.
       </h1>
-      <p className="text-base leading-relaxed text-muted-foreground lg:max-w-md">
+      <p className="text-base leading-relaxed text-muted-foreground max-w-[768px]">
         I&apos;m a Staff Product Designer working on AI and developer platforms
         at IBM. I turn complex systems into products that are clear, usable, and
         durable. I&apos;m experienced across OSS, startups, and enterprise.

@@ -43,14 +43,11 @@ export function WorkCard({
     <Link
       ref={cardRef}
       href={`/work/${slug}`}
-      className="group relative block w-full overflow-hidden rounded-[8px] bg-[#141414] transition-all duration-200 border border-white/[0.10] hover:border-white/[0.14]"
+      className="group relative block w-full overflow-hidden rounded-[8px] bg-[#141414] transition-all duration-200 border border-transparent hover:border-white/[0.12]"
       onMouseMove={handleMouseMove}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      {/* Subtle surface sheen so empty cards still read as tiles */}
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-white/[0.05] to-transparent" />
-
       {/* Border glow effect that follows cursor */}
       <div
         className="pointer-events-none absolute -inset-px rounded-[8px] opacity-0 transition-opacity duration-300 group-hover:opacity-100"

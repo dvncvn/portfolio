@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { motion, useMotionValueEvent, useScroll } from "framer-motion";
+import { HyperText } from "@/components/ui/hyper-text";
 
 type SiteShellProps = {
   children: React.ReactNode;
@@ -84,9 +85,15 @@ export function SiteShell({ children }: SiteShellProps) {
           <div className="flex items-center gap-2">
             <Link
               href="/"
-              className="font-mono text-[16px] font-medium uppercase text-foreground"
+              className="text-foreground"
             >
-              SIMON DVNCVN
+              <HyperText
+                as="span"
+                className="font-mono text-[16px] font-medium uppercase leading-none"
+                animateOnHover
+              >
+                SIMON DVNCVN
+              </HyperText>
             </Link>
           </div>
           <nav className="flex items-center gap-6 text-[16px]">

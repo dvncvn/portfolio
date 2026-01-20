@@ -1,63 +1,114 @@
+import Link from "next/link";
+import { IntroBlock } from "@/components/intro-block";
+import { EmploymentTable, type EmploymentRow } from "@/components/employment-table";
+import { WorkCard } from "@/components/work-card";
+
+const workHistory: EmploymentRow[] = [
+  {
+    role: "Staff Product Designer",
+    roleFlag: "Acquired",
+    company: "IBM",
+    companyFlag: null,
+    years: "2025 – Now",
+  },
+  {
+    role: "Staff Product Designer",
+    company: "DataStax",
+    roleFlag: "Promoted",
+    companyFlag: null,
+    years: "2024 – 2025",
+  },
+  {
+    role: "Product Design Manager",
+    company: "DataStax",
+    roleFlag: "Promoted",
+    companyFlag: null,
+    years: "2023 – 2024",
+  },
+  {
+    role: "Senior Product Designer",
+    company: "DataStax",
+    roleFlag: null,
+    companyFlag: null,
+    years: "2023 – 2024",
+  },
+];
+
+const projects = [
+  {
+    slug: "langflow-platform-redesign",
+    title: "Langflow: Platform Redesign",
+    date: "Nov 2024",
+    tall: true,
+    imageSrc: "/images/langflow-preview.png",
+  },
+  {
+    slug: "langflow-agent-experience",
+    title: "Langflow: Agent Experience",
+    date: "2024",
+    tall: false,
+  },
+  {
+    slug: "astra-streaming",
+    title: "Astra Streaming",
+    date: "2023",
+    tall: false,
+  },
+  {
+    slug: "astra-db",
+    title: "Astra DB",
+    date: "2022",
+    tall: true,
+  },
+];
+
 export default function Home() {
   return (
-    <div className="py-16">
-      <section className="grid gap-12 lg:grid-cols-[1.2fr_1fr]">
-        <div className="space-y-6">
-          <p className="text-xs uppercase tracking-[0.28em] text-muted-foreground">
-            Staff product designer
-          </p>
-          <h1 className="text-4xl font-semibold leading-tight">
-            Hi, I&apos;m Simon.
-          </h1>
-          <p className="max-w-lg text-base leading-7 text-muted-foreground">
-            Visual-first portfolio focused on product systems, platform work,
-            and the details that make complex tools feel calm.
-          </p>
-          <div className="inline-flex items-center text-sm text-muted-foreground">
-            Hover to learn more about me → Info
-          </div>
-        </div>
+    <div className="py-20">
+      {/* Hero section */}
+      <section className="grid gap-16 lg:grid-cols-2 lg:gap-24">
+        <IntroBlock />
 
-        <div className="rounded-2xl border border-white/10 bg-surface p-6">
-          <p className="text-xs uppercase tracking-[0.24em] text-muted-foreground">
-            Recent work
-          </p>
-          <div className="mt-4 space-y-3 text-sm text-muted-foreground">
-            <div className="flex items-center justify-between">
-              <span>Langflow</span>
-              <span>Staff Product Designer</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span>Datastax</span>
-              <span>Product Design Lead</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span>Capital One</span>
-              <span>Senior Product Designer</span>
-            </div>
-          </div>
-        </div>
+        <EmploymentTable rows={workHistory} />
       </section>
 
-      <section className="mt-16">
-        <div className="grid gap-6 md:grid-cols-2">
-          {Array.from({ length: 4 }).map((_, index) => (
-            <div
-              key={`work-card-${index}`}
-              className="group relative h-48 overflow-hidden rounded-2xl border border-white/10 bg-surface/70 p-6 transition-colors"
-            >
-              <div className="text-xs uppercase tracking-[0.22em] text-muted-foreground">
-                Project
-              </div>
-              <div className="mt-3 text-lg font-medium">Project Title</div>
-              <div className="mt-1 text-sm text-muted-foreground">
-                Platform redesign
-              </div>
-              <div className="pointer-events-none absolute inset-0 opacity-0 transition-opacity group-hover:opacity-100">
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(255,255,255,0.08),_transparent_55%)]" />
-              </div>
-            </div>
-          ))}
+      {/* Work section */}
+      <section className="mt-32">
+        <div className="mb-8 flex items-baseline justify-between">
+          <h2 className="text-lg font-medium text-foreground">Work</h2>
+          <Link
+            href="/?presentation=true"
+            className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+          >
+            View as presentation
+          </Link>
+        </div>
+
+        <div className="flex flex-col gap-6 md:flex-row">
+          <div className="flex flex-col gap-6 md:flex-1">
+            {[projects[0], projects[2]].map((project) => (
+              <WorkCard
+                key={project.slug}
+                slug={project.slug}
+                title={project.title}
+                date={project.date}
+                tall={project.tall}
+                imageSrc={project.imageSrc}
+              />
+            ))}
+          </div>
+          <div className="flex flex-col gap-6 md:flex-1">
+            {[projects[1], projects[3]].map((project) => (
+              <WorkCard
+                key={project.slug}
+                slug={project.slug}
+                title={project.title}
+                date={project.date}
+                tall={project.tall}
+                imageSrc={project.imageSrc}
+              />
+            ))}
+          </div>
         </div>
       </section>
     </div>

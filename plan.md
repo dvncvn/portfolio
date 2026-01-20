@@ -8,6 +8,7 @@ Context
 - Requirements live in `../Requirements/requirements.md` and screenshots in `../Requirements/`.
 
 Assumptions and decisions to document (add entries below as they happen)
+- [x] Color tokens: background #0B0A09, foreground #E9E9E2, muted #A3A3A3, accent #E93940.
 - [ ] Note any resolved ambiguity from visual references.
 - [ ] Record any theme or layout decisions that affect future theming.
 - [ ] Confirm content format choice (JSON vs MDX).
@@ -22,19 +23,22 @@ Phase 0: Setup and structure
 
 Phase 1: Core shell and layout
 - [x] Build `SiteShell` with header and footer:
-  - Header: wordmark + theme switcher stub + nav (Work, Play, Info).
-  - Footer: "Made in Madison, WI." left; Resume/GitHub/LinkedIn/Email right.
+  - Header: wordmark + seedling emoji + nav (Work, Play, Info).
+  - Footer: "Made in Madison WI" left; GitHub/LinkedIn/Email right.
 - [x] Implement global layout with generous spacing and dark theme tokens.
 - [x] Set up font loading (Inter + IBM Plex Mono) with no layout shift.
+- [x] Active nav state styling (accent red for current section).
 
 Phase 2: Home page
-- [ ] Implement hero section:
-  - Left: H1 “Hi, I'm Simon” + 2-3 line intro with hover-to-info affordance.
-  - Right: compact work history table.
-- [ ] Implement Work grid:
-  - 4 project cards with asymmetric layout and hover metadata.
-  - Placeholder hover interaction (ambient, subtle) without large movement.
-- [ ] Add placeholders for images with fixed aspect ratios and blurred/low-quality fallbacks.
+- [x] Implement hero section:
+  - Left: H1 "Hi, I'm Simon" + 2-3 line intro.
+  - Right: compact work history table with role, status badge, years.
+- [x] Implement Work grid:
+  - 4 project cards with asymmetric layout (first card spans 2 rows).
+  - Placeholder hover interaction (subtle gradient).
+- [x] Add placeholders for images with fixed aspect ratios.
+- [x] Refine hover-to-info affordance on intro text (appears on hover).
+- [x] Card hover effects with cursor-following border glow.
 
 Phase 3: Project page template
 - [ ] Build `ProjectHero` (back link, title, chips, summary block, responsibilities).
@@ -71,3 +75,5 @@ Progress log
 - 2026-01-20: Site shell, fonts, and global theme tokens added.
 - 2026-01-20: Home page scaffolded with hero and grid placeholders.
 - 2026-01-20: shadcn/ui initialized and base styles applied.
+- 2026-01-20: Updated colors to match reference, refined hero and work grid layout.
+- 2026-01-20: Added IntroBlock with hover-to-info affordance, WorkCard with cursor-following glow.

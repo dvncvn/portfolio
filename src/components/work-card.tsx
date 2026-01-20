@@ -46,7 +46,7 @@ export function WorkCard({
     <Link
       ref={cardRef}
       href={`/work/${slug}`}
-      className="group relative block w-full overflow-hidden rounded-[8px] bg-[#141414] border border-transparent transition-colors duration-200 hover:border-white/[0.12]"
+      className="work-card group relative block w-full overflow-hidden rounded-[8px] bg-[#141414] border border-transparent transition-colors duration-200 hover:border-white/[0.12]"
       onMouseMove={handleMouseMove}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}

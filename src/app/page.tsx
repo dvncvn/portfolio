@@ -54,10 +54,14 @@ export default function Home() {
           </h2>
         </div>
 
-        <div className="flex flex-col gap-6 md:flex-row">
+        <div className="work-grid flex flex-col gap-6 md:flex-row">
           <div className="flex flex-col gap-6 md:flex-1">
             {[projects[0], projects[2]].map((project) => (
-              <BlurFade key={project.slug} delay={delayBySlug[project.slug] ?? 0}>
+              <BlurFade
+                key={project.slug}
+                delay={delayBySlug[project.slug] ?? 0}
+                className="work-grid-item"
+              >
                 <WorkCard
                   slug={project.slug}
                   title={project.title}
@@ -71,7 +75,11 @@ export default function Home() {
           </div>
           <div className="flex flex-col gap-6 md:flex-1">
             {[projects[1], projects[3]].map((project) => (
-              <BlurFade key={project.slug} delay={delayBySlug[project.slug] ?? 0}>
+              <BlurFade
+                key={project.slug}
+                delay={delayBySlug[project.slug] ?? 0}
+                className="work-grid-item"
+              >
                 <WorkCard
                   slug={project.slug}
                   title={project.title}

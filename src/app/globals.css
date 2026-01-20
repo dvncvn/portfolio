@@ -83,6 +83,17 @@ html {
   overflow-y: scroll;
 }
 
+/* Work grid hover emphasis: dim non-hovered cards */
+.work-grid:hover .work-card {
+  opacity: 0.45;
+  transition: opacity 300ms ease;
+}
+
+.work-grid:hover .work-card:hover,
+.work-grid:hover .work-card:focus-within {
+  opacity: 1;
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;

@@ -77,6 +77,11 @@ body {
   font-family: var(--font-sans), system-ui, -apple-system, sans-serif;
 }
 
+html {
+  /* Prevent layout shift when vertical scrollbar appears/disappears */
+  scrollbar-gutter: stable;
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;

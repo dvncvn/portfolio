@@ -4,21 +4,11 @@ import Link from "next/link";
 import { useState } from "react";
 import { motion } from "framer-motion";
 
-export function IntroBlock() {
+export function IntroBlock({ animate = true }: { animate?: boolean }) {
   const [isHovered, setIsHovered] = useState(false);
 
-  return (
-    <motion.div
-      initial={{ opacity: 1, y: 8 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{
-        duration: 0.35,
-        ease: [0.25, 0.1, 0.25, 1],
-      }}
-      className="group relative space-y-4"
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-    >
+  const content = (
+    <>
       <h1 className="text-[18px] font-medium leading-tight text-foreground">
         Hi, I&apos;m Simon.
       </h1>
@@ -49,6 +39,34 @@ export function IntroBlock() {
           </Link>
         </div>
       </div>
+    </>
+  );
+
+  if (!animate) {
+    return (
+      <div
+        className="group relative space-y-4"
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+      >
+        {content}
+      </div>
+    );
+  }
+
+  return (
+    <motion.div
+      initial={{ opacity: 1, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{
+        duration: 0.35,
+        ease: "easeOut",
+      }}
+      className="group relative space-y-4"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      {content}
     </motion.div>
   );
 }

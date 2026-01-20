@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { IntroBlock } from "@/components/intro-block";
-import { WorkCardAnimated } from "@/components/work-card";
+import { WorkCard } from "@/components/work-card";
+import { WorkGridAnimated, WorkGridAnimatedItem } from "@/components/work-grid-animated";
 
 const projects = [
   {
@@ -35,7 +36,7 @@ export default function Home() {
     <div className="py-20">
       {/* Hero section */}
       <section className="grid gap-16 lg:gap-24">
-        <IntroBlock />
+        <IntroBlock animate={false} />
       </section>
 
       {/* Work section */}
@@ -50,34 +51,34 @@ export default function Home() {
           </Link>
         </div>
 
-        <div className="flex flex-col gap-6 md:flex-row">
+        <WorkGridAnimated className="flex flex-col gap-6 md:flex-row">
           <div className="flex flex-col gap-6 md:flex-1">
-            {[projects[0], projects[2]].map((project, idx) => (
-              <WorkCardAnimated
-                key={project.slug}
-                slug={project.slug}
-                title={project.title}
-                date={project.date}
-                tall={project.tall}
-                imageSrc={project.imageSrc}
-                index={idx * 2}
-              />
+            {[projects[0], projects[2]].map((project) => (
+              <WorkGridAnimatedItem key={project.slug}>
+                <WorkCard
+                  slug={project.slug}
+                  title={project.title}
+                  date={project.date}
+                  tall={project.tall}
+                  imageSrc={project.imageSrc}
+                />
+              </WorkGridAnimatedItem>
             ))}
           </div>
           <div className="flex flex-col gap-6 md:flex-1">
-            {[projects[1], projects[3]].map((project, idx) => (
-              <WorkCardAnimated
-                key={project.slug}
-                slug={project.slug}
-                title={project.title}
-                date={project.date}
-                tall={project.tall}
-                imageSrc={project.imageSrc}
-                index={idx * 2 + 1}
-              />
+            {[projects[1], projects[3]].map((project) => (
+              <WorkGridAnimatedItem key={project.slug}>
+                <WorkCard
+                  slug={project.slug}
+                  title={project.title}
+                  date={project.date}
+                  tall={project.tall}
+                  imageSrc={project.imageSrc}
+                />
+              </WorkGridAnimatedItem>
             ))}
           </div>
-        </div>
+        </WorkGridAnimated>
       </section>
     </div>
   );

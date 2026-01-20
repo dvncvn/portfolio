@@ -42,13 +42,9 @@ export default function Home() {
       {/* Work section */}
       <section className="mt-32">
         <div className="mb-8 flex items-baseline justify-between">
-          <h2 className="text-lg font-medium text-foreground">Work</h2>
-          <Link
-            href="/?presentation=true"
-            className="text-sm text-muted-foreground transition-colors hover:text-foreground"
-          >
-            View as presentation
-          </Link>
+          <h2 className="text-[14px] font-medium uppercase tracking-wide text-foreground">
+            Work
+          </h2>
         </div>
 
         <WorkGridAnimated className="flex flex-col gap-6 md:flex-row">

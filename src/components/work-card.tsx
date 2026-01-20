@@ -43,10 +43,16 @@ export function WorkCard({
     <Link
       ref={cardRef}
       href={`/work/${slug}`}
-      className="group relative block w-full overflow-hidden rounded-[8px] bg-[#141414] transition-all duration-200 border border-transparent hover:border-white/[0.12]"
+      className="group relative block w-full overflow-hidden rounded-[8px] bg-[#141414] border border-transparent transition-colors duration-200 hover:border-white/[0.12]"
       onMouseMove={handleMouseMove}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
+      style={
+        {
+          // Keep this as a fixed value so the interaction is predictable and calm.
+          ["--footer-h" as any]: "56px",
+        } as React.CSSProperties
+      }
     >
       {/* Border glow effect that follows cursor */}
       <div
@@ -60,38 +66,43 @@ export function WorkCard({
 
       {/* Card content - responsive heights */}
       <div
-        className={`relative flex flex-col ${
+        className={`relative ${
           tall ? "h-[260px] sm:h-[380px] md:h-[510px]" : "h-[260px] sm:h-[260px] md:h-[294px]"
         }`}
       >
-        {/* Image area - centered in card for tall cards with images */}
-        {tall && imageSrc && (
-          <div className="flex flex-1 items-center justify-center p-6 pb-0">
-            <div className="relative w-[85%] overflow-hidden rounded-[8px] border border-border/30 shadow-2xl">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={imageSrc}
-                alt={title}
-                className="h-full w-full object-cover"
-              />
+        {/* Inset region (8px all around) */}
+        <div className="absolute inset-2 overflow-hidden rounded-[6px] bg-[#0f0f0f]">
+          {imageSrc ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={imageSrc}
+              alt={title}
+              className="h-full w-full object-cover transition-[filter,transform] duration-[420ms] ease-out group-hover:brightness-[0.98]"
+              loading="lazy"
+            />
+          ) : null}
+
+          {/* Bottom overlay that slides up over the image (image itself stays static) */}
+          <div
+            className={[
+              "absolute inset-x-0 bottom-0",
+              "transition-[transform,opacity] duration-[420ms] ease-out",
+              isHovered ? "translate-y-0 opacity-100" : "translate-y-[calc(var(--footer-h)+8px)] opacity-0",
+            ].join(" ")}
+          >
+            {/* Soft edge (prevents a hard border between overlay + image) */}
+            <div className="pointer-events-none absolute -top-8 left-0 right-0 h-8 bg-gradient-to-t from-[#141414] to-transparent" />
+
+            {/* Panel */}
+            <div
+              className="flex items-end justify-between bg-[#141414] px-6 py-3"
+              style={{ height: "var(--footer-h)" }}
+            >
+              <h3 className="text-[14px] font-medium text-foreground">{title}</h3>
+              <span className="text-[14px] text-muted-foreground">{date}</span>
             </div>
           </div>
-        )}
-
-        {/* Title and date - bottom positioned, only visible on hover */}
-        <div
-          className={`absolute inset-x-0 bottom-0 flex items-end justify-between p-5 transition-opacity duration-300 ${
-            isHovered ? "opacity-100" : "opacity-0"
-          }`}
-        >
-          <h3 className="text-base font-medium text-foreground">{title}</h3>
-          <span className="text-sm text-muted-foreground">{date}</span>
         </div>
-      </div>
-
-      {/* Gradient for text readability on hover */}
-      <div className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
-        <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/60 to-transparent" />
       </div>
     </Link>
   );

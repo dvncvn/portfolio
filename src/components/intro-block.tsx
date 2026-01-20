@@ -9,8 +9,8 @@ export function IntroBlock({ animate = true }: { animate?: boolean }) {
 
   const content = (
     <>
-      <h1 className="text-[18px] font-medium leading-tight text-foreground">
-        Hi, I&apos;m Simon.
+      <h1 className="text-[20px] font-medium leading-tight text-foreground">
+        Hi, I&apos;m Simon
       </h1>
       <p className="text-base leading-relaxed text-muted-foreground max-w-[768px]">
         I&apos;m a Staff Product Designer working on AI and developer platforms

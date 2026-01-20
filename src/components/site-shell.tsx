@@ -84,15 +84,12 @@ export function SiteShell({ children }: SiteShellProps) {
           <div className="flex items-center gap-2">
             <Link
               href="/"
-              className="text-sm font-medium uppercase text-foreground"
+              className="font-mono text-[16px] font-medium uppercase text-foreground"
             >
               SIMON DVNCVN
             </Link>
-            <span className="text-sm" aria-hidden="true">
-              🌱
-            </span>
           </div>
-          <nav className="flex items-center gap-6 text-sm">
+          <nav className="flex items-center gap-6 text-[16px]">
             {navLinks.map((link) => (
               <Link
                 key={link.label}

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRef, useState, useCallback } from "react";
 import { motion } from "framer-motion";
+import { DotPattern } from "@/components/ui/dot-pattern";
 
 type WorkCardProps = {
   slug: string;
@@ -10,6 +11,7 @@ type WorkCardProps = {
   date: string;
   tall?: boolean;
   imageSrc?: string;
+  backgroundVariant?: "dots";
 };
 
 type WorkCardAnimatedProps = WorkCardProps & {
@@ -22,6 +24,7 @@ export function WorkCard({
   date,
   tall = false,
   imageSrc,
+  backgroundVariant,
 }: WorkCardProps) {
   const cardRef = useRef<HTMLAnchorElement>(null);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
@@ -74,6 +77,20 @@ export function WorkCard({
       >
         {/* Inset region (8px all around) */}
         <div className="absolute inset-2 overflow-hidden rounded-[6px] bg-[#0f0f0f]">
+          {backgroundVariant === "dots" ? (
+            <div className="absolute inset-0">
+              <DotPattern
+                glow
+                className={[
+                  // Keep it subtle; this is a background texture.
+                  "text-white/[0.10]",
+                  // Soft vignette so it doesn't fight the content.
+                  "[mask-image:radial-gradient(320px_circle_at_center,white,transparent)]",
+                ].join(" ")}
+              />
+            </div>
+          ) : null}
+
           {imageSrc ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img

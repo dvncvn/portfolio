@@ -15,6 +15,7 @@ const projects = [
     title: "Langflow: Agent Experience",
     date: "2024",
     tall: false,
+    backgroundVariant: "dots" as const,
   },
   {
     slug: "astra-streaming",
@@ -63,6 +64,7 @@ export default function Home() {
                   date={project.date}
                   tall={project.tall}
                   imageSrc={project.imageSrc}
+                  backgroundVariant={project.backgroundVariant}
                 />
               </BlurFade>
             ))}
@@ -76,6 +78,7 @@ export default function Home() {
                   date={project.date}
                   tall={project.tall}
                   imageSrc={project.imageSrc}
+                  backgroundVariant={project.backgroundVariant}
                 />
               </BlurFade>
             ))}

@@ -84,10 +84,59 @@ export function WorkCard({
                 className={[
                   // Keep it subtle; this is a background texture.
                   "text-white/[0.10]",
-                  // Soft vignette so it doesn't fight the content.
-                  "[mask-image:radial-gradient(320px_circle_at_center,white,transparent)]",
+                  "transition-opacity duration-300",
+                  isHovered ? "opacity-100" : "opacity-80",
                 ].join(" ")}
               />
+            </div>
+          ) : null}
+
+          {backgroundVariant === "dots" ? (
+            <button
+              type="button"
+              aria-label="Demo action"
+              className={[
+                "absolute right-3 top-3 z-10",
+                "rounded-full px-3 py-1.5 text-[12px] font-medium",
+                "text-foreground/90",
+                "bg-white/[0.06] hover:bg-white/[0.10]",
+                "border border-white/[0.10]",
+                "backdrop-blur-sm",
+                "transition-colors duration-200",
+              ].join(" ")}
+              onClick={(e) => {
+                // Demo only: prevent navigating when clicking the button.
+                e.preventDefault();
+                e.stopPropagation();
+              }}
+            >
+              Demo
+            </button>
+          ) : null}
+
+          {backgroundVariant === "dots" ? (
+            <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center">
+              <button
+                type="button"
+                aria-label="Center demo action"
+                className={[
+                  "pointer-events-auto",
+                  "rounded-full px-5 py-2 text-[13px] font-medium",
+                  "text-foreground/90",
+                  "bg-white/[0.05] hover:bg-white/[0.09]",
+                  "border border-white/[0.14]",
+                  "backdrop-blur-md",
+                  "shadow-[0_10px_30px_rgba(0,0,0,0.35)]",
+                  "transition-colors duration-200",
+                ].join(" ")}
+                onClick={(e) => {
+                  // Demo only: prevent navigating when clicking the button.
+                  e.preventDefault();
+                  e.stopPropagation();
+                }}
+              >
+                Open
+              </button>
             </div>
           ) : null}
 

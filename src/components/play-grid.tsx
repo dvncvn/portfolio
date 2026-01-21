@@ -9,7 +9,7 @@ type PlayGridProps = {
 
 export function PlayGrid({ items }: PlayGridProps) {
   return (
-    <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+    <div className="grid gap-0 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
       {items.map((item, idx) => (
         <BlurFade key={item.href} delay={0.12 + idx * 0.05} inView>
           <a

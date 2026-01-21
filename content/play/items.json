@@ -22,6 +22,18 @@
     "description": "Material and surface studies.",
     "thumbnail": "/images/langflow-preview.png",
     "href": "https://example.com"
+  },
+  {
+    "title": "Terra",
+    "description": "Generative Three.js visual with audio reactivity and ASCII textures.",
+    "thumbnail": "/images/langflow-preview.png",
+    "href": "https://example.com"
+  },
+  {
+    "title": "Of what was",
+    "description": "Ambient, tape-based album released on Bandcamp under Inverleith.",
+    "thumbnail": "/images/langflow-preview.png",
+    "href": "https://example.com"
   }
 ]
 

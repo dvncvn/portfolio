@@ -35,7 +35,7 @@ export function IntroBlock({ animate = true }: { animate?: boolean }) {
             className="text-muted-foreground transition-colors hover:text-foreground"
             tabIndex={isHovered ? 0 : -1}
           >
-            Learn more about me →
+            More →
           </Link>
         </div>
       </div>

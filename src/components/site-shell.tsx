@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { motion, useMotionValueEvent, useScroll } from "framer-motion";
 import { HyperText } from "@/components/ui/hyper-text";
@@ -52,6 +52,7 @@ function useHideOnScroll() {
 
 export function SiteShell({ children }: SiteShellProps) {
   const pathname = usePathname();
+  const router = useRouter();
   const hidden = useHideOnScroll();
 
   const isActive = (href: string) => {
@@ -85,7 +86,15 @@ export function SiteShell({ children }: SiteShellProps) {
           <div className="flex items-center gap-2">
             <Link
               href="/"
-              className="text-foreground"
+              aria-label="Home"
+              className="inline-flex items-center text-foreground -m-2 p-2"
+              onPointerDown={(e) => {
+                // Navigate immediately even if the wordmark is mid-animation.
+                // Keep href="/" for accessibility, but trigger navigation on pointer down
+                // to avoid any perceived delay from ongoing animation work.
+                e.preventDefault();
+                router.push("/");
+              }}
             >
               <HyperText
                 as="span"
@@ -119,7 +128,7 @@ export function SiteShell({ children }: SiteShellProps) {
 
       <main className="mx-auto w-full max-w-[1400px] px-6">{children}</main>
 
-      <footer className="mt-32">
+      <footer className="mt-20">
         <div className="mx-auto flex w-full max-w-[1400px] flex-col gap-4 px-6 py-8 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
           <span>Made in Madison WI</span>
           <div className="flex flex-wrap gap-6">

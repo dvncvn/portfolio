@@ -22,6 +22,8 @@ interface HyperTextProps extends MotionProps {
   startOnView?: boolean
   /** Whether to trigger animation on hover */
   animateOnHover?: boolean
+  /** If true, only animate once (first trigger) */
+  animateOnce?: boolean
   /** Custom character set for scramble effect. Defaults to uppercase alphabet */
   characterSet?: CharacterSet
 }
@@ -40,6 +42,7 @@ export function HyperText({
   as: Component = "div",
   startOnView = false,
   animateOnHover = true,
+  animateOnce = false,
   characterSet = DEFAULT_CHARACTER_SET,
   ...props
 }: HyperTextProps) {
@@ -51,11 +54,15 @@ export function HyperText({
     children.split("")
   )
   const [isAnimating, setIsAnimating] = useState(false)
+  const hasAnimated = useRef(false)
+  const isHovering = useRef(false)
+  const hasTriggeredThisHover = useRef(false)
   const iterationCount = useRef(0)
   const elementRef = useRef<HTMLElement>(null)
 
-  const handleAnimationTrigger = () => {
-    if (animateOnHover && !isAnimating) {
+  const trigger = () => {
+    if (animateOnce && hasAnimated.current) return
+    if (!isAnimating) {
       iterationCount.current = 0
       setIsAnimating(true)
     }
@@ -119,6 +126,7 @@ export function HyperText({
       if (progress < 1) {
         animationFrameId = requestAnimationFrame(animate)
       } else {
+        hasAnimated.current = true
         setIsAnimating(false)
       }
     }
@@ -131,9 +139,29 @@ export function HyperText({
   return (
     <MotionComponent
       ref={elementRef}
-      className={cn("inline-block overflow-hidden", className)}
-      onMouseEnter={handleAnimationTrigger}
       {...props}
+      // Keep this clickable/selectable within links while animating.
+      // (No pointer-events disabling; no preventDefault/stopPropagation anywhere.)
+      className={cn("inline-block overflow-hidden", className)}
+      onPointerEnter={(e: React.PointerEvent) => {
+        if (!animateOnHover) return
+        // Avoid retriggers caused by layout/scroll-driven header motion:
+        // only animate after a real pointer movement while hovering.
+        isHovering.current = true
+        hasTriggeredThisHover.current = false
+      }}
+      onPointerMove={(e: React.PointerEvent) => {
+        if (!animateOnHover) return
+        if (!isHovering.current) return
+        if (hasTriggeredThisHover.current) return
+        hasTriggeredThisHover.current = true
+        trigger()
+      }}
+      onPointerLeave={(e: React.PointerEvent) => {
+        if (!animateOnHover) return
+        isHovering.current = false
+        hasTriggeredThisHover.current = false
+      }}
     >
       <AnimatePresence>
         {displayText.map((letter, index) => (

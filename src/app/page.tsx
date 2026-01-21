@@ -47,9 +47,9 @@ export default function Home() {
       </section>
 
       {/* Work section */}
-      <section className="mt-32">
+      <section className="work-section mt-32">
         <div className="mb-8 flex items-baseline justify-between">
-          <h2 className="text-[14px] font-medium uppercase tracking-wide text-foreground">
+          <h2 className="text-[14px] font-medium uppercase tracking-wide text-[#7D7D7D]">
             Work
           </h2>
         </div>

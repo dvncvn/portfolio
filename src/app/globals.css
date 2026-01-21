@@ -83,14 +83,17 @@ html {
   overflow-y: scroll;
 }
 
-/* Work grid hover emphasis: dim non-hovered cards */
-.work-grid:hover .work-card {
-  opacity: 0.45;
+/* Home/work grid hover emphasis: dim non-hovered cards (including dead space) */
+.work-card {
   transition: opacity 300ms ease;
 }
 
-.work-grid:hover .work-card:hover,
-.work-grid:hover .work-card:focus-within {
+.work-section:hover .work-card {
+  opacity: 0.45;
+}
+
+.work-section:hover .work-card:hover,
+.work-section:hover .work-card:focus-within {
   opacity: 1;
 }
 

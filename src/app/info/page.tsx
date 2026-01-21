@@ -1,7 +1,7 @@
 "use client";
 
-import { motion } from "framer-motion";
 import { EmploymentTable, type EmploymentRow } from "@/components/employment-table";
+import { BlurFade } from "@/components/ui/blur-fade";
 
 const workHistory: EmploymentRow[] = [
   {
@@ -37,37 +37,34 @@ const workHistory: EmploymentRow[] = [
 export default function InfoPage() {
   return (
     <div className="py-20">
-      <div className="grid gap-16 lg:grid-cols-2 lg:gap-24">
-        <motion.div
-          initial={{ opacity: 1, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{
-            duration: 0.35,
-            ease: [0.25, 0.1, 0.25, 1],
-          }}
-          className="space-y-4"
-        >
-          <h1 className="text-[18px] font-medium leading-tight text-foreground">
-            Info
-          </h1>
-          <p className="text-[14px] leading-relaxed text-muted-foreground lg:max-w-md">
-            A few details, links, and a quick work history. This page will get
-            fleshed out as content comes together.
-          </p>
-        </motion.div>
+      {/* 2-column layout with max 80px gap at large sizes */}
+      <section className="grid gap-10 lg:grid-cols-2 lg:gap-20">
+        {/* Left column: intro (unanimated) + table immediately below */}
+        <div className="space-y-8">
+          <div className="space-y-4">
+            <h1 className="text-[20px] font-medium leading-tight text-foreground">
+              Hi, I&apos;m Simon
+            </h1>
+            <p className="text-base leading-relaxed text-muted-foreground lg:max-w-[768px]">
+              I&apos;m a Staff Product Designer working on AI and developer platforms
+              at IBM. I turn complex systems into products that are clear, usable, and
+              durable. I&apos;m experienced across OSS, startups, and enterprise.
+            </p>
+          </div>
 
-        <motion.div
-          initial={{ opacity: 1, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{
-            duration: 0.35,
-            delay: 0.06,
-            ease: [0.25, 0.1, 0.25, 1],
-          }}
-        >
-          <EmploymentTable rows={workHistory} />
-        </motion.div>
-      </div>
+          {/* Table should be the first thing below the intro paragraph */}
+          <BlurFade delay={0}>
+            <EmploymentTable rows={workHistory} />
+          </BlurFade>
+        </div>
+
+        {/* Right column: photo (placeholder for now) */}
+        <BlurFade delay={0.06} className="w-full">
+          <div className="w-full overflow-hidden rounded-[8px] bg-[#121212]">
+            <div className="aspect-[4/5] w-full bg-gradient-to-b from-white/[0.06] to-transparent" />
+          </div>
+        </BlurFade>
+      </section>
     </div>
   );
 }

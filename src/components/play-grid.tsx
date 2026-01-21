@@ -9,14 +9,14 @@ type PlayGridProps = {
 
 export function PlayGrid({ items }: PlayGridProps) {
   return (
-    <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+    <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
       {items.map((item, idx) => (
         <BlurFade key={item.href} delay={0.12 + idx * 0.05} inView>
           <a
             href={item.href}
             target="_blank"
             rel="noopener noreferrer"
-            className="group block rounded-[8px] bg-[#121212] p-4 transition-colors hover:bg-white/[0.02]"
+            className="group block rounded-[8px] bg-transparent p-4 transition-colors hover:bg-[#121212]"
           >
             <div className="space-y-3">
               <div className="overflow-hidden rounded-[6px] border border-white/10 bg-black/20">

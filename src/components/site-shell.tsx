@@ -5,6 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { motion, useMotionValueEvent, useScroll } from "framer-motion";
 import { HyperText } from "@/components/ui/hyper-text";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 type SiteShellProps = {
   children: React.ReactNode;
@@ -82,7 +83,7 @@ export function SiteShell({ children }: SiteShellProps) {
         }}
       >
         {/* Content */}
-        <div className="mx-auto flex h-[72px] w-full max-w-[1400px] items-center justify-between px-6">
+        <div className="mx-auto grid h-[72px] w-full max-w-[1400px] grid-cols-3 items-center px-6">
           <div className="flex items-center gap-2">
             <Link
               href="/"
@@ -105,7 +106,10 @@ export function SiteShell({ children }: SiteShellProps) {
               </HyperText>
             </Link>
           </div>
-          <nav className="flex items-center gap-6 text-[16px]">
+          <div className="flex items-center justify-center">
+            <ThemeToggle />
+          </div>
+          <nav className="flex items-center justify-end gap-6 text-[16px]">
             {navLinks.map((link) => (
               <Link
                 key={link.label}

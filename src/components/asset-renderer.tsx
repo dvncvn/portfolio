@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { WorkProjectAsset, WorkProjectSection } from "@/content/types";
 import { CompareView } from "@/components/compare-view";
+import { BlurFade } from "@/components/ui/blur-fade";
 
 type AssetRendererProps = {
   section: WorkProjectSection;
@@ -168,7 +169,11 @@ export function AssetRenderer({ section }: AssetRendererProps) {
   if (assets.length === 0) return null;
 
   if (section.layout === "carousel") {
-    return <CarouselView assets={assets} />;
+    return (
+      <BlurFade delay={0.15} inView inViewMargin="-100px">
+        <CarouselView assets={assets} />
+      </BlurFade>
+    );
   }
 
   if (section.layout === "split") {

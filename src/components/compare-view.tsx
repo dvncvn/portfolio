@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useRef, useState, useCallback, useLayoutEffect, useEffect } from "react";
+import { BlurFade } from "@/components/ui/blur-fade";
 
 type CompareViewProps = {
   beforeSrc: string;
@@ -114,13 +115,14 @@ export function CompareView({
         <h3 className="text-[20px] font-medium text-foreground">Before / After</h3>
       </div>
       {/* Desktop/large: interactive slider */}
-      <div className="relative hidden overflow-hidden rounded-[8px] sm:block">
-        <div
-          ref={containerRef}
-          className="relative w-full"
-          style={{ aspectRatio: `${width}/${height}` }}
-          onPointerDown={handlePointerDown}
-        >
+      <BlurFade delay={0.1} inView inViewMargin="-100px" className="hidden sm:block">
+        <div className="relative overflow-hidden rounded-[8px]">
+          <div
+            ref={containerRef}
+            className="relative w-full"
+            style={{ aspectRatio: `${width}/${height}` }}
+            onPointerDown={handlePointerDown}
+          >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={beforeSrc}
@@ -189,11 +191,13 @@ export function CompareView({
                 </svg>
               </span>
             </button>
+            </div>
           </div>
         </div>
-      </div>
+      </BlurFade>
       {/* Mobile/small: static before/after frames */}
-      <div className="space-y-4 sm:hidden">
+      <BlurFade delay={0.1} inView inViewMargin="-100px" className="sm:hidden">
+        <div className="space-y-4">
         {[{ src: afterSrc, alt: afterAlt }, { src: beforeSrc, alt: beforeAlt }].map(
           (image) => (
             <button
@@ -216,7 +220,8 @@ export function CompareView({
             </button>
           )
         )}
-      </div>
+        </div>
+      </BlurFade>
       {description ? (
         <div className="text-center">
           <p className="text-[14px] leading-relaxed text-muted-foreground">{description}</p>

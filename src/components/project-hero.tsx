@@ -2,26 +2,22 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { Chip } from "@/components/chip";
 import { WorkProjectAsset } from "@/content/types";
+import type { WorkProjectMeta } from "@/content/types";
 
 type ProjectHeroProps = {
   title: string;
-  role?: string;
-  product?: string;
-  timeframe?: string;
   heroAsset?: WorkProjectAsset;
   summary: string;
+  meta?: WorkProjectMeta;
   responsibilities?: string[];
 };
 
 export function ProjectHero({
   title,
-  role = "Staff Product Designer",
-  product,
-  timeframe,
   heroAsset,
   summary,
+  meta,
   responsibilities,
 }: ProjectHeroProps) {
   const heroAspectRatio =
@@ -36,59 +32,89 @@ export function ProjectHero({
         duration: 0.35,
         ease: [0.25, 0.1, 0.25, 1],
       }}
-      className="space-y-6"
+      className="space-y-10"
     >
-      <Link
-        href="/"
-        className="inline-flex text-[14px] text-muted-foreground transition-colors hover:text-foreground"
-      >
-        ← Back to Work
-      </Link>
+      {/* Breadcrumb */}
+      <nav aria-label="Breadcrumb" className="flex justify-center">
+        <div className="flex items-center gap-2 text-[14px] text-muted-foreground">
+          <Link href="/" className="transition-colors hover:text-foreground">
+            Work
+          </Link>
+          <span className="text-muted-foreground/60">/</span>
+        </div>
+      </nav>
 
-      <div className="space-y-3">
-        <h1 className="text-[36px] font-medium leading-tight text-foreground md:text-[48px]">
+      {/* Title */}
+      <div className="mx-auto max-w-[768px]">
+        <h1 className="text-center text-[36px] font-medium leading-tight text-foreground md:text-[48px]">
           {title}
         </h1>
-
-        <div className="flex flex-wrap gap-2">
-          {role ? <Chip>{role}</Chip> : null}
-          {product ? <Chip>{product}</Chip> : null}
-          {timeframe ? <Chip>{timeframe}</Chip> : null}
-        </div>
       </div>
 
       {heroAsset ? (
         <div
-          className="mx-auto w-full max-w-[460px] overflow-hidden rounded-[24px] border border-white/10 bg-[#0f0f0f]"
+          className="mx-auto w-full max-w-[920px]"
           style={{ aspectRatio: heroAspectRatio }}
         >
-          <div className="relative h-full w-full">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={heroAsset.src}
-              alt={heroAsset.alt ?? ""}
-              className="h-full w-full object-contain p-14 opacity-[0.92]"
-              draggable={false}
-            />
-          </div>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={heroAsset.src}
+            alt={heroAsset.alt ?? ""}
+            className="h-full w-full object-contain"
+            draggable={false}
+          />
         </div>
       ) : null}
 
-      <div className="space-y-6">
-        <p className="text-[14px] leading-relaxed text-muted-foreground">
-          {summary}
-        </p>
+      {/* Summary + metadata */}
+      <div className="mx-auto w-full max-w-[768px]">
+        <div className="grid gap-8 md:grid-cols-[minmax(0,1fr)_270px] md:items-start">
+          <div className="space-y-6">
+            <h2 className="text-[20px] font-medium text-foreground">Summary</h2>
+            <div className="space-y-10 text-[16px] leading-relaxed text-muted-foreground">
+              {summary
+                .split(/\n\s*\n/g)
+                .map((p) => p.trim())
+                .filter(Boolean)
+                .map((p, idx) => (
+                  <p key={idx}>{p}</p>
+                ))}
+            </div>
+          </div>
 
-        {responsibilities && responsibilities.length > 0 ? (
-          <ul className="space-y-2 text-[14px] text-muted-foreground">
-            {responsibilities.slice(0, 4).map((r) => (
-              <li key={r} className="flex gap-3 text-left">
-                <span className="mt-[7px] h-[3px] w-[3px] rounded-full bg-muted-foreground/60" />
-                <span>{r}</span>
-              </li>
-            ))}
-          </ul>
-        ) : null}
+          {meta ? (
+            <dl className="grid gap-y-6 text-[16px]">
+              {meta.company ? (
+                <div className="grid grid-cols-[1fr_1fr] gap-6">
+                  <dt className="text-muted-foreground/60">Company</dt>
+                  <dd className="text-foreground">{meta.company}</dd>
+                </div>
+              ) : null}
+              {meta.dates ? (
+                <div className="grid grid-cols-[1fr_1fr] gap-6">
+                  <dt className="text-muted-foreground/60">Dates</dt>
+                  <dd className="text-foreground">{meta.dates}</dd>
+                </div>
+              ) : null}
+              {meta.role ? (
+                <div className="grid grid-cols-[1fr_1fr] gap-6">
+                  <dt className="text-muted-foreground/60">Role</dt>
+                  <dd className="text-foreground">{meta.role}</dd>
+                </div>
+              ) : null}
+              {meta.team && meta.team.length > 0 ? (
+                <div className="grid grid-cols-[1fr_1fr] gap-6">
+                  <dt className="text-muted-foreground/60">Team</dt>
+                  <dd className="space-y-1 text-foreground">
+                    {meta.team.map((t) => (
+                      <div key={t}>{t}</div>
+                    ))}
+                  </dd>
+                </div>
+              ) : null}
+            </dl>
+          ) : null}
+        </div>
       </div>
     </motion.header>
   );

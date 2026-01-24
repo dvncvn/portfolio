@@ -41,6 +41,7 @@ export function AssetRenderer({ section }: AssetRendererProps) {
         afterAlt={after.alt ?? "After"}
         width={before.width}
         height={before.height}
+        description={section.caption}
       />
     );
   }

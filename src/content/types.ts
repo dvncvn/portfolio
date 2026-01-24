@@ -19,6 +19,13 @@ export type WorkProjectSection = {
   layout: SectionLayout;
 };
 
+export type WorkProjectMeta = {
+  company?: string;
+  dates?: string;
+  role?: string;
+  team?: string[];
+};
+
 export type WorkProject = {
   slug: string;
   title: string;
@@ -26,6 +33,7 @@ export type WorkProject = {
   timeframe?: string;
   heroAsset: WorkProjectAsset;
   summary: string;
+  meta?: WorkProjectMeta;
   responsibilities?: string[];
   sections: WorkProjectSection[];
 };

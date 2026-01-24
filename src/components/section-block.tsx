@@ -21,14 +21,16 @@ export function SectionBlock({ section, index = 0 }: SectionBlockProps) {
       }}
       className="space-y-4"
     >
-      <div className="mx-auto max-w-[768px] space-y-2">
-        <h2 className="text-[14px] font-medium text-foreground">{section.heading}</h2>
-        {section.caption ? (
-          <p className="text-[14px] leading-relaxed text-muted-foreground">
-            {section.caption}
-          </p>
-        ) : null}
-      </div>
+      {section.layout !== "compare" ? (
+        <div className="mx-auto max-w-[768px] space-y-2">
+          <h2 className="text-[20px] font-medium text-foreground">{section.heading}</h2>
+          {section.caption ? (
+            <p className="text-[16px] leading-relaxed text-muted-foreground">
+              {section.caption}
+            </p>
+          ) : null}
+        </div>
+      ) : null}
       <div className="mx-auto w-full max-w-[1200px]">
         <AssetRenderer section={section} />
       </div>

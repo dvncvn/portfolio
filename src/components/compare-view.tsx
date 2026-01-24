@@ -194,7 +194,7 @@ export function CompareView({
       </div>
       {/* Mobile/small: static before/after frames */}
       <div className="space-y-4 sm:hidden">
-        {[{ src: beforeSrc, alt: beforeAlt }, { src: afterSrc, alt: afterAlt }].map(
+        {[{ src: afterSrc, alt: afterAlt }, { src: beforeSrc, alt: beforeAlt }].map(
           (image) => (
             <button
               key={image.src}

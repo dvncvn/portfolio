@@ -45,23 +45,30 @@
       ]
     },
     {
-      "heading": "System building blocks",
-      "caption": "Core components standardized for consistency and speed.",
-      "layout": "split",
+      "heading": "System level change",
+      "caption": "This work went far beyond visual polish. The redesign addressed foundational UX problems using appropriate, modern patterns.\n\n- Established clear hierarchy and sign-posting across the product.\n- Drastically improved usability by reducing noise and cognitive load.\n- Moved beyond raw concepts like “tokens” and “variables” toward intent-driven configuration.\n- Reframed the experience so Langflow felt like a serious, modern platform—not a clever side project held together by abstractions.",
+      "layout": "stacked",
       "assets": [
         {
           "type": "image",
-          "src": "/images/langflow-preview.png",
-          "alt": "Component patterns",
-          "width": 1536,
-          "height": 1024
+          "src": "/assets/work/langflow-platform-redesign/ui-components.png",
+          "alt": "System-wide component upgrades",
+          "width": 3028,
+          "height": 1968
         },
         {
           "type": "image",
-          "src": "/images/langflow-preview.png",
-          "alt": "Component patterns",
-          "width": 1536,
-          "height": 1024
+          "src": "/assets/work/langflow-platform-redesign/after_ playground.png",
+          "alt": "Updated playground experience",
+          "width": 3028,
+          "height": 1968
+        },
+        {
+          "type": "image",
+          "src": "/assets/work/langflow-platform-redesign/after_ projects.png",
+          "alt": "Updated project management flows",
+          "width": 3028,
+          "height": 1968
         }
       ]
     }

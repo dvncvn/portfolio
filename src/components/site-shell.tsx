@@ -5,7 +5,6 @@ import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { motion, useMotionValueEvent, useScroll } from "framer-motion";
 import { HyperText } from "@/components/ui/hyper-text";
-import { ThemeToggle } from "@/components/theme-toggle";
 
 type SiteShellProps = {
   children: React.ReactNode;
@@ -92,7 +91,7 @@ export function SiteShell({ children }: SiteShellProps) {
       >
         {/* Content */}
         <div className="w-full px-6">
-          <div className="mx-auto grid h-[72px] w-full max-w-[1400px] grid-cols-3 items-center">
+          <div className="mx-auto grid h-[72px] w-full max-w-[1400px] grid-cols-2 items-center">
             <div className="flex items-center gap-2">
               <Link
                 href="/"
@@ -114,9 +113,6 @@ export function SiteShell({ children }: SiteShellProps) {
                   SIMON DVNCVN
                 </HyperText>
               </Link>
-            </div>
-            <div className="flex items-center justify-center">
-              <ThemeToggle />
             </div>
             <nav className="flex items-center justify-end gap-6 text-[16px]">
               {navLinks.map((link) => (
@@ -147,7 +143,7 @@ export function SiteShell({ children }: SiteShellProps) {
       <footer className="mt-20">
         <div className="w-full px-6">
           <div className="mx-auto flex w-full max-w-[1400px] flex-col gap-4 py-8 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
-            <span>Made in Madison WI</span>
+            <span className="font-mono text-[#464646]">Made in Madison WI</span>
             <div className="flex flex-wrap gap-6">
               {footerLinks.map((link) => (
                 <Link

@@ -10,6 +10,19 @@ type SectionBlockProps = {
 };
 
 export function SectionBlock({ section, index = 0 }: SectionBlockProps) {
+  const caption = section.caption?.trim();
+  const captionLines = caption ? caption.split("\n").map((line) => line.trim()).filter(Boolean) : [];
+  const firstBulletIndex = captionLines.findIndex((line) => line.startsWith("- "));
+  const captionIntro =
+    firstBulletIndex === -1 ? captionLines.join(" ") : captionLines.slice(0, firstBulletIndex).join(" ");
+  const captionBullets =
+    firstBulletIndex === -1
+      ? []
+      : captionLines
+          .slice(firstBulletIndex)
+          .filter((line) => line.startsWith("- "))
+          .map((line) => line.replace(/^- /, ""));
+
   return (
     <motion.section
       initial={{ opacity: 1, y: 12 }}
@@ -22,12 +35,17 @@ export function SectionBlock({ section, index = 0 }: SectionBlockProps) {
       className="space-y-4"
     >
       {section.layout !== "compare" ? (
-        <div className="mx-auto max-w-[768px] space-y-2">
+        <div className="mx-auto max-w-[768px] space-y-4">
           <h2 className="text-[20px] font-medium text-foreground">{section.heading}</h2>
-          {section.caption ? (
-            <p className="text-[16px] leading-relaxed text-muted-foreground">
-              {section.caption}
-            </p>
+          {captionIntro ? (
+            <p className="text-[16px] leading-relaxed text-muted-foreground">{captionIntro}</p>
+          ) : null}
+          {captionBullets.length > 0 ? (
+            <ul className="list-disc space-y-2 pl-5 text-[16px] leading-relaxed text-muted-foreground">
+              {captionBullets.map((item) => (
+                <li key={item}>{item}</li>
+              ))}
+            </ul>
           ) : null}
         </div>
       ) : null}

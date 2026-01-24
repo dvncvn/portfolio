@@ -100,8 +100,8 @@ export function WorkCard({
       <div
         className={`relative p-2 ${
           tall
-            ? "h-[260px] md:h-auto md:aspect-[1/1]"
-            : "h-[260px] sm:h-[260px] md:h-auto md:aspect-[684/401]"
+            ? "aspect-[4/3] md:aspect-[1/1]"
+            : "aspect-[4/3] md:aspect-[684/401]"
         }`}
       >
         <div className="flex h-full flex-col">
@@ -111,7 +111,7 @@ export function WorkCard({
               <InlineSvg
                 src={imageSrc}
                 className={[
-                  "h-full w-full p-12 opacity-[0.92]",
+                  "h-full w-full p-8 opacity-[0.92] sm:p-10 md:p-12",
                   // Ensure the inlined <svg> fills the box and stays centered.
                   "[&>svg]:block [&>svg]:h-full [&>svg]:w-full",
                 ].join(" ")}
@@ -179,7 +179,7 @@ export function WorkCard({
                   className={[
                     "absolute inset-0 h-full w-full object-contain",
                     "transition-opacity duration-300 ease-out",
-                    imageSrc.endsWith(".svg") ? "p-12 opacity-[0.92]" : "p-8",
+                    imageSrc.endsWith(".svg") ? "p-8 opacity-[0.92] sm:p-10 md:p-12" : "p-6 sm:p-8",
                   ].join(" ")}
                   loading="lazy"
                   draggable={false}

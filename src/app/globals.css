@@ -106,12 +106,14 @@ html {
     --workcard-accent var(--accent-ms, 500ms) ease-out;
 }
 
-.work-section:hover .work-card {
+.work-section:hover .work-card,
+.work-section:focus-within .work-card {
   opacity: 0.45;
 }
 
 .work-section:hover .work-card:hover,
-.work-section:hover .work-card:focus-within {
+.work-section:hover .work-card:focus-within,
+.work-section:focus-within .work-card:focus-within {
   opacity: 1;
 }
 

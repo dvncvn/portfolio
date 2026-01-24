@@ -74,7 +74,7 @@ export function CompareView({
       <div className="text-center">
         <h3 className="text-[20px] font-medium text-foreground">Before / After</h3>
       </div>
-      <div className="relative overflow-hidden rounded-[8px] border border-white/10 bg-[#121212]">
+      <div className="relative overflow-hidden rounded-[8px]">
         <div
           ref={containerRef}
           className="relative w-full cursor-ew-resize"
@@ -127,14 +127,12 @@ export function CompareView({
             </button>
           </div>
         </div>
-        <div className="space-y-3 px-4 py-4">
-          {description ? (
-            <p className="text-[14px] leading-relaxed text-muted-foreground">
-              {description}
-            </p>
-          ) : null}
-        </div>
       </div>
+      {description ? (
+        <div className="text-center">
+          <p className="text-[14px] leading-relaxed text-muted-foreground">{description}</p>
+        </div>
+      ) : null}
     </div>
   );
 }

@@ -30,17 +30,17 @@
       "assets": [
         {
           "type": "image",
-          "src": "/assets/work/langflow-platform-redesign/after_flow.png",
-          "alt": "After",
-          "width": 3032,
-          "height": 2010
-        },
-        {
-          "type": "image",
-          "src": "/assets/work/langflow-platform-redesign/before_flow.png",
+          "src": "/assets/work/langflow-platform-redesign/1-left-before_flow.png",
           "alt": "Before",
           "width": 3028,
           "height": 1968
+        },
+        {
+          "type": "image",
+          "src": "/assets/work/langflow-platform-redesign/2-right-after_flow.png",
+          "alt": "After",
+          "width": 3032,
+          "height": 2010
         }
       ]
     },

@@ -31,16 +31,16 @@ function ImageAsset({
 
 export function AssetRenderer({ section }: AssetRendererProps) {
   if (section.layout === "compare") {
-    const [before, after] = section.assets;
-    if (!before || !after) return null;
+    const [left, right] = section.assets;
+    if (!left || !right) return null;
     return (
       <CompareView
-        beforeSrc={before.src}
-        afterSrc={after.src}
-        beforeAlt={before.alt ?? "Before"}
-        afterAlt={after.alt ?? "After"}
-        width={before.width}
-        height={before.height}
+        beforeSrc={right.src}
+        afterSrc={left.src}
+        beforeAlt={right.alt ?? "Before"}
+        afterAlt={left.alt ?? "After"}
+        width={left.width}
+        height={left.height}
         description={section.caption}
       />
     );

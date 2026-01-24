@@ -91,78 +91,78 @@ export function SiteShell({ children }: SiteShellProps) {
         }}
       >
         {/* Content */}
-        <div className="mx-auto grid h-[72px] w-full max-w-[1400px] grid-cols-3 items-center px-6">
-          <div className="flex items-center gap-2">
-            <Link
-              href="/"
-              aria-label="Home"
-              className="inline-flex items-center text-foreground -m-2 p-2"
-              onPointerDown={(e) => {
-                // Navigate immediately even if the wordmark is mid-animation.
-                // Keep href="/" for accessibility, but trigger navigation on pointer down
-                // to avoid any perceived delay from ongoing animation work.
-                e.preventDefault();
-                router.push("/");
-              }}
-            >
-              <HyperText
-                as="span"
-                className="font-mono text-[16px] font-medium uppercase leading-none"
-                animateOnHover
-              >
-                SIMON DVNCVN
-              </HyperText>
-            </Link>
-          </div>
-          <div className="flex items-center justify-center">
-            <ThemeToggle />
-          </div>
-          <nav className="flex items-center justify-end gap-6 text-[16px]">
-            {navLinks.map((link) => (
+        <div className="w-full px-6">
+          <div className="mx-auto grid h-[72px] w-full max-w-[1400px] grid-cols-3 items-center">
+            <div className="flex items-center gap-2">
               <Link
-                key={link.label}
-                href={link.href}
-                className={
-                  isActive(link.href)
-                    ? "text-accent"
-                    : "text-muted-foreground transition-colors hover:text-foreground"
-                }
+                href="/"
+                aria-label="Home"
+                className="inline-flex items-center text-foreground -m-2 p-2"
+                onPointerDown={(e) => {
+                  // Navigate immediately even if the wordmark is mid-animation.
+                  // Keep href="/" for accessibility, but trigger navigation on pointer down
+                  // to avoid any perceived delay from ongoing animation work.
+                  e.preventDefault();
+                  router.push("/");
+                }}
               >
-                {link.label}
+                <HyperText
+                  as="span"
+                  className="font-mono text-[16px] font-medium uppercase leading-none"
+                  animateOnHover
+                >
+                  SIMON DVNCVN
+                </HyperText>
               </Link>
-            ))}
-          </nav>
+            </div>
+            <div className="flex items-center justify-center">
+              <ThemeToggle />
+            </div>
+            <nav className="flex items-center justify-end gap-6 text-[16px]">
+              {navLinks.map((link) => (
+                <Link
+                  key={link.label}
+                  href={link.href}
+                  className={
+                    isActive(link.href)
+                      ? "text-accent"
+                      : "text-muted-foreground transition-colors hover:text-foreground"
+                  }
+                >
+                  {link.label}
+                </Link>
+              ))}
+            </nav>
+          </div>
         </div>
       </motion.header>
 
       {/* Spacer for fixed header */}
       <div className="h-[72px]" />
 
-      <main
-        id="main-content"
-        tabIndex={-1}
-        className="mx-auto w-full max-w-[1400px] px-6"
-      >
-        {children}
+      <main id="main-content" tabIndex={-1} className="w-full px-6">
+        <div className="mx-auto w-full max-w-[1400px]">{children}</div>
       </main>
 
       <footer className="mt-20">
-        <div className="mx-auto flex w-full max-w-[1400px] flex-col gap-4 px-6 py-8 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
-          <span>Made in Madison WI</span>
-          <div className="flex flex-wrap gap-6">
-            {footerLinks.map((link) => (
-              <Link
-                key={link.label}
-                href={link.href}
-                target={link.href.startsWith("http") ? "_blank" : undefined}
-                rel={
-                  link.href.startsWith("http") ? "noopener noreferrer" : undefined
-                }
-                className="transition-colors hover:text-foreground"
-              >
-                {link.label}
-              </Link>
-            ))}
+        <div className="w-full px-6">
+          <div className="mx-auto flex w-full max-w-[1400px] flex-col gap-4 py-8 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
+            <span>Made in Madison WI</span>
+            <div className="flex flex-wrap gap-6">
+              {footerLinks.map((link) => (
+                <Link
+                  key={link.label}
+                  href={link.href}
+                  target={link.href.startsWith("http") ? "_blank" : undefined}
+                  rel={
+                    link.href.startsWith("http") ? "noopener noreferrer" : undefined
+                  }
+                  className="transition-colors hover:text-foreground"
+                >
+                  {link.label}
+                </Link>
+              ))}
+            </div>
           </div>
         </div>
       </footer>

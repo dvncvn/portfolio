@@ -2,13 +2,35 @@ import { IntroBlock } from "@/components/intro-block";
 import { WorkCard } from "@/components/work-card";
 import { BlurFade } from "@/components/ui/blur-fade";
 
-const projects = [
+type HomeProjectCard = {
+  slug: string;
+  title: string;
+  date: string;
+  tall: boolean;
+  imageSrc: string;
+  svgAccent?: {
+    matchStrokeHex?: string;
+    matchFillHex?: string;
+    baseColorHex?: string;
+    hoverColorHex: string;
+    transitionMs?: number;
+  };
+};
+
+const projects: HomeProjectCard[] = [
   {
     slug: "langflow-platform-redesign",
     title: "Langflow: Platform Redesign",
     date: "Nov 2024",
     tall: true,
     imageSrc: "/assets/work/langflow-platform-redesign/lf-art.svg",
+    // Tight scope: only this card has inline SVG accent behavior for now.
+    svgAccent: {
+      matchStrokeHex: "#01F8A5",
+      baseColorHex: "#E9E9E2",
+      hoverColorHex: "#01F8A5",
+      transitionMs: 360,
+    },
   },
   {
     slug: "astra-db",
@@ -56,7 +78,7 @@ export default function Home() {
           </h2>
         </div>
 
-        <div className="work-grid flex flex-col gap-6 md:flex-row">
+        <div className="work-grid flex flex-col gap-6 md:flex-row md:gap-8">
           <div className="flex flex-col gap-6 md:flex-1">
             {/* Left column */}
             {[projects[0], projects[1]].map((project) => (
@@ -71,6 +93,7 @@ export default function Home() {
                   date={project.date}
                   tall={project.tall}
                   imageSrc={project.imageSrc}
+                  svgAccent={project.svgAccent}
                 />
               </BlurFade>
             ))}
@@ -89,6 +112,7 @@ export default function Home() {
                   date={project.date}
                   tall={project.tall}
                   imageSrc={project.imageSrc}
+                  svgAccent={project.svgAccent}
                 />
               </BlurFade>
             ))}

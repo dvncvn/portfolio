@@ -5,10 +5,9 @@
   "timeframe": "Nov 2024",
   "heroAsset": {
     "type": "image",
-    "src": "/images/langflow-preview.png",
-    "alt": "Langflow platform redesign preview",
-    "width": 1536,
-    "height": 1024
+    "src": "/assets/work/langflow-platform-redesign/lf-art.svg",
+    "alt": "Langflow platform redesign diagram",
+    "aspectRatio": "1/1"
   },
   "summary": "A platform-wide redesign to improve clarity, hierarchy, and usability across Langflow’s core surfaces while preserving the product’s speed and flexibility.",
   "responsibilities": [
@@ -25,17 +24,17 @@
       "assets": [
         {
           "type": "image",
-          "src": "/images/langflow-preview.png",
+          "src": "/assets/work/langflow-platform-redesign/before_flow.png",
           "alt": "Before",
-          "width": 1536,
-          "height": 1024
+          "width": 3028,
+          "height": 1968
         },
         {
           "type": "image",
-          "src": "/images/langflow-preview.png",
+          "src": "/assets/work/langflow-platform-redesign/after_flow.png",
           "alt": "After",
-          "width": 1536,
-          "height": 1024
+          "width": 3032,
+          "height": 2010
         }
       ]
     },

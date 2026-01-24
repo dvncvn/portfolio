@@ -8,35 +8,37 @@ const projects = [
     title: "Langflow: Platform Redesign",
     date: "Nov 2024",
     tall: true,
-    imageSrc: "/images/langflow-preview.png",
+    imageSrc: "/assets/work/langflow-platform-redesign/lf-art.svg",
+  },
+  {
+    slug: "astra-db",
+    title: "Astra DB: Designing an AI-Native Database",
+    date: "Aug 2023 – Jan 2024",
+    tall: false,
+    imageSrc: "/assets/work/astra-db/astra-art.svg",
+  },
+  {
+    slug: "context-forge",
+    title: "Context Forge: Reimagined",
+    date: "Dec 2025",
+    tall: false,
+    imageSrc: "/assets/work/context-forge/cf-art.svg",
   },
   {
     slug: "langflow-agent-experience",
     title: "Langflow: Agent Experience",
-    date: "2024",
-    tall: false,
-    backgroundVariant: "dots" as const,
-  },
-  {
-    slug: "astra-streaming",
-    title: "Astra Streaming",
-    date: "2023",
-    tall: false,
-  },
-  {
-    slug: "astra-db",
-    title: "Astra DB",
-    date: "2022",
+    date: "Nov 2024 – Sep 2025",
     tall: true,
+    imageSrc: "/assets/work/langflow-agent-experience/agent-art.svg",
   },
 ];
 
 export default function Home() {
   const delayBySlug: Record<string, number> = {
     "langflow-platform-redesign": 0.12,
-    "langflow-agent-experience": 0.18,
-    "astra-streaming": 0.24,
-    "astra-db": 0.3,
+    "astra-db": 0.18,
+    "context-forge": 0.24,
+    "langflow-agent-experience": 0.3,
   };
 
   return (
@@ -56,7 +58,8 @@ export default function Home() {
 
         <div className="work-grid flex flex-col gap-6 md:flex-row">
           <div className="flex flex-col gap-6 md:flex-1">
-            {[projects[0], projects[2]].map((project) => (
+            {/* Left column */}
+            {[projects[0], projects[1]].map((project) => (
               <BlurFade
                 key={project.slug}
                 delay={delayBySlug[project.slug] ?? 0}
@@ -68,13 +71,13 @@ export default function Home() {
                   date={project.date}
                   tall={project.tall}
                   imageSrc={project.imageSrc}
-                  backgroundVariant={project.backgroundVariant}
                 />
               </BlurFade>
             ))}
           </div>
           <div className="flex flex-col gap-6 md:flex-1">
-            {[projects[1], projects[3]].map((project) => (
+            {/* Right column */}
+            {[projects[2], projects[3]].map((project) => (
               <BlurFade
                 key={project.slug}
                 delay={delayBySlug[project.slug] ?? 0}
@@ -86,7 +89,6 @@ export default function Home() {
                   date={project.date}
                   tall={project.tall}
                   imageSrc={project.imageSrc}
-                  backgroundVariant={project.backgroundVariant}
                 />
               </BlurFade>
             ))}

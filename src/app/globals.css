@@ -85,6 +85,12 @@ html {
   overflow-y: scroll;
 }
 
+/* Keyboard focus treatment */
+:where(a, button, input, select, textarea, [role="button"], [tabindex]:not([tabindex="-1"])):focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 3px;
+}
+
 /* Home/work grid hover emphasis: dim non-hovered cards (including dead space) */
 .work-card {
   transition: opacity 300ms ease;

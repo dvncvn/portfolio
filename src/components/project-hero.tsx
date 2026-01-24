@@ -3,12 +3,14 @@
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { Chip } from "@/components/chip";
+import { WorkProjectAsset } from "@/content/types";
 
 type ProjectHeroProps = {
   title: string;
   role?: string;
   product?: string;
   timeframe?: string;
+  heroAsset?: WorkProjectAsset;
   summary: string;
   responsibilities?: string[];
 };
@@ -18,9 +20,14 @@ export function ProjectHero({
   role = "Staff Product Designer",
   product,
   timeframe,
+  heroAsset,
   summary,
   responsibilities,
 }: ProjectHeroProps) {
+  const heroAspectRatio =
+    heroAsset?.aspectRatio ??
+    (heroAsset?.width && heroAsset?.height ? `${heroAsset.width}/${heroAsset.height}` : "1/1");
+
   return (
     <motion.header
       initial={{ opacity: 1, y: 10 }}
@@ -49,6 +56,23 @@ export function ProjectHero({
           {timeframe ? <Chip>{timeframe}</Chip> : null}
         </div>
       </div>
+
+      {heroAsset ? (
+        <div
+          className="mx-auto w-full max-w-[460px] overflow-hidden rounded-[24px] border border-white/10 bg-[#0f0f0f]"
+          style={{ aspectRatio: heroAspectRatio }}
+        >
+          <div className="relative h-full w-full">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={heroAsset.src}
+              alt={heroAsset.alt ?? ""}
+              className="h-full w-full object-contain p-14 opacity-[0.92]"
+              draggable={false}
+            />
+          </div>
+        </div>
+      ) : null}
 
       <div className="space-y-6">
         <p className="text-[14px] leading-relaxed text-muted-foreground">

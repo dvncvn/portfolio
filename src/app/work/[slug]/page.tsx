@@ -25,6 +25,7 @@ export default async function WorkProjectPage({
             title={project.title}
             product={project.title.split(":")[0]}
             timeframe={project.timeframe}
+            heroAsset={project.heroAsset}
             summary={project.summary}
             responsibilities={project.responsibilities}
           />

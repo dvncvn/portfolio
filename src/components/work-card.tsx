@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { useRef, useState, useCallback } from "react";
 import { motion } from "framer-motion";
-import { DotPattern } from "@/components/ui/dot-pattern";
 
 type WorkCardProps = {
   slug: string;
@@ -11,7 +10,6 @@ type WorkCardProps = {
   date: string;
   tall?: boolean;
   imageSrc?: string;
-  backgroundVariant?: "dots";
 };
 
 type WorkCardAnimatedProps = WorkCardProps & {
@@ -24,7 +22,6 @@ export function WorkCard({
   date,
   tall = false,
   imageSrc,
-  backgroundVariant,
 }: WorkCardProps) {
   const cardRef = useRef<HTMLAnchorElement>(null);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
@@ -46,16 +43,15 @@ export function WorkCard({
     <Link
       ref={cardRef}
       href={`/work/${slug}`}
-      className="work-card group relative block w-full overflow-hidden rounded-[8px] bg-[#141414] border border-transparent transition-colors duration-200 hover:border-white/[0.12]"
+      className={[
+        "work-card group relative block w-full overflow-hidden rounded-[8px]",
+        "bg-[#121212]",
+      ].join(" ")}
       onMouseMove={handleMouseMove}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      style={
-        {
-          // Keep this as a fixed value so the interaction is predictable and calm.
-          ["--footer-h" as any]: "56px",
-        } as React.CSSProperties
-      }
+      onFocus={() => setIsHovered(true)}
+      onBlur={() => setIsHovered(false)}
     >
       {/* Border glow effect that follows cursor */}
       <div
@@ -69,106 +65,50 @@ export function WorkCard({
 
       {/* Card content - responsive heights */}
       <div
-        className={`relative ${
+        className={`relative p-2 ${
           tall
             ? "h-[260px] md:h-auto md:aspect-[1/1]"
             : "h-[260px] sm:h-[260px] md:h-[294px]"
         }`}
       >
-        {/* Inset region (8px all around) */}
-        <div className="absolute inset-2 overflow-hidden rounded-[6px] bg-[#0f0f0f]">
-          {backgroundVariant === "dots" ? (
-            <div className="absolute inset-0">
-              <DotPattern
-                glow
+        <div className="flex h-full flex-col">
+          {/* Card-within-card (project art) */}
+          <div className="relative flex-1 overflow-hidden rounded-[6px] bg-[#0B0A09]">
+            {imageSrc ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={imageSrc}
+                alt={title}
                 className={[
-                  // Keep it subtle; this is a background texture.
-                  "text-white/[0.10]",
-                  "transition-opacity duration-300",
-                  isHovered ? "opacity-100" : "opacity-80",
+                  "h-full w-full",
+                  "object-contain",
+                  "transition-[filter] duration-200",
+                  imageSrc.endsWith(".svg") ? "p-12 opacity-[0.92]" : "p-8",
                 ].join(" ")}
+                loading="lazy"
+                draggable={false}
               />
-            </div>
-          ) : null}
+            ) : null}
+          </div>
 
-          {backgroundVariant === "dots" ? (
-            <button
-              type="button"
-              aria-label="Demo action"
+          {/* Footer (always visible) */}
+          <div className="flex items-baseline justify-between gap-6 px-6 pb-3 pt-5">
+            <h3
               className={[
-                "absolute right-3 top-3 z-10",
-                "rounded-full px-3 py-1.5 text-[12px] font-medium",
-                "text-foreground/90",
-                "bg-white/[0.06] hover:bg-white/[0.10]",
-                "border border-white/[0.10]",
-                "backdrop-blur-sm",
-                "transition-colors duration-200",
+                "text-[16px] font-medium transition-colors duration-200",
+                isHovered ? "text-foreground" : "text-[#A3A3A3]",
               ].join(" ")}
-              onClick={(e) => {
-                // Demo only: prevent navigating when clicking the button.
-                e.preventDefault();
-                e.stopPropagation();
-              }}
             >
-              Demo
-            </button>
-          ) : null}
-
-          {backgroundVariant === "dots" ? (
-            <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center">
-              <button
-                type="button"
-                aria-label="Center demo action"
-                className={[
-                  "pointer-events-auto",
-                  "rounded-full px-5 py-2 text-[13px] font-medium",
-                  "text-foreground/90",
-                  "bg-white/[0.05] hover:bg-white/[0.09]",
-                  "border border-white/[0.14]",
-                  "backdrop-blur-md",
-                  "shadow-[0_10px_30px_rgba(0,0,0,0.35)]",
-                  "transition-colors duration-200",
-                ].join(" ")}
-                onClick={(e) => {
-                  // Demo only: prevent navigating when clicking the button.
-                  e.preventDefault();
-                  e.stopPropagation();
-                }}
-              >
-                Open
-              </button>
-            </div>
-          ) : null}
-
-          {imageSrc ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={imageSrc}
-              alt={title}
-              className="h-full w-full object-cover transition-[filter,transform] duration-[420ms] ease-out group-hover:brightness-[0.98]"
-              loading="lazy"
-            />
-          ) : null}
-
-          {/* Bottom overlay that slides up over the image (image itself stays static) */}
-          <div
-            className={[
-              "absolute inset-x-0 bottom-0",
-              "transition-[transform,opacity] duration-[420ms] ease-out",
-              isHovered ? "translate-y-0 opacity-100" : "translate-y-[calc(var(--footer-h)+8px)] opacity-0",
-            ].join(" ")}
-          >
-            {/* Soft edge (prevents a hard border between overlay + image) */}
-            <div className="pointer-events-none absolute -top-8 left-0 right-0 h-8 bg-gradient-to-t from-[#141414] to-transparent" />
-
-            {/* Panel */}
-            <div
-              className="flex items-end justify-between bg-[#141414] px-6 py-3"
-              style={{ height: "var(--footer-h)" }}
+              {title}
+            </h3>
+            <span
+              className={[
+                "font-mono text-[16px] transition-colors duration-200",
+                isHovered ? "text-[#7D7D7D]" : "text-[#464646]",
+              ].join(" ")}
             >
-              <h3 className="text-[14px] font-medium text-foreground">{title}</h3>
-              <span className="text-[14px] text-muted-foreground">{date}</span>
-            </div>
+              {date}
+            </span>
           </div>
         </div>
       </div>

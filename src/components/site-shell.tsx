@@ -65,6 +65,14 @@ export function SiteShell({ children }: SiteShellProps) {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
+      {/* Skip link for keyboard users */}
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:fixed focus:left-6 focus:top-4 focus:z-[60] focus:rounded-[8px] focus:border focus:border-white/10 focus:bg-black/60 focus:px-3 focus:py-2 focus:font-mono focus:text-[14px] focus:text-foreground focus:backdrop-blur"
+      >
+        Skip to content
+      </a>
+
       <motion.header
         initial={{ y: 0 }}
         animate={{ y: hidden ? -100 : 0 }}
@@ -130,7 +138,13 @@ export function SiteShell({ children }: SiteShellProps) {
       {/* Spacer for fixed header */}
       <div className="h-[72px]" />
 
-      <main className="mx-auto w-full max-w-[1400px] px-6">{children}</main>
+      <main
+        id="main-content"
+        tabIndex={-1}
+        className="mx-auto w-full max-w-[1400px] px-6"
+      >
+        {children}
+      </main>
 
       <footer className="mt-20">
         <div className="mx-auto flex w-full max-w-[1400px] flex-col gap-4 px-6 py-8 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between">

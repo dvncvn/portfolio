@@ -14,8 +14,11 @@
   --background: #0B0A09;
   --foreground: #E9E9E2;
   --muted-foreground: #A3A3A3;
-  --accent: #E93940;
-  --accent-foreground: #ffffff;
+  --highlight: #01F8A5;
+  --highlight-foreground: #0B0A09;
+  /* Neutral-only UI: no red accent */
+  --accent: #E9E9E2;
+  --accent-foreground: #0B0A09;
   --card: #151413;
   --card-foreground: #E9E9E2;
   --popover: #151413;
@@ -25,7 +28,7 @@
   --secondary: #1a1918;
   --secondary-foreground: #E9E9E2;
   --muted: #1a1918;
-  --destructive: #E93940;
+  --destructive: #E9E9E2;
   --border: rgba(255, 255, 255, 0.08);
   --input: rgba(255, 255, 255, 0.1);
   --ring: #A3A3A3;
@@ -43,7 +46,10 @@
   --background: #f8f8f6;
   --foreground: #111113;
   --muted-foreground: #5f5f6a;
-  --accent: #E93940;
+  --highlight: #01F8A5;
+  --highlight-foreground: #0B0A09;
+  /* Neutral-only UI: no red accent */
+  --accent: #111113;
   --accent-foreground: #ffffff;
   --card: #ffffff;
   --card-foreground: #111113;
@@ -84,6 +90,25 @@
 
 body {
   font-family: var(--font-sans), system-ui, -apple-system, sans-serif;
+}
+
+/* Text selection highlight */
+::selection {
+  background: var(--highlight);
+  color: var(--highlight-foreground);
+}
+
+::-moz-selection {
+  background: var(--highlight);
+  color: var(--highlight-foreground);
+}
+
+/* Optional inline highlight utility */
+.text-highlight {
+  background: var(--highlight);
+  color: var(--highlight-foreground);
+  border-radius: 6px;
+  padding: 0.08em 0.28em;
 }
 
 html {

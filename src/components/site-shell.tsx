@@ -125,7 +125,7 @@ export function SiteShell({ children }: SiteShellProps) {
                   href={link.href}
                   className={
                     isActive(link.href)
-                      ? "text-accent"
+                      ? "text-foreground"
                       : "text-muted-foreground transition-colors hover:text-foreground"
                   }
                 >

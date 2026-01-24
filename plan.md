@@ -16,7 +16,7 @@ Asset drop locations (for SVG/PNG/WebP)
 - Suggested per-project path: `public/assets/work/<project-slug>/`
 
 Assumptions and decisions (keep current)
-- [x] Color tokens: background #0B0A09, foreground #E9E9E2, muted #A3A3A3, accent #E93940.
+- [x] Color tokens: background #0B0A09, foreground #E9E9E2, muted #A3A3A3 (neutral-only, no red accent).
 - [ ] Work index location: confirm whether Work index is the homepage, `/work`, or both (avoid duplicating routes).
 - [ ] Decide which project is “most complex” and will define the canonical template first.
 

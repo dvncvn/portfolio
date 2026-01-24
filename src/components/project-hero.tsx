@@ -32,7 +32,7 @@ export function ProjectHero({
         duration: 0.35,
         ease: [0.25, 0.1, 0.25, 1],
       }}
-      className="space-y-10"
+      className="space-y-2"
     >
       {/* Breadcrumb */}
       <nav aria-label="Breadcrumb" className="flex justify-center">
@@ -45,7 +45,7 @@ export function ProjectHero({
       </nav>
 
       {/* Title */}
-      <div className="mx-auto max-w-[768px]">
+      <div className="relative z-10 mx-auto max-w-[768px] -mb-6">
         <h1 className="text-center text-[36px] font-medium leading-tight text-foreground md:text-[48px]">
           {title}
         </h1>
@@ -53,21 +53,21 @@ export function ProjectHero({
 
       {heroAsset ? (
         <div
-          className="mx-auto w-full max-w-[920px]"
+          className="relative z-0 mx-auto w-full max-w-[900px] -mb-8 overflow-visible md:-mb-12"
           style={{ aspectRatio: heroAspectRatio }}
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={heroAsset.src}
             alt={heroAsset.alt ?? ""}
-            className="h-full w-full object-contain"
+            className="h-full w-full origin-center scale-[0.85] object-contain md:scale-[1.0]"
             draggable={false}
           />
         </div>
       ) : null}
 
       {/* Summary + metadata */}
-      <div className="mx-auto w-full max-w-[768px]">
+      <div className="relative z-10 mx-auto mt-4 w-full max-w-[768px]">
         <div className="grid gap-8 md:grid-cols-[minmax(0,1fr)_270px] md:items-start">
           <div className="space-y-6">
             <h2 className="text-[20px] font-medium text-foreground">Summary</h2>

@@ -1,6 +1,6 @@
 export type AssetType = "image" | "video";
 
-export type SectionLayout = "single" | "split" | "stacked" | "compare";
+export type SectionLayout = "single" | "split" | "stacked" | "compare" | "carousel";
 
 export type WorkProjectAsset = {
   type: AssetType;

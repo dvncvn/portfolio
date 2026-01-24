@@ -161,6 +161,11 @@ html {
   --workcard-accent: var(--accent-hover);
 }
 
+/* Carousel scroller - hide scrollbar */
+.carousel-scroller::-webkit-scrollbar {
+  display: none;
+}
+
 /* Play card hover surface (theme aware) */
 .play-card {
   position: relative;

@@ -9,8 +9,9 @@ type HomeProjectCard = {
   tall: boolean;
   imageSrc: string;
   svgAccent?: {
-    matchStrokeHex?: string;
-    matchFillHex?: string;
+    matchStrokeHex?: string | string[];
+    matchFillHex?: string | string[];
+    matchStopColorHex?: string | string[];
     baseColorHex?: string;
     hoverColorHex: string;
     transitionMs?: number;
@@ -29,7 +30,7 @@ const projects: HomeProjectCard[] = [
       matchStrokeHex: "#01F8A5",
       baseColorHex: "#E9E9E2",
       hoverColorHex: "#01F8A5",
-      transitionMs: 360,
+      transitionMs: 850,
     },
   },
   {
@@ -38,6 +39,12 @@ const projects: HomeProjectCard[] = [
     date: "Aug 2023 – Jan 2024",
     tall: false,
     imageSrc: "/assets/work/astra-db/astra-art.svg",
+    svgAccent: {
+      matchStrokeHex: "#00FFAA",
+      baseColorHex: "#E9E9E2",
+      hoverColorHex: "#00FFAA",
+      transitionMs: 850,
+    },
   },
   {
     slug: "context-forge",
@@ -45,6 +52,12 @@ const projects: HomeProjectCard[] = [
     date: "Dec 2025",
     tall: false,
     imageSrc: "/assets/work/context-forge/cf-art.svg",
+    svgAccent: {
+      matchStopColorHex: ["#FFB50B", "#FC481B", "#00FFAA", "#249361", "#3ECF8E"],
+      baseColorHex: "#E9E9E2",
+      hoverColorHex: "#00FFAA",
+      transitionMs: 850,
+    },
   },
   {
     slug: "langflow-agent-experience",
@@ -52,6 +65,13 @@ const projects: HomeProjectCard[] = [
     date: "Nov 2024 – Sep 2025",
     tall: true,
     imageSrc: "/assets/work/langflow-agent-experience/agent-art.svg",
+    svgAccent: {
+      matchFillHex: ["#7528FC", "#FF3276", "#F480FF", "#F62B54", "#3ECF8E"],
+      matchStrokeHex: "#7078CF",
+      baseColorHex: "#E9E9E2",
+      hoverColorHex: "#3ECF8E",
+      transitionMs: 850,
+    },
   },
 ];
 

@@ -3,6 +3,13 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* Allow smooth interpolation of our accent color custom property */
+@property --workcard-accent {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #E9E9E2;
+}
+
 :root {
   --background: #0B0A09;
   --foreground: #E9E9E2;
@@ -93,7 +100,10 @@ html {
 
 /* Home/work grid hover emphasis: dim non-hovered cards (including dead space) */
 .work-card {
-  transition: opacity 300ms ease;
+  --workcard-accent: var(--accent-base, #E9E9E2);
+  transition:
+    opacity 300ms ease,
+    --workcard-accent var(--accent-ms, 500ms) ease-out;
 }
 
 .work-section:hover .work-card {
@@ -103,6 +113,25 @@ html {
 .work-section:hover .work-card:hover,
 .work-section:hover .work-card:focus-within {
   opacity: 1;
+}
+
+/* Work card SVG accent transitions (inline SVGs only) */
+.work-card [data-accent-stroke="true"] {
+  stroke: var(--workcard-accent);
+}
+
+.work-card [data-accent-fill="true"] {
+  fill: var(--workcard-accent);
+}
+
+.work-card [data-accent-stop="true"] {
+  stop-color: var(--workcard-accent);
+}
+
+.work-card:hover,
+.work-card:focus-within,
+.work-card.is-hovered {
+  --workcard-accent: var(--accent-hover);
 }
 
 /* Play card hover surface (theme aware) */

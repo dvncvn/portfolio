@@ -1,6 +1,14 @@
 export type AssetType = "image" | "video";
 
-export type SectionLayout = "single" | "split" | "stacked" | "compare" | "carousel" | "bento" | "github-stars";
+export type SectionLayout =
+  | "single"
+  | "split"
+  | "stacked"
+  | "compare"
+  | "carousel"
+  | "bento"
+  | "github-stars"
+  | "single-caption";
 
 export type BentoLayoutItem = {
   colSpan?: number;

@@ -34,7 +34,7 @@ export function SectionBlock({ section, index = 0 }: SectionBlockProps) {
       }}
       className="space-y-[88px]"
     >
-      {section.layout !== "compare" ? (
+      {section.layout !== "compare" && section.layout !== "single-caption" ? (
         <div className="mx-auto max-w-[768px] space-y-4">
           <h2 className="text-[20px] font-medium text-foreground">{section.heading}</h2>
           {captionIntro ? (

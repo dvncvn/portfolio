@@ -51,24 +51,29 @@
       "assets": [
         {
           "type": "image",
-          "src": "/assets/work/langflow-platform-redesign/ui-components.png",
-          "alt": "System-wide component upgrades",
-          "width": 3028,
-          "height": 1968
+          "src": "/assets/work/langflow-platform-redesign/bento-assets/thumbs/bento-1.png",
+          "alt": "System-wide component upgrades"
         },
         {
           "type": "image",
-          "src": "/assets/work/langflow-platform-redesign/after_ playground.png",
+          "src": "/assets/work/langflow-platform-redesign/bento-assets/thumbs/bento-2.png",
           "alt": "Updated playground experience",
-          "width": 3028,
-          "height": 1968
+          "fullSrc": "/assets/work/langflow-platform-redesign/bento-assets/full/card-2.png"
         },
         {
           "type": "image",
-          "src": "/assets/work/langflow-platform-redesign/after_ projects.png",
-          "alt": "Updated project management flows",
-          "width": 3028,
-          "height": 1968
+          "src": "/assets/work/langflow-platform-redesign/bento-assets/thumbs/bento-3.png",
+          "alt": "Updated project management flows"
+        },
+        {
+          "type": "image",
+          "src": "/assets/work/langflow-platform-redesign/bento-assets/thumbs/bento-4.png",
+          "alt": "Refined navigation and structure"
+        },
+        {
+          "type": "image",
+          "src": "/assets/work/langflow-platform-redesign/bento-assets/thumbs/bento-5.png",
+          "alt": "Modernized UI surfaces"
         }
       ]
     },
@@ -86,6 +91,19 @@
         "midLabel": "Apr '24",
         "endLabel": "Today"
       }
+    },
+    {
+      "heading": "",
+      "caption": "Jensen Huang with redesigned Langflow on stage at NVIDIA GTC 2024",
+      "layout": "single-caption",
+      "assets": [
+        {
+          "type": "image",
+          "src": "/assets/work/langflow-platform-redesign/impact/jensen.png",
+          "alt": "Jensen Huang with redesigned Langflow on stage at NVIDIA GTC 2024",
+          "aspectRatio": "16/9"
+        }
+      ]
     }
   ]
 }

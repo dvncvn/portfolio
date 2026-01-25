@@ -7,6 +7,7 @@ import { BentoLayoutItem, WorkProjectAsset, WorkProjectSection } from "@/content
 import { CompareView } from "@/components/compare-view";
 import { BlurFade } from "@/components/ui/blur-fade";
 import { GithubStarsChart } from "@/components/github-stars-chart";
+import { DotPattern } from "@/components/ui/dot-pattern";
 
 type AssetRendererProps = {
   section: WorkProjectSection;
@@ -472,36 +473,94 @@ function BentoView({
 }) {
   const { activeIndex, openAt, close, next, prev } = useGalleryLightbox(assets);
   const layoutItems = getBentoLayout(assets.length, layout);
+  const cardBaseClass =
+    "bento-card group relative w-full cursor-pointer overflow-hidden rounded-[8px] bg-[#121212] p-4 transition-opacity duration-300 ease-out aspect-[4/3] md:aspect-auto select-none";
+  const renderCard = (
+    asset: WorkProjectAsset,
+    idx: number,
+    className = "",
+    contentClassName = "",
+    backgroundSrc?: string,
+    showDotGrid = false,
+  ) => (
+    <button
+      key={`${asset.src}-${idx}`}
+      type="button"
+      onClick={() => openAt(idx)}
+      className={`${cardBaseClass} ${className}`}
+    >
+      {backgroundSrc ? (
+        <>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={backgroundSrc}
+            alt=""
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0 h-full w-full object-cover grayscale"
+            draggable={false}
+          />
+          <div className="absolute inset-0 bg-black/25" />
+        </>
+      ) : null}
+      {showDotGrid ? (
+        <div className="pointer-events-none absolute inset-2 overflow-hidden rounded-[6px] bg-[#0B0B0B]/60">
+          <DotPattern
+            width={12}
+            height={12}
+            cx={1}
+            cy={1}
+            cr={1}
+            className="text-white/6"
+          />
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(0,0,0,0)_55%,rgba(0,0,0,0.7)_100%)]" />
+        </div>
+      ) : null}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={asset.src}
+        alt={asset.alt ?? ""}
+        className={`relative z-10 h-full w-full object-contain ${contentClassName}`}
+        loading="lazy"
+        draggable={false}
+      />
+    </button>
+  );
+  const isCustomFiveUp = assets.length === 5 && (!layout || layout.length === 0);
+  const bentoTwoBackground = "/assets/work/langflow-platform-redesign/bento-assets/thumbs/bento-2-bg.png";
 
   return (
     <>
-      <div className="bento-section grid gap-4 md:grid-cols-6 md:auto-rows-[minmax(160px,1fr)]">
-        {assets.map((asset, idx) => {
-          const layoutItem = layoutItems[idx] ?? {};
-          const colSpan = layoutItem.colSpan ?? 3;
-          const rowSpan = layoutItem.rowSpan ?? 1;
-          const colSpanClass = COL_SPAN_CLASSES[colSpan] ?? "md:col-span-3";
-          const rowSpanClass = ROW_SPAN_CLASSES[rowSpan] ?? "md:row-span-1";
+      {isCustomFiveUp ? (
+        <div className="bento-section space-y-8">
+          <div className="grid gap-8 md:[grid-template-columns:0.349fr_0.651fr]">
+            {renderCard(assets[0], 0, "md:h-[540px]", "scale-[0.82]")}
+            {renderCard(
+              assets[1],
+              1,
+              "md:h-[540px]",
+              "absolute inset-x-8 bottom-0 top-8 h-auto w-[calc(100%-4rem)] object-contain",
+              bentoTwoBackground,
+            )}
+          </div>
+          <div className="grid gap-8 md:[grid-template-columns:0.309fr_0.302fr_0.389fr]">
+            {renderCard(assets[2], 2, "p-2 md:h-[508px]", "scale-[0.84]", undefined, true)}
+            {renderCard(assets[3], 3, "md:h-[508px]", "scale-[0.84]")}
+            {renderCard(assets[4], 4, "p-2 md:h-[508px]", "scale-[0.82]", undefined, true)}
+          </div>
+        </div>
+      ) : (
+        <div className="bento-section grid gap-8 md:grid-cols-6 md:auto-rows-[minmax(160px,1fr)]">
+          {assets.map((asset, idx) => {
+            const layoutItem = layoutItems[idx] ?? {};
+            const colSpan = layoutItem.colSpan ?? 3;
+            const rowSpan = layoutItem.rowSpan ?? 1;
+            const colSpanClass = COL_SPAN_CLASSES[colSpan] ?? "md:col-span-3";
+            const rowSpanClass = ROW_SPAN_CLASSES[rowSpan] ?? "md:row-span-1";
 
-          return (
-            <button
-              key={`${asset.src}-${idx}`}
-              type="button"
-              onClick={() => openAt(idx)}
-              className={`bento-card group relative w-full cursor-pointer overflow-hidden rounded-[8px] bg-[#121212] p-4 transition-opacity duration-300 ease-out ${colSpanClass} ${rowSpanClass}`}
-            >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={asset.src}
-                alt={asset.alt ?? ""}
-                className="h-full w-full object-contain"
-                loading="lazy"
-                draggable={false}
-              />
-            </button>
-          );
-        })}
-      </div>
+            return renderCard(asset, idx, `${colSpanClass} ${rowSpanClass}`);
+          })}
+        </div>
+      )}
 
       <AnimatePresence>
         {activeIndex !== null ? (
@@ -559,6 +618,33 @@ export function AssetRenderer({ section }: AssetRendererProps) {
     return (
       <BlurFade delay={0.15} inView inViewMargin="-100px">
         <BentoView assets={assets} layout={section.bento?.items} />
+      </BlurFade>
+    );
+  }
+
+  if (section.layout === "single-caption") {
+    const asset = assets[0];
+    return (
+      <BlurFade delay={0.15} inView inViewMargin="-100px">
+        <div className="space-y-4">
+          <div className="mx-auto w-full max-w-[768px] overflow-hidden rounded-[8px]">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            {asset ? (
+              <img
+                src={asset.src}
+                alt={asset.alt ?? ""}
+                className="block h-auto w-full"
+                loading="lazy"
+                draggable={false}
+              />
+            ) : null}
+          </div>
+          {section.caption ? (
+            <div className="text-center">
+              <p className="text-[14px] leading-relaxed text-[#737373]">{section.caption}</p>
+            </div>
+          ) : null}
+        </div>
       </BlurFade>
     );
   }

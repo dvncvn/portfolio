@@ -8,6 +8,7 @@ type HomeProjectCard = {
   date: string;
   tall: boolean;
   imageSrc: string;
+  hoverImageSrc?: string;
   svgPadding?: string;
   svgAccent?: {
     matchStrokeHex?: string | string[];
@@ -25,15 +26,9 @@ const projects: HomeProjectCard[] = [
     title: "Langflow: Platform Redesign",
     date: "Nov 2024",
     tall: true,
-    imageSrc: "/assets/work/langflow-platform-redesign/lf-art.svg",
+    imageSrc: "/assets/work/langflow-platform-redesign/lf-art_ neutral.svg",
+    hoverImageSrc: "/assets/work/langflow-platform-redesign/lf-art_hover.svg",
     svgPadding: "p-0",
-    // Tight scope: only this card has inline SVG accent behavior for now.
-    svgAccent: {
-      matchStrokeHex: "#01F8A5",
-      baseColorHex: "#E9E9E2",
-      hoverColorHex: "#01F8A5",
-      transitionMs: 850,
-    },
   },
   {
     slug: "astra-db",
@@ -115,6 +110,7 @@ export default function Home() {
                   date={project.date}
                   tall={project.tall}
                   imageSrc={project.imageSrc}
+                  hoverImageSrc={project.hoverImageSrc}
                   svgAccent={project.svgAccent}
                   svgPadding={project.svgPadding}
                 />
@@ -135,6 +131,7 @@ export default function Home() {
                   date={project.date}
                   tall={project.tall}
                   imageSrc={project.imageSrc}
+                  hoverImageSrc={project.hoverImageSrc}
                   svgAccent={project.svgAccent}
                   svgPadding={project.svgPadding}
                 />

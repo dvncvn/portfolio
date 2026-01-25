@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useRef, useState, useCallback } from "react";
+import { useRef, useState, useCallback, useMemo } from "react";
 import { motion } from "framer-motion";
 import { InlineSvg } from "@/components/inline-svg";
 
@@ -63,6 +63,60 @@ export function WorkCard({
     []
   );
 
+  // Memoize transform to prevent SVG reload on hover state changes
+  const svgTransform = useMemo(() => {
+    if (!svgAccent) return undefined;
+
+    return (raw: string) => {
+      let out = raw;
+
+      const asArray = (v?: string | string[]) =>
+        v ? (Array.isArray(v) ? v : [v]) : [];
+
+      const replaceHexAttr = (
+        input: string,
+        attr: "stroke" | "fill" | "stop-color",
+        hexes: string[],
+        dataAttr: string,
+        baseHex: string
+      ) => {
+        return hexes.reduce((acc, hexRaw) => {
+          const hex = hexRaw.replace("#", "");
+          const re = new RegExp(`${attr}="#?${hex}"`, "gi");
+          return acc.replace(re, () => `${attr}="${baseHex}" ${dataAttr}`);
+        }, input);
+      };
+
+      const baseHex = svgAccent.baseColorHex ?? "#E9E9E2";
+
+      out = replaceHexAttr(
+        out,
+        "stroke",
+        asArray(svgAccent.matchStrokeHex),
+        `data-accent-stroke="true"`,
+        baseHex
+      );
+
+      out = replaceHexAttr(
+        out,
+        "fill",
+        asArray(svgAccent.matchFillHex),
+        `data-accent-fill="true"`,
+        baseHex
+      );
+
+      out = replaceHexAttr(
+        out,
+        "stop-color",
+        asArray(svgAccent.matchStopColorHex),
+        `data-accent-stop="true"`,
+        baseHex
+      );
+
+      return out;
+    };
+  }, [svgAccent]);
+
   return (
     <Link
       ref={cardRef}
@@ -77,16 +131,7 @@ export function WorkCard({
       onMouseLeave={() => setIsHovered(false)}
       onFocus={() => setIsHovered(true)}
       onBlur={() => setIsHovered(false)}
-      style={
-        svgAccent
-          ? ({
-              // Used by global CSS rules to animate SVG parts.
-              ["--accent-base" as any]: svgAccent.baseColorHex ?? "#E9E9E2",
-              ["--accent-hover" as any]: svgAccent.hoverColorHex,
-              ["--accent-ms" as any]: `${svgAccent.transitionMs ?? 800}ms`,
-            } as React.CSSProperties)
-          : undefined
-      }
+      style={undefined}
     >
       {/* Border glow effect that follows cursor */}
       <div
@@ -117,59 +162,7 @@ export function WorkCard({
                   // Ensure the inlined <svg> fills the box and stays centered.
                   "[&>svg]:block [&>svg]:h-full [&>svg]:w-full",
                 ].join(" ")}
-                transform={(raw) => {
-                  let out = raw;
-
-                  const asArray = (v?: string | string[]) =>
-                    v ? (Array.isArray(v) ? v : [v]) : [];
-
-                  const replaceHexAttr = (
-                    input: string,
-                    attr: "stroke" | "fill" | "stop-color",
-                    hexes: string[],
-                    dataAttr: string,
-                    baseHex: string
-                  ) => {
-                    return hexes.reduce((acc, hexRaw) => {
-                      const hex = hexRaw.replace("#", "");
-                      const re = new RegExp(`${attr}="#?${hex}"`, "gi");
-                      // Force neutral base color at rest (so accents never show "hot" by default),
-                      // then add a marker attribute for CSS hover override.
-                      return acc.replace(re, () => `${attr}="${baseHex}" ${dataAttr}`);
-                    }, input);
-                  };
-
-                  const baseHex = svgAccent.baseColorHex ?? "#E9E9E2";
-
-                  // Replace matching stroke colors with CSS var + marker attribute.
-                  out = replaceHexAttr(
-                    out,
-                    "stroke",
-                    asArray(svgAccent.matchStrokeHex),
-                    `data-accent-stroke="true"`,
-                    baseHex
-                  );
-
-                  // Replace matching fill colors with CSS var + marker attribute.
-                  out = replaceHexAttr(
-                    out,
-                    "fill",
-                    asArray(svgAccent.matchFillHex),
-                    `data-accent-fill="true"`,
-                    baseHex
-                  );
-
-                  // Replace matching stop colors (for gradients) with CSS var + marker attribute.
-                  out = replaceHexAttr(
-                    out,
-                    "stop-color",
-                    asArray(svgAccent.matchStopColorHex),
-                    `data-accent-stop="true"`,
-                    baseHex
-                  );
-
-                  return out;
-                }}
+                transform={svgTransform}
               />
             ) : imageSrc ? (
               <div className="absolute inset-0">
@@ -180,8 +173,11 @@ export function WorkCard({
                   alt={title}
                   className={[
                     "absolute inset-0 h-full w-full object-contain",
-                    "transition-opacity duration-300 ease-out",
-                    imageSrc.endsWith(".svg") ? "p-8 opacity-[0.92] sm:p-10 md:p-12" : "p-6 sm:p-8",
+                    "transition-opacity duration-700 ease-in-out",
+                    hoverImageSrc ? (isHovered ? "opacity-0" : "opacity-[0.92]") : "opacity-[0.92]",
+                    imageSrc.endsWith(".svg")
+                      ? (svgPadding ?? "p-8 sm:p-10 md:p-12")
+                      : "p-6 sm:p-8",
                   ].join(" ")}
                   loading="lazy"
                   draggable={false}
@@ -196,9 +192,11 @@ export function WorkCard({
                     aria-hidden="true"
                     className={[
                       "absolute inset-0 h-full w-full object-contain",
-                      "transition-opacity duration-300 ease-out",
+                      "transition-opacity duration-700 ease-in-out",
                       isHovered ? "opacity-[0.92]" : "opacity-0",
-                      hoverImageSrc.endsWith(".svg") ? "p-12" : "p-8",
+                      hoverImageSrc.endsWith(".svg")
+                        ? (svgPadding ?? "p-8 sm:p-10 md:p-12")
+                        : "p-6 sm:p-8",
                     ].join(" ")}
                     draggable={false}
                   />

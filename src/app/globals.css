@@ -3,12 +3,6 @@
 
 @custom-variant dark (&:is(.dark *));
 
-/* Allow smooth interpolation of our accent color custom property */
-@property --workcard-accent {
-  syntax: "<color>";
-  inherits: true;
-  initial-value: #E9E9E2;
-}
 
 :root {
   --background: #0B0A09;
@@ -125,10 +119,7 @@ html {
 
 /* Home/work grid hover emphasis: dim non-hovered cards (including dead space) */
 .work-card {
-  --workcard-accent: var(--accent-base, #E9E9E2);
-  transition:
-    opacity 300ms ease,
-    --workcard-accent var(--accent-ms, 500ms) ease-out;
+  transition: opacity 300ms ease;
 }
 
 .work-section:hover .work-card,
@@ -158,23 +149,32 @@ html {
   opacity: 1;
 }
 
-/* Work card SVG accent transitions (inline SVGs only) */
+/* Work card SVG accent transitions */
 .work-card [data-accent-stroke="true"] {
-  stroke: var(--workcard-accent);
+  stroke: #E9E9E2;
+  transition: stroke 850ms ease-out;
 }
 
 .work-card [data-accent-fill="true"] {
-  fill: var(--workcard-accent);
+  fill: #E9E9E2;
+  transition: fill 850ms ease-out;
 }
 
 .work-card [data-accent-stop="true"] {
-  stop-color: var(--workcard-accent);
+  stop-color: #E9E9E2;
+  transition: stop-color 850ms ease-out;
 }
 
-.work-card:hover,
-.work-card:focus-within,
-.work-card.is-hovered {
-  --workcard-accent: var(--accent-hover);
+.work-card.is-hovered [data-accent-stroke="true"] {
+  stroke: var(--highlight);
+}
+
+.work-card.is-hovered [data-accent-fill="true"] {
+  fill: var(--highlight);
+}
+
+.work-card.is-hovered [data-accent-stop="true"] {
+  stop-color: var(--highlight);
 }
 
 /* Carousel scroller - hide scrollbar */

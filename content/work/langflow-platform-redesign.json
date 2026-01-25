@@ -24,8 +24,8 @@
   ],
   "sections": [
     {
-      "heading": "Before → After",
-      "caption": "A tighter hierarchy and calmer layout system across the primary canvas experience.",
+      "heading": "",
+      "caption": "Before / After",
       "layout": "compare",
       "assets": [
         {
@@ -47,7 +47,7 @@
     {
       "heading": "System level change",
       "caption": "This work went far beyond visual polish. The redesign addressed foundational UX problems using appropriate, modern patterns.\n\n- Established clear hierarchy and sign-posting across the product.\n- Drastically improved usability by reducing noise and cognitive load.\n- Moved beyond raw concepts like “tokens” and “variables” toward intent-driven configuration.\n- Reframed the experience so Langflow felt like a serious, modern platform.",
-      "layout": "carousel",
+      "layout": "bento",
       "assets": [
         {
           "type": "image",

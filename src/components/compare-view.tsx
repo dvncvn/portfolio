@@ -111,9 +111,6 @@ export function CompareView({
 
   return (
     <div className="space-y-4">
-      <div className="text-center">
-        <h3 className="text-[20px] font-medium text-foreground">Before / After</h3>
-      </div>
       {/* Desktop/large: interactive slider */}
       <BlurFade delay={0.1} inView inViewMargin="-100px" className="hidden sm:block">
         <div className="relative overflow-hidden rounded-[8px]">
@@ -224,7 +221,7 @@ export function CompareView({
       </BlurFade>
       {description ? (
         <div className="text-center">
-          <p className="text-[14px] leading-relaxed text-muted-foreground">{description}</p>
+          <p className="text-[14px] leading-relaxed text-[#464646]">{description}</p>
         </div>
       ) : null}
 

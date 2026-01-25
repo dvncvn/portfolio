@@ -28,7 +28,7 @@ export default async function WorkProjectPage({
           responsibilities={project.responsibilities}
         />
 
-        <div className="space-y-16">
+        <div className="space-y-[88px]">
           {project.sections.map((section, idx) => (
             <SectionBlock key={`${section.heading}-${idx}`} section={section} index={idx} />
           ))}

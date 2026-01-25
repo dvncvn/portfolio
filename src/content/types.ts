@@ -1,11 +1,17 @@
 export type AssetType = "image" | "video";
 
-export type SectionLayout = "single" | "split" | "stacked" | "compare" | "carousel";
+export type SectionLayout = "single" | "split" | "stacked" | "compare" | "carousel" | "bento";
+
+export type BentoLayoutItem = {
+  colSpan?: number;
+  rowSpan?: number;
+};
 
 export type WorkProjectAsset = {
   type: AssetType;
   src: string;
   alt?: string;
+  fullSrc?: string;
   poster?: string;
   width?: number;
   height?: number;
@@ -17,6 +23,9 @@ export type WorkProjectSection = {
   caption?: string;
   assets: WorkProjectAsset[];
   layout: SectionLayout;
+  bento?: {
+    items?: BentoLayoutItem[];
+  };
 };
 
 export type WorkProjectMeta = {

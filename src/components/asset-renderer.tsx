@@ -1,13 +1,327 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { WorkProjectAsset, WorkProjectSection } from "@/content/types";
+import { createPortal } from "react-dom";
+import { motion, AnimatePresence } from "framer-motion";
+import { BentoLayoutItem, WorkProjectAsset, WorkProjectSection } from "@/content/types";
 import { CompareView } from "@/components/compare-view";
 import { BlurFade } from "@/components/ui/blur-fade";
 
 type AssetRendererProps = {
   section: WorkProjectSection;
 };
+
+type LightboxState = {
+  src: string;
+  alt: string;
+};
+
+const COL_SPAN_CLASSES: Record<number, string> = {
+  1: "md:col-span-1",
+  2: "md:col-span-2",
+  3: "md:col-span-3",
+  4: "md:col-span-4",
+  5: "md:col-span-5",
+  6: "md:col-span-6",
+};
+
+const ROW_SPAN_CLASSES: Record<number, string> = {
+  1: "md:row-span-1",
+  2: "md:row-span-2",
+  3: "md:row-span-3",
+};
+
+function useLightbox() {
+  const [lightbox, setLightbox] = useState<LightboxState | null>(null);
+
+  useEffect(() => {
+    if (!lightbox) return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setLightbox(null);
+      }
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [lightbox]);
+
+  return {
+    lightbox,
+    openLightbox: (asset: WorkProjectAsset) =>
+      setLightbox({ src: asset.fullSrc ?? asset.src, alt: asset.alt ?? "" }),
+    closeLightbox: () => setLightbox(null),
+  };
+}
+
+function Lightbox({
+  lightbox,
+  onClose,
+}: {
+  lightbox: LightboxState;
+  onClose: () => void;
+}) {
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-6"
+      onClick={onClose}
+    >
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={lightbox.src}
+        alt={lightbox.alt}
+        className="max-h-[90vh] w-auto max-w-[90vw]"
+        onClick={(event) => event.stopPropagation()}
+        draggable={false}
+      />
+    </div>
+  );
+}
+
+function getAssetLightboxSrc(asset: WorkProjectAsset) {
+  return asset.fullSrc ?? asset.src;
+}
+
+function useGalleryLightbox(assets: WorkProjectAsset[]) {
+  const [activeIndex, setActiveIndex] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (activeIndex === null) return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setActiveIndex(null);
+      }
+      if (event.key === "ArrowRight") {
+        setActiveIndex((prev) => {
+          if (prev === null) return prev;
+          return (prev + 1) % assets.length;
+        });
+      }
+      if (event.key === "ArrowLeft") {
+        setActiveIndex((prev) => {
+          if (prev === null) return prev;
+          return (prev - 1 + assets.length) % assets.length;
+        });
+      }
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [activeIndex, assets.length]);
+
+  return {
+    activeIndex,
+    openAt: (index: number) => setActiveIndex(index),
+    close: () => setActiveIndex(null),
+    next: () =>
+      setActiveIndex((prev) => {
+        if (prev === null) return prev;
+        return (prev + 1) % assets.length;
+      }),
+    prev: () =>
+      setActiveIndex((prev) => {
+        if (prev === null) return prev;
+        return (prev - 1 + assets.length) % assets.length;
+      }),
+  };
+}
+
+function GalleryLightbox({
+  assets,
+  activeIndex,
+  onClose,
+  onNext,
+  onPrev,
+}: {
+  assets: WorkProjectAsset[];
+  activeIndex: number;
+  onClose: () => void;
+  onNext: () => void;
+  onPrev: () => void;
+}) {
+  const asset = assets[activeIndex];
+  const src = getAssetLightboxSrc(asset);
+  const alt = asset.alt ?? "";
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+    const originalBodyOverflow = document.body.style.overflow;
+    const originalHtmlOverflow = document.documentElement.style.overflow;
+    document.body.style.overflow = "hidden";
+    document.documentElement.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = originalBodyOverflow;
+      document.documentElement.style.overflow = originalHtmlOverflow;
+    };
+  }, []);
+
+  if (!mounted) return null;
+
+  return createPortal(
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.2, ease: "easeOut" }}
+      style={{
+        position: "fixed",
+        top: 0,
+        left: 0,
+        width: "100%",
+        height: "100%",
+        zIndex: 9999,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        backgroundColor: "rgba(0, 0, 0, 0.7)",
+        backdropFilter: "blur(8px)",
+        overflow: "hidden",
+      }}
+      onClick={onClose}
+    >
+      <button
+        type="button"
+        onClick={(event) => {
+          event.stopPropagation();
+          onClose();
+        }}
+        aria-label="Close image"
+        style={{
+          position: "absolute",
+          top: "32px",
+          right: "32px",
+          zIndex: 10000,
+          width: "32px",
+          height: "32px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          background: "none",
+          border: "none",
+          padding: 0,
+          color: "rgba(255,255,255,0.8)",
+          cursor: "pointer",
+        }}
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="32"
+          height="32"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          aria-hidden="true"
+        >
+          <path d="M18 6L6 18" />
+          <path d="M6 6l12 12" />
+        </svg>
+      </button>
+
+      <button
+        type="button"
+        aria-label="Previous image"
+        onClick={(event) => {
+          event.stopPropagation();
+          onPrev();
+        }}
+        style={{
+          position: "absolute",
+          left: 32,
+          top: "50%",
+          transform: "translateY(-50%)",
+          zIndex: 10000,
+          background: "none",
+          border: "none",
+          padding: 0,
+          color: "rgba(255,255,255,0.8)",
+          cursor: "pointer",
+        }}
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          aria-hidden="true"
+        >
+          <path d="m15 18-6-6 6-6" />
+        </svg>
+      </button>
+
+      <button
+        type="button"
+        aria-label="Next image"
+        onClick={(event) => {
+          event.stopPropagation();
+          onNext();
+        }}
+        style={{
+          position: "absolute",
+          right: 32,
+          top: "50%",
+          transform: "translateY(-50%)",
+          zIndex: 10000,
+          background: "none",
+          border: "none",
+          padding: 0,
+          color: "rgba(255,255,255,0.8)",
+          cursor: "pointer",
+        }}
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          aria-hidden="true"
+        >
+          <path d="m9 18 6-6-6-6" />
+        </svg>
+      </button>
+
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 0.95 }}
+        transition={{ duration: 0.2, ease: "easeOut" }}
+        onClick={(event) => event.stopPropagation()}
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          maxHeight: "90vh",
+          maxWidth: "90vw",
+        }}
+      >
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={src}
+          alt={alt}
+          style={{
+            maxHeight: "90vh",
+            maxWidth: "90vw",
+            width: "auto",
+            height: "auto",
+          }}
+          draggable={false}
+        />
+      </motion.div>
+    </motion.div>,
+    document.body
+  );
+}
 
 function ImageAsset({
   asset,
@@ -59,21 +373,8 @@ function CarouselAsset({
 }
 
 function CarouselView({ assets }: { assets: WorkProjectAsset[] }) {
-  const [lightboxSrc, setLightboxSrc] = useState<string | null>(null);
-  const [lightboxAlt, setLightboxAlt] = useState<string | null>(null);
+  const { lightbox, openLightbox, closeLightbox } = useLightbox();
   const scrollerRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!lightboxSrc) return;
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        setLightboxSrc(null);
-        setLightboxAlt(null);
-      }
-    };
-    window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
-  }, [lightboxSrc]);
 
   useEffect(() => {
     const el = scrollerRef.current;
@@ -117,33 +418,101 @@ function CarouselView({ assets }: { assets: WorkProjectAsset[] }) {
             <CarouselAsset
               key={`${asset.src}-${idx}`}
               asset={asset}
-              onClick={() => {
-                setLightboxSrc(asset.src);
-                setLightboxAlt(asset.alt ?? "");
-              }}
+              onClick={() => openLightbox(asset)}
             />
           ))}
         </div>
       </div>
 
-      {lightboxSrc ? (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-6"
-          onClick={() => {
-            setLightboxSrc(null);
-            setLightboxAlt(null);
-          }}
-        >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={lightboxSrc}
-            alt={lightboxAlt ?? ""}
-            className="max-h-[90vh] w-auto max-w-[90vw]"
-            onClick={(event) => event.stopPropagation()}
-            draggable={false}
+      {lightbox ? <Lightbox lightbox={lightbox} onClose={closeLightbox} /> : null}
+    </>
+  );
+}
+
+function getBentoLayout(
+  assetsCount: number,
+  layoutOverrides?: BentoLayoutItem[],
+): BentoLayoutItem[] {
+  if (layoutOverrides && layoutOverrides.length > 0) {
+    return layoutOverrides;
+  }
+
+  if (assetsCount === 1) {
+    return [{ colSpan: 6, rowSpan: 1 }];
+  }
+
+  if (assetsCount === 2) {
+    return [
+      { colSpan: 3, rowSpan: 1 },
+      { colSpan: 3, rowSpan: 1 },
+    ];
+  }
+
+  if (assetsCount === 3) {
+    return [
+      { colSpan: 4, rowSpan: 2 },
+      { colSpan: 2, rowSpan: 1 },
+      { colSpan: 2, rowSpan: 1 },
+    ];
+  }
+
+  return Array.from({ length: assetsCount }, () => ({
+    colSpan: 3,
+    rowSpan: 1,
+  }));
+}
+
+function BentoView({
+  assets,
+  layout,
+}: {
+  assets: WorkProjectAsset[];
+  layout?: BentoLayoutItem[];
+}) {
+  const { activeIndex, openAt, close, next, prev } = useGalleryLightbox(assets);
+  const layoutItems = getBentoLayout(assets.length, layout);
+
+  return (
+    <>
+      <div className="bento-section grid gap-4 md:grid-cols-6 md:auto-rows-[minmax(160px,1fr)]">
+        {assets.map((asset, idx) => {
+          const layoutItem = layoutItems[idx] ?? {};
+          const colSpan = layoutItem.colSpan ?? 3;
+          const rowSpan = layoutItem.rowSpan ?? 1;
+          const colSpanClass = COL_SPAN_CLASSES[colSpan] ?? "md:col-span-3";
+          const rowSpanClass = ROW_SPAN_CLASSES[rowSpan] ?? "md:row-span-1";
+
+          return (
+            <button
+              key={`${asset.src}-${idx}`}
+              type="button"
+              onClick={() => openAt(idx)}
+              className={`bento-card group relative w-full cursor-pointer overflow-hidden rounded-[8px] bg-[#121212] p-4 transition-opacity duration-300 ease-out ${colSpanClass} ${rowSpanClass}`}
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={asset.src}
+                alt={asset.alt ?? ""}
+                className="h-full w-full object-contain"
+                loading="lazy"
+                draggable={false}
+              />
+            </button>
+          );
+        })}
+      </div>
+
+      <AnimatePresence>
+        {activeIndex !== null ? (
+          <GalleryLightbox
+            assets={assets}
+            activeIndex={activeIndex}
+            onClose={close}
+            onNext={next}
+            onPrev={prev}
           />
-        </div>
-      ) : null}
+        ) : null}
+      </AnimatePresence>
     </>
   );
 }
@@ -172,6 +541,14 @@ export function AssetRenderer({ section }: AssetRendererProps) {
     return (
       <BlurFade delay={0.15} inView inViewMargin="-100px">
         <CarouselView assets={assets} />
+      </BlurFade>
+    );
+  }
+
+  if (section.layout === "bento") {
+    return (
+      <BlurFade delay={0.15} inView inViewMargin="-100px">
+        <BentoView assets={assets} layout={section.bento?.items} />
       </BlurFade>
     );
   }

@@ -32,16 +32,16 @@ export function SectionBlock({ section, index = 0 }: SectionBlockProps) {
         delay: 0.08 + index * 0.06,
         ease: [0.25, 0.1, 0.25, 1],
       }}
-      className="space-y-4"
+      className="space-y-[88px]"
     >
       {section.layout !== "compare" ? (
         <div className="mx-auto max-w-[768px] space-y-4">
           <h2 className="text-[20px] font-medium text-foreground">{section.heading}</h2>
           {captionIntro ? (
-            <p className="text-[16px] leading-relaxed text-muted-foreground">{captionIntro}</p>
+            <p className="text-[16px] leading-relaxed text-[#737373]">{captionIntro}</p>
           ) : null}
           {captionBullets.length > 0 ? (
-            <ul className="list-disc space-y-2 pl-5 text-[16px] leading-relaxed text-muted-foreground">
+            <ul className="list-disc space-y-2 pl-5 text-[16px] leading-relaxed text-[#737373]">
               {captionBullets.map((item) => (
                 <li key={item}>{item}</li>
               ))}
@@ -49,7 +49,7 @@ export function SectionBlock({ section, index = 0 }: SectionBlockProps) {
           ) : null}
         </div>
       ) : null}
-      <div className="mx-auto w-full max-w-[1200px]">
+      <div className="mx-auto w-full max-w-[1400px]">
         <AssetRenderer section={section} />
       </div>
     </motion.section>

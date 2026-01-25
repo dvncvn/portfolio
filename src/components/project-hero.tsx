@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { motion } from "framer-motion";
+import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
+import { useRef } from "react";
 import { WorkProjectAsset } from "@/content/types";
 import type { WorkProjectMeta } from "@/content/types";
 
@@ -20,6 +21,13 @@ export function ProjectHero({
   meta,
   responsibilities,
 }: ProjectHeroProps) {
+  const heroAssetRef = useRef<HTMLDivElement | null>(null);
+  const shouldReduceMotion = useReducedMotion();
+  const { scrollYProgress } = useScroll({
+    target: heroAssetRef,
+    offset: ["start end", "end start"],
+  });
+  const heroParallaxY = useTransform(scrollYProgress, [0, 1], [-24, 24]);
   const heroAspectRatio =
     heroAsset?.aspectRatio ??
     (heroAsset?.width && heroAsset?.height ? `${heroAsset.width}/${heroAsset.height}` : "1/1");
@@ -32,7 +40,7 @@ export function ProjectHero({
         duration: 0.35,
         ease: [0.25, 0.1, 0.25, 1],
       }}
-      className="space-y-2"
+      className="space-y-0"
     >
       {/* Breadcrumb */}
       <nav aria-label="Breadcrumb" className="flex justify-center">
@@ -45,7 +53,7 @@ export function ProjectHero({
       </nav>
 
       {/* Title */}
-      <div className="relative z-10 mx-auto max-w-[768px] -mb-6">
+      <div className="relative z-10 mx-auto mt-12 max-w-[768px] -mb-16">
         <h1 className="text-center text-[36px] font-medium leading-tight text-foreground md:text-[48px]">
           {title}
         </h1>
@@ -53,21 +61,23 @@ export function ProjectHero({
 
       {heroAsset ? (
         <div
-          className="relative z-0 mx-auto w-full max-w-[900px] -mb-8 overflow-visible md:-mb-12"
+          ref={heroAssetRef}
+          className="relative z-0 mx-auto w-full max-w-[900px] -mb-14 overflow-visible md:-mb-20"
           style={{ aspectRatio: heroAspectRatio }}
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
+          <motion.img
             src={heroAsset.src}
             alt={heroAsset.alt ?? ""}
-            className="h-full w-full origin-center scale-[0.85] object-contain md:scale-[1.0]"
+            className="h-full w-full origin-center scale-[0.8] object-contain select-none pointer-events-none md:scale-[0.95]"
             draggable={false}
+            style={{ y: shouldReduceMotion ? 0 : heroParallaxY }}
           />
         </div>
       ) : null}
 
       {/* Summary + metadata */}
-      <div className="relative z-10 mx-auto mt-4 w-full max-w-[768px]">
+      <div className="relative z-10 mx-auto mt-0 w-full max-w-[768px]">
         <div className="grid gap-8 md:grid-cols-[minmax(0,1fr)_270px] md:items-start">
           <div className="space-y-6">
             <h2 className="text-[20px] font-medium text-foreground">Summary</h2>

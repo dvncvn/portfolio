@@ -25,8 +25,8 @@ export function SectionBlock({ section, index = 0 }: SectionBlockProps) {
 
   return (
     <motion.section
-      initial={{ opacity: 1, y: 12 }}
-      animate={{ opacity: 1, y: 0 }}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
       transition={{
         duration: 0.35,
         delay: 0.08 + index * 0.06,

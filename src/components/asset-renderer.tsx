@@ -34,6 +34,30 @@ const ROW_SPAN_CLASSES: Record<number, string> = {
   3: "md:row-span-3",
 };
 
+function MarqueeReviewCard({
+  name,
+  title,
+  body,
+}: {
+  name: string;
+  title?: string;
+  body: string;
+}) {
+  return (
+    <figure className="h-40 w-80 flex-shrink-0 overflow-hidden rounded-[12px] border border-white/10 bg-[#121212] p-5 transition-colors duration-200 ease-out hover:bg-white/5">
+      <figcaption className="flex flex-col gap-0.5">
+        <span className="text-[14px] font-medium text-foreground">{name}</span>
+        {title ? (
+          <span className="text-[12px] text-muted-foreground">{title}</span>
+        ) : null}
+      </figcaption>
+      <blockquote className="mt-3 line-clamp-3 text-[13px] leading-relaxed text-muted-foreground">
+        {body}
+      </blockquote>
+    </figure>
+  );
+}
+
 function useLightbox() {
   const [lightbox, setLightbox] = useState<LightboxState | null>(null);
 
@@ -611,39 +635,17 @@ export function AssetRenderer({ section }: AssetRendererProps) {
     const firstRow = items.slice(0, splitIndex);
     const secondRow = items.slice(splitIndex);
 
-    const ReviewCard = ({
-      name,
-      title,
-      body,
-    }: {
-      name: string;
-      title?: string;
-      body: string;
-    }) => (
-      <figure className="h-40 w-80 flex-shrink-0 overflow-hidden rounded-[12px] border border-white/10 bg-[#121212] p-5 transition-colors duration-200 ease-out hover:bg-white/5">
-        <figcaption className="flex flex-col gap-0.5">
-          <span className="text-[14px] font-medium text-foreground">{name}</span>
-          {title ? (
-            <span className="text-[12px] text-muted-foreground">{title}</span>
-          ) : null}
-        </figcaption>
-        <blockquote className="mt-3 line-clamp-3 text-[13px] leading-relaxed text-muted-foreground">
-          {body}
-        </blockquote>
-      </figure>
-    );
-
     return (
       <BlurFade delay={0.15} inView inViewMargin="-100px">
         <div className="relative flex w-full flex-col gap-4 overflow-hidden">
           <Marquee reverse pauseOnHover speed={35}>
             {firstRow.map((review) => (
-              <ReviewCard key={`${review.name}-${review.body}`} {...review} />
+              <MarqueeReviewCard key={`${review.name}-${review.body}`} {...review} />
             ))}
           </Marquee>
           <Marquee pauseOnHover speed={35}>
             {secondRow.map((review) => (
-              <ReviewCard key={`${review.name}-${review.body}`} {...review} />
+              <MarqueeReviewCard key={`${review.name}-${review.body}`} {...review} />
             ))}
           </Marquee>
           <div className="pointer-events-none absolute inset-y-0 left-0 w-1/4 bg-gradient-to-r from-background md:w-1/2 md:from-40%" />

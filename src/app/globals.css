@@ -143,6 +143,10 @@ html {
 }
 
 /* Bento section hover states */
+.bento-card {
+  contain: content;
+}
+
 .bento-section:hover .bento-card,
 .bento-section:focus-within .bento-card {
   opacity: 0.45;
@@ -232,6 +236,8 @@ html {
 
 .marquee-content {
   --marquee-duration: 60s;
+  will-change: transform;
+  backface-visibility: hidden;
 }
 
 .marquee-content.marquee-forward {

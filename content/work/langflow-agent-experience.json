@@ -1,0 +1,72 @@
+{
+  "slug": "langflow-agent-experience",
+  "title": "Langflow: Agent Experience",
+  "shortScope": "Agent experience",
+  "timeframe": "Nov 2024 – Sep 2025",
+  "nextProject": {
+    "slug": "context-forge",
+    "title": "Context Forge: Reimagined"
+  },
+  "heroAsset": {
+    "type": "image",
+    "src": "/assets/work/langflow-agent-experience/project-page.svg",
+    "alt": "Langflow agent experience diagram",
+    "aspectRatio": "1/1"
+  },
+  "summary": "TODO: Add summary of the Agent Experience project.\n\nDescribe the problem space, your role, and the key outcomes.",
+  "meta": {
+    "company": "DataStax",
+    "dates": "Nov 2024 – Sep 2025",
+    "role": "Design Lead",
+    "team": ["TODO: team composition"]
+  },
+  "responsibilities": [
+    "TODO: Add responsibilities"
+  ],
+  "sections": [
+    {
+      "heading": "",
+      "caption": "Before / After",
+      "layout": "compare",
+      "assets": [
+        {
+          "type": "image",
+          "src": "/assets/work/langflow-agent-experience/before-canvas.png",
+          "alt": "Before",
+          "width": 1152,
+          "height": 864
+        },
+        {
+          "type": "image",
+          "src": "/assets/work/langflow-agent-experience/after-canvas.png",
+          "alt": "After",
+          "width": 1152,
+          "height": 864
+        }
+      ]
+    },
+    {
+      "heading": "TODO: Bento heading",
+      "caption": "TODO: Bento caption",
+      "layout": "bento",
+      "assets": [
+        {
+          "type": "image",
+          "src": "/assets/work/langflow-agent-experience/bento-assets/thumb/card-1-fg.png",
+          "alt": "TODO: Asset description"
+        },
+        {
+          "type": "image",
+          "src": "/assets/work/langflow-agent-experience/bento-assets/thumb/card-2-fg.png",
+          "alt": "TODO: Asset description"
+        }
+      ]
+    },
+    {
+      "heading": "Impact",
+      "caption": "TODO: Add impact description and key metrics.",
+      "layout": "single",
+      "assets": []
+    }
+  ]
+}

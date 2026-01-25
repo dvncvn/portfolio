@@ -25,6 +25,14 @@ export type WorkProjectAsset = {
   width?: number;
   height?: number;
   aspectRatio?: string;
+  row?: number;
+  position?: string;
+  effect?: "vignette";
+  background?: {
+    src: string;
+    inset?: number;
+    filter?: "grayscale";
+  };
 };
 
 export type GithubStarsConfig = {

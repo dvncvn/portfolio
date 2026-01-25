@@ -1,0 +1,110 @@
+{
+  "slug": "context-forge",
+  "title": "Context Forge",
+  "shortScope": "",
+  "timeframe": "",
+  "nextProject": {
+    "slug": "",
+    "title": ""
+  },
+  "heroAsset": {
+    "type": "image",
+    "src": "/assets/work/context-forge/hero.png",
+    "alt": "",
+    "aspectRatio": "1/1"
+  },
+  "summary": "",
+  "meta": {
+    "company": "",
+    "dates": "",
+    "role": "",
+    "team": []
+  },
+  "responsibilities": [],
+  "sections": [
+    {
+      "heading": "",
+      "caption": "",
+      "layout": "compare",
+      "assets": [
+        {
+          "type": "image",
+          "src": "/assets/work/context-forge/before.png",
+          "alt": "Before",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "type": "image",
+          "src": "/assets/work/context-forge/after.png",
+          "alt": "After",
+          "width": 0,
+          "height": 0
+        }
+      ]
+    },
+    {
+      "heading": "",
+      "caption": "",
+      "layout": "bento",
+      "maxWidth": 1400,
+      "assets": [
+        {
+          "type": "image",
+          "src": "/assets/work/context-forge/bento-assets/thumb/card-1-fg.png",
+          "alt": "Server cards overview",
+          "width": 374,
+          "height": 700,
+          "row": 1,
+          "position": "center",
+          "effect": "vignette"
+        },
+        {
+          "type": "image",
+          "src": "/assets/work/context-forge/bento-assets/thumb/card-2-fg.png",
+          "alt": "Dataset details template",
+          "width": 994,
+          "height": 700,
+          "row": 1,
+          "position": "bottom-right"
+        },
+        {
+          "type": "image",
+          "src": "/assets/work/context-forge/bento-assets/thumb/card-3-fg.png",
+          "alt": "Tools list with metrics",
+          "width": 684,
+          "height": 604,
+          "row": 2,
+          "position": "bottom-left"
+        },
+        {
+          "type": "image",
+          "src": "/assets/work/context-forge/bento-assets/thumb/card-4-fg.png",
+          "alt": "Export Virtual MCP Server modal",
+          "width": 684,
+          "height": 604,
+          "row": 2,
+          "position": "center",
+          "background": {
+            "src": "/assets/work/context-forge/bento-assets/thumb/card-4-bg.png",
+            "inset": 8,
+            "filter": "grayscale"
+          }
+        }
+      ]
+    },
+    {
+      "heading": "Impact",
+      "caption": "",
+      "layout": "single-caption",
+      "assets": [
+        {
+          "type": "image",
+          "src": "/assets/work/context-forge/impact.png",
+          "alt": "",
+          "aspectRatio": "16/9"
+        }
+      ]
+    }
+  ]
+}

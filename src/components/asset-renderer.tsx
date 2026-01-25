@@ -507,6 +507,8 @@ function BentoView({
     contentClassName = "",
     backgroundSrc?: string,
     showDotGrid = false,
+    insetBackground = false,
+    verticalFadeDotGrid = false,
   ) => (
     <button
       key={`${asset.src}-${idx}`}
@@ -515,29 +517,42 @@ function BentoView({
       className={`${cardBaseClass} ${className}`}
     >
       {backgroundSrc ? (
-        <>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={backgroundSrc}
-            alt=""
-            aria-hidden="true"
-            className="pointer-events-none absolute inset-0 h-full w-full object-cover grayscale"
-            draggable={false}
-          />
-          <div className="absolute inset-0 bg-black/25" />
-        </>
+        insetBackground ? (
+          <div className="pointer-events-none absolute inset-2 overflow-hidden rounded-[6px]">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={backgroundSrc}
+              alt=""
+              aria-hidden="true"
+              className="absolute inset-0 h-full w-full object-cover grayscale"
+              draggable={false}
+            />
+            <div className="absolute inset-0 bg-black/25" />
+          </div>
+        ) : (
+          <>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={backgroundSrc}
+              alt=""
+              aria-hidden="true"
+              className="pointer-events-none absolute inset-0 h-full w-full object-cover grayscale"
+              draggable={false}
+            />
+            <div className="absolute inset-0 bg-black/25" />
+          </>
+        )
       ) : null}
       {showDotGrid ? (
-        <div className="pointer-events-none absolute inset-2 overflow-hidden rounded-[6px] bg-[#0B0B0B]/60">
+        <div className="pointer-events-none absolute inset-2 overflow-hidden rounded-[6px] bg-[#0B0A09]">
           <DotPattern
             width={12}
             height={12}
             cx={1}
             cy={1}
             cr={1}
-            className="text-white/6"
+            className={`text-white/6 ${verticalFadeDotGrid ? "[mask-image:linear-gradient(to_bottom,transparent_0%,black_15%,black_85%,transparent_100%)]" : "[mask-image:radial-gradient(ellipse_at_center,black_55%,transparent_100%)]"}`}
           />
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(0,0,0,0)_55%,rgba(0,0,0,0.7)_100%)]" />
         </div>
       ) : null}
       {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -551,11 +566,69 @@ function BentoView({
     </button>
   );
   const isCustomFiveUp = assets.length === 5 && (!layout || layout.length === 0);
+  const isCustomTwoUp = assets.length === 2 && (!layout || layout.length === 0);
+  const isCustomFourUp = assets.length === 4 && assets.some(a => a.effect === "vignette" || a.background);
   const bentoTwoBackground = "/assets/work/langflow-platform-redesign/bento-assets/thumbs/bento-2-bg.png";
+  const agentExpCard2Background = "/assets/work/langflow-agent-experience/bento-assets/thumb/card-2-bg.png";
 
   return (
     <>
-      {isCustomFiveUp ? (
+      {isCustomFourUp ? (
+        <div className="bento-section max-w-[1400px] mx-auto space-y-8">
+          {/* Row 1: 374px + 994px = 1368px + 32px gap */}
+          <div className="grid gap-8 md:[grid-template-columns:374fr_994fr] md:items-stretch">
+            {renderCard(
+              assets[0],
+              0,
+              "!aspect-auto h-[700px] p-2",
+              "scale-[0.7]",
+              undefined,
+              true,
+              false,
+              true,
+            )}
+            {renderCard(
+              assets[1],
+              1,
+              "!aspect-auto h-[700px]",
+              "absolute bottom-4 right-4 top-auto left-auto h-auto w-auto max-h-[calc(100%-2rem)] max-w-[calc(100%-2rem)] object-contain object-bottom",
+            )}
+          </div>
+          {/* Row 2: 684px + 684px */}
+          <div className="grid gap-8 md:grid-cols-2 md:items-stretch">
+            {renderCard(
+              assets[2],
+              2,
+              "!aspect-auto h-[604px]",
+              "absolute bottom-4 left-4 top-auto right-auto h-auto w-auto max-h-[calc(100%-2rem)] max-w-[calc(100%-2rem)] object-contain object-left-bottom",
+            )}
+            {renderCard(
+              assets[3],
+              3,
+              "!aspect-auto h-[604px]",
+              "relative z-10 h-auto w-auto max-h-full max-w-full object-contain m-auto scale-[0.7]",
+              assets[3].background?.src,
+              false,
+              true,
+            )}
+          </div>
+        </div>
+      ) : isCustomTwoUp ? (
+        <div className="bento-section">
+          <div className="grid gap-8 md:[grid-template-columns:0.683fr_0.317fr] md:items-stretch">
+            {renderCard(assets[0], 0, "p-2 !aspect-auto h-[700px]", "scale-[0.88]", undefined, true)}
+            {renderCard(
+              assets[1],
+              1,
+              "!aspect-auto h-[700px] p-2",
+              "relative z-10 h-full w-full object-contain object-top",
+              agentExpCard2Background,
+              false,
+              true,
+            )}
+          </div>
+        </div>
+      ) : isCustomFiveUp ? (
         <div className="bento-section space-y-8">
           <div className="grid gap-8 md:[grid-template-columns:0.349fr_0.651fr]">
             {renderCard(assets[0], 0, "md:h-[540px]", "scale-[0.82]")}

@@ -1,0 +1,38 @@
+{
+  "slug": "astra-db",
+  "title": "Astra",
+  "shortScope": "",
+  "timeframe": "",
+  "nextProject": {
+    "slug": "",
+    "title": ""
+  },
+  "heroAsset": {
+    "type": "image",
+    "src": "/assets/work/astra/hero.png",
+    "alt": "",
+    "aspectRatio": "1/1"
+  },
+  "summary": "",
+  "meta": {
+    "company": "DataStax",
+    "dates": "",
+    "role": "",
+    "team": []
+  },
+  "responsibilities": [],
+  "sections": [
+    {
+      "heading": "",
+      "caption": "",
+      "layout": "single",
+      "assets": [
+        {
+          "type": "image",
+          "src": "/assets/work/astra/section-1.png",
+          "alt": ""
+        }
+      ]
+    }
+  ]
+}

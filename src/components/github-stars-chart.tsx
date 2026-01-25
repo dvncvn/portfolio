@@ -2,6 +2,7 @@
 
 import { useRef, useState } from "react";
 import { motion, useInView, AnimatePresence } from "framer-motion";
+import { NumberTicker } from "@/components/ui/number-ticker";
 
 type GithubStarsChartProps = {
   startStars?: number;
@@ -26,7 +27,7 @@ export function GithubStarsChart({
 
   // Chart dimensions - 768px max width, annotation outside
   const width = 768;
-  const height = 420;
+  const height = 520;
   const paddingTop = 80;
   const paddingBottom = 50;
   const chartHeight = height - paddingTop - paddingBottom;
@@ -205,7 +206,7 @@ export function GithubStarsChart({
             height="50"
             initial={{ opacity: 0 }}
             animate={isInView ? { opacity: 1 } : { opacity: 0 }}
-            transition={{ duration: 0.4, delay: 2.4 }}
+            transition={{ duration: 0.4, delay: 1.0 }}
           >
             <a
               href="https://github.com/langflow-ai/langflow"
@@ -216,7 +217,15 @@ export function GithubStarsChart({
               onMouseLeave={() => setIsHovered(false)}
             >
               <span className="text-[14px] font-medium text-[#E9E9E2]">
-                {endLabel}: {formatStars(currentStars)} stars
+                {endLabel}:{" "}
+                <NumberTicker
+                  value={currentStars}
+                  startValue={midStars}
+                  delay={0}
+                  duration={1.6}
+                  formatFn={formatStars}
+                />
+                {" "}stars
               </span>
               <AnimatePresence>
                 {isHovered && (

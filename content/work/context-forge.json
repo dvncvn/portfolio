@@ -4,23 +4,28 @@
   "shortScope": "",
   "timeframe": "",
   "nextProject": {
-    "slug": "",
-    "title": ""
+    "slug": "astra-db",
+    "title": "Astra"
   },
   "heroAsset": {
     "type": "image",
-    "src": "/assets/work/context-forge/hero.png",
-    "alt": "",
+    "src": "/assets/work/context-forge/project-page.svg",
+    "alt": "Context Forge project artwork",
     "aspectRatio": "1/1"
   },
-  "summary": "",
+  "summary": "Langflow had accumulated years of experience debt. The UI was dated, the mental model was inconsistent, and the product no longer reflected the pace or expectations of modern AI development.\n\nIn parallel with a brand refresh, I led a full end-to-end redesign of the platform to modernize Langflow quickly and decisively.\n\nI owned the entire product surface. Information architecture, interaction patterns, visual language, and shipped quality.",
   "meta": {
-    "company": "",
-    "dates": "",
-    "role": "",
-    "team": []
+    "company": "DataStax",
+    "dates": "Oct – Dec 2024",
+    "role": "Design Lead + Product leader",
+    "team": ["2 designers", "6 engineers"]
   },
-  "responsibilities": [],
+  "responsibilities": [
+    "Information architecture",
+    "Interaction design",
+    "Visual system",
+    "Prototyping with engineers"
+  ],
   "sections": [
     {
       "heading": "",
@@ -44,8 +49,8 @@
       ]
     },
     {
-      "heading": "",
-      "caption": "",
+      "heading": "System level change",
+      "caption": "This work went far beyond visual polish. The redesign addressed foundational UX problems using appropriate, modern patterns.\n\n- Established clear hierarchy and sign-posting across the product.\n- Drastically improved usability by reducing noise and cognitive load.\n- Moved beyond raw concepts like 'tokens' and 'variables' toward intent-driven configuration.\n- Reframed the experience so Langflow felt like a serious, modern platform.",
       "layout": "bento",
       "maxWidth": 1400,
       "assets": [

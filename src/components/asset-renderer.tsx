@@ -580,18 +580,14 @@ function BentoView({
             {renderCard(
               assets[0],
               0,
-              "!aspect-auto h-[700px] p-2",
-              "scale-[0.7]",
-              undefined,
-              true,
-              false,
-              true,
+              "!aspect-auto h-[700px]",
+              "scale-[0.95] [mask-image:linear-gradient(to_bottom,transparent_0%,black_15%,black_85%,transparent_100%)]",
             )}
             {renderCard(
               assets[1],
               1,
-              "!aspect-auto h-[700px]",
-              "absolute bottom-4 right-4 top-auto left-auto h-auto w-auto max-h-[calc(100%-2rem)] max-w-[calc(100%-2rem)] object-contain object-bottom",
+              "!aspect-auto h-[700px] !p-0 !pt-8",
+              "absolute bottom-0 right-0 top-auto left-auto h-auto w-auto max-h-full max-w-full object-contain object-right-bottom",
             )}
           </div>
           {/* Row 2: 684px + 684px */}
@@ -599,14 +595,14 @@ function BentoView({
             {renderCard(
               assets[2],
               2,
-              "!aspect-auto h-[604px]",
-              "absolute bottom-4 left-4 top-auto right-auto h-auto w-auto max-h-[calc(100%-2rem)] max-w-[calc(100%-2rem)] object-contain object-left-bottom",
+              "!aspect-auto h-[604px] !p-0 !pt-8",
+              "absolute bottom-0 left-0 top-auto right-auto h-auto w-auto max-h-full max-w-full object-contain object-left-bottom",
             )}
             {renderCard(
               assets[3],
               3,
               "!aspect-auto h-[604px]",
-              "relative z-10 h-auto w-auto max-h-full max-w-full object-contain m-auto scale-[0.7]",
+              "relative z-10 h-auto w-auto max-h-full max-w-full object-contain m-auto scale-[0.8]",
               assets[3].background?.src,
               false,
               true,

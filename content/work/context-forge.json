@@ -1,11 +1,11 @@
 {
   "slug": "context-forge",
-  "title": "Context Forge",
+  "title": "Context Forge: Reimagined",
   "shortScope": "",
   "timeframe": "",
   "nextProject": {
     "slug": "astra-db",
-    "title": "Astra"
+    "title": "Astra DB: Designing an AI Native Database"
   },
   "heroAsset": {
     "type": "image",
@@ -49,8 +49,8 @@
       ]
     },
     {
-      "heading": "System level change",
-      "caption": "This work went far beyond visual polish. The redesign addressed foundational UX problems using appropriate, modern patterns.\n\n- Established clear hierarchy and sign-posting across the product.\n- Drastically improved usability by reducing noise and cognitive load.\n- Moved beyond raw concepts like 'tokens' and 'variables' toward intent-driven configuration.\n- Reframed the experience so Langflow felt like a serious, modern platform.",
+      "heading": "",
+      "caption": "",
       "layout": "bento",
       "maxWidth": 1400,
       "assets": [

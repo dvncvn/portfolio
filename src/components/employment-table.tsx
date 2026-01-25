@@ -1,7 +1,5 @@
 "use client";
 
-import Link from "next/link";
-
 export type EmploymentRow = {
   role: string;
   roleFlag?: string | null;
@@ -12,6 +10,7 @@ export type EmploymentRow = {
 
 type EmploymentTableProps = {
   rows: EmploymentRow[];
+  onViewHistory?: () => void;
 };
 
 function formatYearsShort(years: string) {
@@ -31,14 +30,14 @@ function formatYearsShort(years: string) {
   return `${toShort(start)} - ${toShort(end)}`;
 }
 
-export function EmploymentTable({ rows }: EmploymentTableProps) {
+export function EmploymentTable({ rows, onViewHistory }: EmploymentTableProps) {
   return (
-    <div className="w-full max-w-none lg:max-w-[520px] lg:ml-auto">
-      <table className="w-full table-fixed border-collapse text-[14px]">
+    <div className="w-full max-w-[768px]">
+      <table className="w-full table-fixed border-collapse text-[16px]">
         <colgroup>
           <col />
-          <col className="hidden w-[96px] sm:table-column" />
-          <col className="w-[96px] sm:w-[120px]" />
+          <col className="hidden w-[120px] sm:table-column" />
+          <col className="w-[96px] sm:w-[140px]" />
         </colgroup>
         <tbody>
           {rows.map((row, idx) => (
@@ -72,21 +71,41 @@ export function EmploymentTable({ rows }: EmploymentTableProps) {
                 </div>
               </td>
 
-              <td className="py-2 align-middle text-right font-mono tabular-nums text-muted-foreground whitespace-nowrap">
+              <td className="py-2 pl-4 align-middle text-right font-mono tabular-nums text-muted-foreground whitespace-nowrap">
                 <span className="sm:hidden">{formatYearsShort(row.years)}</span>
-                <span className="hidden sm:inline">{row.years}</span>
+                <span className="hidden sm:inline">{row.years.replace(/Now$/, "Now ")}</span>
               </td>
             </tr>
           ))}
         </tbody>
       </table>
 
-      <Link
-        href="/info"
-        className="mt-6 block text-[14px] text-muted-foreground transition-colors hover:text-foreground"
-      >
-        View full 12 year history
-      </Link>
+      {onViewHistory && (
+        <button
+          type="button"
+          onClick={onViewHistory}
+          className="group/btn -ml-3 mt-6 inline-flex items-center gap-2 rounded-md px-3 py-1.5 text-[14px] text-muted-foreground transition-all duration-200 ease-out hover:bg-white/[0.06] hover:text-foreground"
+        >
+          <span>View full 12 year history</span>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className="transition-transform duration-200 ease-out group-hover/btn:scale-110"
+          >
+            <path d="M15 3h6v6"/>
+            <path d="m21 3-7 7"/>
+            <path d="m3 21 7-7"/>
+            <path d="M9 21H3v-6"/>
+          </svg>
+        </button>
+      )}
     </div>
   );
 }

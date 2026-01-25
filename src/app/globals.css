@@ -182,6 +182,11 @@ html {
   display: none;
 }
 
+/* Generic scrollbar hide utility */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
 /* Play card hover surface (theme aware) */
 .play-card {
   position: relative;

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { EmploymentTable, type EmploymentRow } from "@/components/employment-table";
-import { ResumeTakeover, type ResumeEntry } from "@/components/resume-takeover";
+import { ResumeTakeover, type ResumeData } from "@/components/resume-takeover";
 import { BlurFade } from "@/components/ui/blur-fade";
 import { motion } from "framer-motion";
 
@@ -65,19 +65,123 @@ const workHistory: EmploymentRow[] = [
   },
 ];
 
-const fullWorkHistory: ResumeEntry[] = [
-  { role: "Staff Product Designer", company: "IBM", years: "2025 – Now" },
-  { role: "Staff Product Designer", company: "DataStax", years: "2024 – 2025" },
-  { role: "Product Design Manager", company: "DataStax", years: "2023 – 2024" },
-  { role: "Senior Product Designer", company: "DataStax", years: "2022 – 2023" },
-  { role: "Senior Product Designer", company: "Instacart", years: "2021 – 2022" },
-  { role: "Product Designer", company: "Instacart", years: "2020 – 2021" },
-  { role: "Product Designer", company: "Dropbox", years: "2018 – 2020" },
-  { role: "Product Designer", company: "Optimizely", years: "2016 – 2018" },
-  { role: "UX Designer", company: "Optimizely", years: "2015 – 2016" },
-  { role: "UX Designer", company: "Freelance", years: "2014 – 2015" },
-  { role: "Visual Designer", company: "Agency", years: "2013 – 2014" },
-];
+const resumeData: ResumeData = {
+  name: "Simon Duncan",
+  title: "Staff Product Designer",
+  location: "Madison, WI (Remote)",
+  portfolio: "simonduncan.co",
+  email: "simonfraserduncan@gmail.com",
+  phone: "612 704 0593",
+  summary: "Focused on developer tools and AI products. Strong product intuition, high judgment in ambiguity, and end-to-end execution from framing to shipped UI. Close engineering partner, often prototyping in code.",
+  sections: [
+    {
+      title: "Experience",
+      entries: [
+        {
+          company: "IBM (via DataStax acquisition)",
+          role: "Staff Product Designer",
+          location: "Madison, WI (Remote)",
+          years: "Dec 2020 – Present",
+          progression: "Senior Product Designer → Design Manager → Staff Product Designer",
+          bullets: [
+            "Design lead for Langflow, an open-source visual GenAI agent builder. Helped scale adoption from 14k to 140k+ GitHub stars by improving onboarding, templates, and the core developer experience",
+            "Led product design for Astra DB, contributing to growth from 0 to $70M+ ARR",
+            "Managed a team of 4 designers during DataStax's pivot to an AI-first company, maintaining momentum through organizational change",
+            "Defined cloud experience success metrics with product and engineering leadership to tie UX investment to measurable outcomes",
+            "Contributed to securing $115M Series E funding through product narrative, experience storytelling, and customer-ready demos",
+            "Only design IC recipient of the Ellis Award for outstanding business impact",
+          ],
+        },
+        {
+          company: "New Relic",
+          role: "Senior Product Designer",
+          location: "Portland, OR",
+          years: "2020",
+          bullets: [
+            "Redesigned the New Relic One admin portal, simplifying key platform administration workflows and improving usability for enterprise teams",
+          ],
+        },
+        {
+        company: "Scott Logic",
+        role: "Lead Product Designer",
+        location: "Edinburgh, United Kingdom",
+        years: "2019 – 2020",
+          bullets: [
+            "Led FinTech engagements across retail and institutional products, partnering with engineering to ship end-to-end improvements",
+            "Co-led a 10-person design team, supporting hiring and mentoring",
+            "Built and ran the graduate design program, including recruiting, onboarding, and coaching",
+          ],
+        },
+        {
+          company: "Branch",
+          role: "Product Designer",
+          location: "Minneapolis, MN (Remote)",
+          years: "2020",
+          bullets: [
+            "Established foundational user research practices during COVID-era volatility, capturing customer anxieties and translating insights into product decisions",
+          ],
+        },
+        {
+          company: "Trek Bicycle",
+          role: "Product Designer",
+          location: "Madison, WI",
+          years: "2018",
+          bullets: [
+            "Led UX research, experimentation, and analytics for Trekbikes.com, including A/B testing and funnel analysis to drive iterative improvements",
+          ],
+        },
+        {
+          company: "Cloudability",
+          role: "Product Designer",
+          location: "Boulder, CO",
+          years: "2017",
+          bullets: [
+            "Led design for automation and container-related experiences, with emphasis on operational clarity and data visualization",
+          ],
+        },
+        {
+          company: "IHS Markit",
+          role: "Product Designer",
+          location: "Boulder, CO",
+          years: "2015 – 2017",
+          bullets: [
+            "Led product design engagements with FinTech teams across discovery, interaction design, and shipped UI",
+          ],
+        },
+        {
+        company: "Scott Logic",
+        role: "UX Designer",
+        location: "Edinburgh, United Kingdom",
+        years: "2013 – 2015",
+          bullets: [
+            "Delivered product design for FinTech clients, from discovery through execution",
+          ],
+        },
+        {
+          company: "Great Wolf Lodge",
+          role: "Content Manager",
+          location: "Madison, WI",
+          years: "2012 – 2013",
+          bullets: [
+            "Owned A/B testing and site optimization for a high-traffic, revenue-critical site",
+          ],
+        },
+      ],
+    },
+  ],
+  education: {
+    degree: "BA, Music and Technology",
+    school: "University of East Anglia, Norwich, England",
+    honors: "First Class Honours",
+  },
+  skills: "Product strategy, problem framing, information architecture, interaction design, UI design, design systems, prototyping, discovery, qualitative research, quantitative analysis, experimentation and A/B testing, metrics definition, stakeholder management, team leadership, basic front-end development",
+  tools: [
+    "Figma, prototyping, design systems tooling",
+    "Cursor, Warp, hands-on coding and rapid iteration",
+    "Midjourney and image tooling for concept exploration and production assets",
+    "Prompting, agent-assisted workflows, and AI-enabled prototyping to accelerate exploration and delivery",
+  ],
+};
 
 export default function InfoPage() {
   const [isResumeOpen, setIsResumeOpen] = useState(false);
@@ -117,16 +221,13 @@ export default function InfoPage() {
                 Ways of Working
               </h2>
               <ul className="list-disc space-y-2 pl-5 text-base leading-relaxed text-muted-foreground">
-                <li>Staff-level product designer operating across strategy, systems, and execution</li>
-                <li>End-to-end: problem framing and mental models through interaction design and shipped UI</li>
-                <li>Strong in ambiguous, zero-to-one spaces where patterns do not exist yet</li>
-                <li>Strong product intuition. I use it to make clear calls and move work forward without waiting on perfect inputs or a heavily staffed PM layer</li>
-                <li>Systems thinker who designs for humans, prioritizing clarity, hierarchy, and intent over novelty</li>
-                <li>Close collaboration with engineering, often working directly in code or design-adjacent prototypes</li>
-                <li>Not wed to any particular process or tool. I&apos;ll use what works and drop what doesn&apos;t</li>
-                <li>Here to ship, not to chase imaginary UX awards or perform a perfect process</li>
-                <li>Momentum and judgment over process theater. Artifacts exist to accelerate decisions and delivery, not to perform alignment</li>
-                <li>Particularly interested in developer tools, agentic systems, and products where UX meaningfully shapes what&apos;s possible</li>
+                <li>End-to-end: problem framing through shipped UI</li>
+                <li>Strong in ambiguous, zero-to-one spaces</li>
+                <li>Strong product intuition. I make calls and keep momentum without waiting on perfect inputs or PM coverage</li>
+                <li>Systems-minded, human-centered. Clarity, hierarchy, intent over novelty</li>
+                <li>Partner tightly with engineering, often in code or prototypes</li>
+                <li>Flexible on process and tools. I&apos;ll use what works and drop what doesn&apos;t</li>
+                <li>Focused on developer tools and agentic systems where UX shapes what&apos;s possible</li>
               </ul>
             </div>
           </BlurFade>
@@ -138,7 +239,7 @@ export default function InfoPage() {
                 Outside of Work
               </h2>
               <p className="text-base leading-relaxed text-muted-foreground">
-                Outside of product design, I&apos;m a parent, runner, and musician.
+                Outside of product design, I&apos;m a parent, husband, runner, and musician.
               </p>
               <p className="text-base leading-relaxed text-muted-foreground">
                 I spend a lot of time thinking about creativity, constraint, and sustainability. I make music that blends ambient, electronic, and guitar-driven textures, and I&apos;m interested in long-term lifestyle design, balancing ambition with family, health, and creative output.
@@ -163,7 +264,7 @@ export default function InfoPage() {
       <ResumeTakeover
         isOpen={isResumeOpen}
         onClose={() => setIsResumeOpen(false)}
-        entries={fullWorkHistory}
+        data={resumeData}
         resumeUrl="/assets/resume.pdf"
       />
     </div>

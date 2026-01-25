@@ -5,6 +5,8 @@ import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { motion, useMotionValueEvent, useScroll } from "framer-motion";
 import { HyperText } from "@/components/ui/hyper-text";
+import { CommandPalette } from "@/components/command-palette";
+import { RatModeDialog } from "@/components/rat-mode-dialog";
 
 type SiteShellProps = {
   children: React.ReactNode;
@@ -50,16 +52,87 @@ function useHideOnScroll() {
   return hidden;
 }
 
+const RAT_MODE_SEQUENCE = "rat mode";
+
 export function SiteShell({ children }: SiteShellProps) {
   const pathname = usePathname();
   const router = useRouter();
   const hidden = useHideOnScroll();
+  const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
+  const [ratModeDialogOpen, setRatModeDialogOpen] = useState(false);
+  const [ratModeActive, setRatModeActive] = useState(false);
+  const keySequenceRef = useRef("");
 
   const isActive = (href: string) => {
     if (href === "/") {
       return pathname === "/" || pathname.startsWith("/work");
     }
     return pathname.startsWith(href);
+  };
+
+  // Handle '/' key to open command palette
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Don't trigger if user is typing in an input
+      const target = e.target as HTMLElement;
+      if (
+        target.tagName === "INPUT" ||
+        target.tagName === "TEXTAREA" ||
+        target.isContentEditable
+      ) {
+        return;
+      }
+
+      if (e.key === "/") {
+        e.preventDefault();
+        setCommandPaletteOpen((prev) => !prev);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
+
+  // Detect "rat mode" sequence
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Don't trigger if user is typing in an input or dialog is open
+      const target = e.target as HTMLElement;
+      if (
+        target.tagName === "INPUT" ||
+        target.tagName === "TEXTAREA" ||
+        target.isContentEditable ||
+        ratModeDialogOpen
+      ) {
+        return;
+      }
+
+      // Only track printable characters
+      if (e.key.length === 1) {
+        keySequenceRef.current += e.key.toLowerCase();
+        
+        // Keep only the last N characters (length of sequence)
+        if (keySequenceRef.current.length > RAT_MODE_SEQUENCE.length) {
+          keySequenceRef.current = keySequenceRef.current.slice(-RAT_MODE_SEQUENCE.length);
+        }
+
+        // Check for match
+        if (keySequenceRef.current === RAT_MODE_SEQUENCE) {
+          keySequenceRef.current = "";
+          setRatModeDialogOpen(true);
+        }
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [ratModeDialogOpen]);
+
+  const handleRatModeConfirm = () => {
+    setRatModeActive(true);
+    setRatModeDialogOpen(false);
+    // Rat mode is now active - can be used for whatever effect you want
+    console.log("🐀 Rat mode activated!");
   };
 
   return (
@@ -136,7 +209,7 @@ export function SiteShell({ children }: SiteShellProps) {
       {/* Spacer for fixed header */}
       <div className="h-[72px]" />
 
-      <main id="main-content" tabIndex={-1} className="w-full px-6">
+      <main id="main-content" tabIndex={-1} className="w-full px-6 focus:outline-none">
         <div className="mx-auto w-full max-w-[1400px]">{children}</div>
       </main>
 
@@ -162,6 +235,19 @@ export function SiteShell({ children }: SiteShellProps) {
           </div>
         </div>
       </footer>
+
+      {/* Command Palette */}
+      <CommandPalette
+        isOpen={commandPaletteOpen}
+        onClose={() => setCommandPaletteOpen(false)}
+      />
+
+      {/* Rat Mode Dialog */}
+      <RatModeDialog
+        isOpen={ratModeDialogOpen}
+        onClose={() => setRatModeDialogOpen(false)}
+        onConfirm={handleRatModeConfirm}
+      />
     </div>
   );
 }

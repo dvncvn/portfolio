@@ -2,10 +2,34 @@ import { notFound } from "next/navigation";
 import { getWorkProject, getWorkProjectSlugs } from "@/content/work";
 import { ProjectHero } from "@/components/project-hero";
 import { SectionBlock } from "@/components/section-block";
+import { getGithubStars } from "@/lib/github";
+import type { WorkProjectSection } from "@/content/types";
 
 export async function generateStaticParams() {
   const slugs = await getWorkProjectSlugs();
   return slugs.map((slug) => ({ slug }));
+}
+
+async function enrichSectionsWithGithubStars(
+  sections: WorkProjectSection[]
+): Promise<WorkProjectSection[]> {
+  return Promise.all(
+    sections.map(async (section) => {
+      if (section.layout === "github-stars" && section.githubStars?.repo) {
+        const stars = await getGithubStars(section.githubStars.repo);
+        if (stars !== null) {
+          return {
+            ...section,
+            githubStars: {
+              ...section.githubStars,
+              currentStars: stars,
+            },
+          };
+        }
+      }
+      return section;
+    })
+  );
 }
 
 export default async function WorkProjectPage({
@@ -16,6 +40,9 @@ export default async function WorkProjectPage({
   const { slug } = await params;
   const project = await getWorkProject(slug);
   if (!project) return notFound();
+
+  // Fetch dynamic GitHub stars for sections that need it
+  const sections = await enrichSectionsWithGithubStars(project.sections);
 
   return (
     <div className="py-20">
@@ -29,7 +56,7 @@ export default async function WorkProjectPage({
         />
 
         <div className="space-y-[88px]">
-          {project.sections.map((section, idx) => (
+          {sections.map((section, idx) => (
             <SectionBlock key={`${section.heading}-${idx}`} section={section} index={idx} />
           ))}
         </div>

@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { BentoLayoutItem, WorkProjectAsset, WorkProjectSection } from "@/content/types";
 import { CompareView } from "@/components/compare-view";
 import { BlurFade } from "@/components/ui/blur-fade";
+import { GithubStarsChart } from "@/components/github-stars-chart";
 
 type AssetRendererProps = {
   section: WorkProjectSection;
@@ -531,6 +532,15 @@ export function AssetRenderer({ section }: AssetRendererProps) {
         height={left.height}
         description={section.caption}
       />
+    );
+  }
+
+  // Handle github-stars layout before checking assets
+  if (section.layout === "github-stars") {
+    return (
+      <BlurFade delay={0.15} inView inViewMargin="-100px">
+        <GithubStarsChart {...(section.githubStars ?? {})} />
+      </BlurFade>
     );
   }
 

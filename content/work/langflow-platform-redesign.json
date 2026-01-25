@@ -71,6 +71,21 @@
           "height": 1968
         }
       ]
+    },
+    {
+      "heading": "Impact",
+      "caption": "My design work helped grow Langflow from a technically capable but fragmented product into DataStax's tip of the spear. It became a major driver of top-of-funnel growth and increased Astra DB consumption on our cloud platform.\n\nA major redesign helped put Langflow on stage with Jensen Huang. During my time as lead designer, Langflow grew from 14k to 144k GitHub stars.\n\nThe response to the work was strong, both internally and externally.\n\nOverall, I helped evolve Langflow from a promising prototype into a modern developer tool that belongs in today's AI stack.",
+      "layout": "github-stars",
+      "assets": [],
+      "githubStars": {
+        "repo": "langflow-ai/langflow",
+        "startStars": 0,
+        "midStars": 14000,
+        "currentStars": 144000,
+        "startLabel": "Mar '23",
+        "midLabel": "Apr '24",
+        "endLabel": "Today"
+      }
     }
   ]
 }

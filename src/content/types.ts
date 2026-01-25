@@ -1,6 +1,6 @@
 export type AssetType = "image" | "video";
 
-export type SectionLayout = "single" | "split" | "stacked" | "compare" | "carousel" | "bento";
+export type SectionLayout = "single" | "split" | "stacked" | "compare" | "carousel" | "bento" | "github-stars";
 
 export type BentoLayoutItem = {
   colSpan?: number;
@@ -18,6 +18,16 @@ export type WorkProjectAsset = {
   aspectRatio?: string;
 };
 
+export type GithubStarsConfig = {
+  repo?: string;
+  startStars?: number;
+  midStars?: number;
+  currentStars?: number;
+  startLabel?: string;
+  midLabel?: string;
+  endLabel?: string;
+};
+
 export type WorkProjectSection = {
   heading: string;
   caption?: string;
@@ -26,6 +36,7 @@ export type WorkProjectSection = {
   bento?: {
     items?: BentoLayoutItem[];
   };
+  githubStars?: GithubStarsConfig;
 };
 
 export type WorkProjectMeta = {

@@ -81,7 +81,7 @@ export function ProjectHero({
         <div className="grid gap-8 md:grid-cols-[minmax(0,1fr)_270px] md:items-start">
           <div className="space-y-6">
             <h2 className="text-[20px] font-medium text-foreground">Summary</h2>
-            <div className="space-y-10 text-[16px] leading-relaxed text-muted-foreground">
+            <div className="space-y-5 text-[16px] leading-relaxed text-muted-foreground">
               {summary
                 .split(/\n\s*\n/g)
                 .map((p) => p.trim())

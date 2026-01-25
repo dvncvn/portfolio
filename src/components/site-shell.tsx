@@ -3,10 +3,13 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { motion, useMotionValueEvent, useScroll } from "framer-motion";
 import { HyperText } from "@/components/ui/hyper-text";
 import { CommandPalette } from "@/components/command-palette";
 import { RatModeDialog } from "@/components/rat-mode-dialog";
+import { ResumeProvider, useResume } from "@/contexts/resume-context";
+import { ResumeTakeover } from "@/components/resume-takeover";
 
 type SiteShellProps = {
   children: React.ReactNode;
@@ -54,7 +57,7 @@ function useHideOnScroll() {
 
 const RAT_MODE_SEQUENCE = "rat mode";
 
-export function SiteShell({ children }: SiteShellProps) {
+function SiteShellContent({ children }: SiteShellProps) {
   const pathname = usePathname();
   const router = useRouter();
   const hidden = useHideOnScroll();
@@ -62,6 +65,7 @@ export function SiteShell({ children }: SiteShellProps) {
   const [ratModeDialogOpen, setRatModeDialogOpen] = useState(false);
   const [ratModeActive, setRatModeActive] = useState(false);
   const keySequenceRef = useRef("");
+  const { isOpen: isResumeOpen, closeResume, resumeData, resumeUrl } = useResume();
 
   const isActive = (href: string) => {
     if (href === "/") {
@@ -131,12 +135,118 @@ export function SiteShell({ children }: SiteShellProps) {
   const handleRatModeConfirm = () => {
     setRatModeActive(true);
     setRatModeDialogOpen(false);
-    // Rat mode is now active - can be used for whatever effect you want
     console.log("🐀 Rat mode activated!");
   };
 
+  // ESC to exit rat mode
+  useEffect(() => {
+    if (!ratModeActive) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        e.preventDefault();
+        setRatModeActive(false);
+        console.log("🐀 Rat mode deactivated");
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [ratModeActive]);
+
+  // Apply rat-mode class to html element for full effect
+  useEffect(() => {
+    if (ratModeActive) {
+      document.documentElement.classList.add("rat-mode");
+    } else {
+      document.documentElement.classList.remove("rat-mode");
+    }
+    return () => {
+      document.documentElement.classList.remove("rat-mode");
+    };
+  }, [ratModeActive]);
+
+  // 🐀 RAT MODE MUSIC - chaotic chiptune generator
+  useEffect(() => {
+    if (!ratModeActive) return;
+
+    let audioContext: AudioContext | null = null;
+    let isPlaying = true;
+
+    const startMusic = () => {
+      audioContext = new AudioContext();
+      const masterGain = audioContext.createGain();
+      masterGain.gain.value = 0.15;
+      masterGain.connect(audioContext.destination);
+
+      // Chaotic arpeggio notes (pentatonic for less dissonance but still chaotic)
+      const notes = [261.63, 293.66, 329.63, 392.00, 440.00, 523.25, 587.33, 659.25];
+      
+      const playNote = () => {
+        if (!audioContext || !isPlaying) return;
+
+        const osc = audioContext.createOscillator();
+        const noteGain = audioContext.createGain();
+        
+        // Random waveform for variety
+        const waveforms: OscillatorType[] = ["square", "sawtooth", "triangle"];
+        osc.type = waveforms[Math.floor(Math.random() * waveforms.length)];
+        
+        // Random note from our scale, sometimes octave up
+        const baseNote = notes[Math.floor(Math.random() * notes.length)];
+        osc.frequency.value = Math.random() > 0.7 ? baseNote * 2 : baseNote;
+        
+        osc.connect(noteGain);
+        noteGain.connect(masterGain);
+        
+        // Quick attack/decay envelope
+        const now = audioContext.currentTime;
+        noteGain.gain.setValueAtTime(0.3, now);
+        noteGain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
+        
+        osc.start(now);
+        osc.stop(now + 0.15);
+
+        // Random tempo between 80-200ms for chaos
+        const nextTime = 80 + Math.random() * 120;
+        setTimeout(playNote, nextTime);
+      };
+
+      // Start the chaos
+      playNote();
+
+      // Add a bass drone for extra ridiculousness
+      const bassOsc = audioContext.createOscillator();
+      const bassGain = audioContext.createGain();
+      bassOsc.type = "sawtooth";
+      bassOsc.frequency.value = 65.41; // Low C
+      bassGain.gain.value = 0.08;
+      bassOsc.connect(bassGain);
+      bassGain.connect(masterGain);
+      bassOsc.start();
+
+      // Wobble the bass
+      const lfo = audioContext.createOscillator();
+      const lfoGain = audioContext.createGain();
+      lfo.frequency.value = 5;
+      lfoGain.gain.value = 10;
+      lfo.connect(lfoGain);
+      lfoGain.connect(bassOsc.frequency);
+      lfo.start();
+    };
+
+    startMusic();
+
+    return () => {
+      isPlaying = false;
+      if (audioContext) {
+        audioContext.close();
+      }
+    };
+  }, [ratModeActive]);
+
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="flex min-h-screen flex-col bg-background text-foreground">
       {/* Skip link for keyboard users */}
       <a
         href="#main-content"
@@ -209,7 +319,7 @@ export function SiteShell({ children }: SiteShellProps) {
       {/* Spacer for fixed header */}
       <div className="h-[72px]" />
 
-      <main id="main-content" tabIndex={-1} className="w-full px-6 focus:outline-none">
+      <main id="main-content" tabIndex={-1} className="flex-1 w-full px-6 focus:outline-none">
         <div className="mx-auto w-full max-w-[1400px]">{children}</div>
       </main>
 
@@ -248,6 +358,32 @@ export function SiteShell({ children }: SiteShellProps) {
         onClose={() => setRatModeDialogOpen(false)}
         onConfirm={handleRatModeConfirm}
       />
+
+      {/* Rat Mode Exit Hint - rendered via portal to escape transformed parents */}
+      {ratModeActive && typeof document !== "undefined" &&
+        createPortal(
+          <div className="rat-mode-hint">
+            🐀 Press ESC to exit rat mode
+          </div>,
+          document.body
+        )
+      }
+
+      {/* Resume Takeover */}
+      <ResumeTakeover
+        isOpen={isResumeOpen}
+        onClose={closeResume}
+        data={resumeData}
+        resumeUrl={resumeUrl}
+      />
     </div>
+  );
+}
+
+export function SiteShell({ children }: SiteShellProps) {
+  return (
+    <ResumeProvider>
+      <SiteShellContent>{children}</SiteShellContent>
+    </ResumeProvider>
   );
 }

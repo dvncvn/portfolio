@@ -1,10 +1,468 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
+import { createPortal } from "react-dom";
 import { EmploymentTable, type EmploymentRow } from "@/components/employment-table";
-import { ResumeTakeover, type ResumeData } from "@/components/resume-takeover";
 import { BlurFade } from "@/components/ui/blur-fade";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
+import { useResume } from "@/contexts/resume-context";
+
+type ImageEffect = "normal" | "dither" | "pixelate" | "ascii";
+
+// 8x8 Bayer matrix for ordered dithering (normalized to 0-1)
+const BAYER_8X8 = [
+  [0/64, 32/64, 8/64, 40/64, 2/64, 34/64, 10/64, 42/64],
+  [48/64, 16/64, 56/64, 24/64, 50/64, 18/64, 58/64, 26/64],
+  [12/64, 44/64, 4/64, 36/64, 14/64, 46/64, 6/64, 38/64],
+  [60/64, 28/64, 52/64, 20/64, 62/64, 30/64, 54/64, 22/64],
+  [3/64, 35/64, 11/64, 43/64, 1/64, 33/64, 9/64, 41/64],
+  [51/64, 19/64, 59/64, 27/64, 49/64, 17/64, 57/64, 25/64],
+  [15/64, 47/64, 7/64, 39/64, 13/64, 45/64, 5/64, 37/64],
+  [63/64, 31/64, 55/64, 23/64, 61/64, 29/64, 53/64, 21/64],
+];
+
+// Color type for effect colors
+type EffectColor = { r: number; g: number; b: number } | null;
+
+// Generate a random vibrant color
+function getRandomColor(): EffectColor {
+  const hue = Math.random() * 360;
+  const saturation = 70 + Math.random() * 30; // 70-100%
+  const lightness = 50 + Math.random() * 20; // 50-70%
+  
+  // Convert HSL to RGB
+  const c = (1 - Math.abs(2 * lightness / 100 - 1)) * saturation / 100;
+  const x = c * (1 - Math.abs((hue / 60) % 2 - 1));
+  const m = lightness / 100 - c / 2;
+  
+  let r = 0, g = 0, b = 0;
+  if (hue < 60) { r = c; g = x; b = 0; }
+  else if (hue < 120) { r = x; g = c; b = 0; }
+  else if (hue < 180) { r = 0; g = c; b = x; }
+  else if (hue < 240) { r = 0; g = x; b = c; }
+  else if (hue < 300) { r = x; g = 0; b = c; }
+  else { r = c; g = 0; b = x; }
+  
+  return {
+    r: Math.round((r + m) * 255),
+    g: Math.round((g + m) * 255),
+    b: Math.round((b + m) * 255),
+  };
+}
+
+function DitheredImage({ src, blockSize = 16, color = null }: { src: string; blockSize?: number; color?: EffectColor }) {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [containerWidth, setContainerWidth] = useState(0);
+
+  const applyOrderedDither = useCallback(
+    (img: HTMLImageElement, canvas: HTMLCanvasElement, size: number, effectColor: EffectColor) => {
+      const ctx = canvas.getContext("2d");
+      if (!ctx) return;
+
+      const w = canvas.width;
+      const h = canvas.height;
+
+      // Draw image with cover behavior (crop to fill)
+      const imgAspect = img.naturalWidth / img.naturalHeight;
+      const canvasAspect = w / h;
+      let sx = 0, sy = 0, sw = img.naturalWidth, sh = img.naturalHeight;
+      
+      if (imgAspect > canvasAspect) {
+        // Image is wider - crop sides
+        sw = img.naturalHeight * canvasAspect;
+        sx = (img.naturalWidth - sw) / 2;
+      } else {
+        // Image is taller - crop top/bottom
+        sh = img.naturalWidth / canvasAspect;
+        sy = (img.naturalHeight - sh) / 2;
+      }
+      
+      ctx.drawImage(img, sx, sy, sw, sh, 0, 0, w, h);
+
+      // Get image data
+      const imageData = ctx.getImageData(0, 0, w, h);
+      const data = imageData.data;
+
+      // Apply ordered dithering
+      for (let y = 0; y < h; y++) {
+        for (let x = 0; x < w; x++) {
+          const i = (y * w + x) * 4;
+
+          // Convert to grayscale
+          const gray = 0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2];
+          const normalizedGray = gray / 255;
+
+          // Get Bayer threshold based on block size
+          const bx = Math.floor(x / (size / 8)) % 8;
+          const by = Math.floor(y / (size / 8)) % 8;
+          const threshold = BAYER_8X8[by][bx];
+
+          // Apply threshold with optional color
+          const isLight = normalizedGray > threshold;
+          if (effectColor) {
+            data[i] = isLight ? effectColor.r : 0;
+            data[i + 1] = isLight ? effectColor.g : 0;
+            data[i + 2] = isLight ? effectColor.b : 0;
+          } else {
+            const output = isLight ? 255 : 0;
+            data[i] = output;
+            data[i + 1] = output;
+            data[i + 2] = output;
+          }
+        }
+      }
+
+      ctx.putImageData(imageData, 0, 0);
+    },
+    []
+  );
+
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const updateWidth = () => {
+      setContainerWidth(container.offsetWidth);
+    };
+
+    updateWidth();
+    const resizeObserver = new ResizeObserver(updateWidth);
+    resizeObserver.observe(container);
+
+    return () => resizeObserver.disconnect();
+  }, []);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas || containerWidth === 0) return;
+
+    // Calculate height based on 4:5 aspect ratio
+    const canvasHeight = Math.round(containerWidth * (5 / 4));
+
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.onload = () => {
+      canvas.width = containerWidth;
+      canvas.height = canvasHeight;
+      applyOrderedDither(img, canvas, blockSize, color);
+    };
+    img.src = src;
+  }, [src, blockSize, containerWidth, applyOrderedDither, color]);
+
+  return (
+    <div ref={containerRef} className="aspect-[4/5] w-full">
+      <canvas ref={canvasRef} className="h-full w-full" />
+    </div>
+  );
+}
+
+function PixelatedImage({ src, pixelSize = 8 }: { src: string; pixelSize?: number }) {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [containerWidth, setContainerWidth] = useState(0);
+
+  const pixelate = useCallback((img: HTMLImageElement, canvas: HTMLCanvasElement, size: number) => {
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    const w = canvas.width;
+    const h = canvas.height;
+
+    // First draw with cover behavior (crop to fill)
+    const imgAspect = img.naturalWidth / img.naturalHeight;
+    const canvasAspect = w / h;
+    let sx = 0, sy = 0, sw = img.naturalWidth, sh = img.naturalHeight;
+    
+    if (imgAspect > canvasAspect) {
+      sw = img.naturalHeight * canvasAspect;
+      sx = (img.naturalWidth - sw) / 2;
+    } else {
+      sh = img.naturalWidth / canvasAspect;
+      sy = (img.naturalHeight - sh) / 2;
+    }
+
+    // Draw scaled down for pixelation
+    const scaledW = Math.ceil(w / size);
+    const scaledH = Math.ceil(h / size);
+    
+    ctx.imageSmoothingEnabled = false;
+    ctx.drawImage(img, sx, sy, sw, sh, 0, 0, scaledW, scaledH);
+    
+    // Scale back up with pixelated rendering
+    ctx.drawImage(canvas, 0, 0, scaledW, scaledH, 0, 0, w, h);
+  }, []);
+
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const updateWidth = () => {
+      setContainerWidth(container.offsetWidth);
+    };
+
+    updateWidth();
+    const resizeObserver = new ResizeObserver(updateWidth);
+    resizeObserver.observe(container);
+
+    return () => resizeObserver.disconnect();
+  }, []);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas || containerWidth === 0) return;
+
+    // Calculate height based on 4:5 aspect ratio
+    const canvasHeight = Math.round(containerWidth * (5 / 4));
+
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.onload = () => {
+      canvas.width = containerWidth;
+      canvas.height = canvasHeight;
+      pixelate(img, canvas, pixelSize);
+    };
+    img.src = src;
+  }, [src, pixelSize, containerWidth, pixelate]);
+
+  return (
+    <div ref={containerRef} className="aspect-[4/5] w-full">
+      <canvas
+        ref={canvasRef}
+        className="h-full w-full"
+        style={{ imageRendering: "pixelated" }}
+      />
+    </div>
+  );
+}
+
+// ASCII characters from dark to light
+const ASCII_CHARS = "@%#*+=-:. ";
+
+function AsciiImage({ src, fontSize = 6, color = null }: { src: string; fontSize?: number; color?: EffectColor }) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [asciiArt, setAsciiArt] = useState<string>("");
+  const [containerWidth, setContainerWidth] = useState(0);
+  
+  // Default green color if no color specified
+  const textColor = color ? `rgb(${color.r}, ${color.g}, ${color.b})` : "rgb(74, 222, 128)";
+
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const updateWidth = () => {
+      setContainerWidth(container.offsetWidth);
+    };
+
+    updateWidth();
+    const resizeObserver = new ResizeObserver(updateWidth);
+    resizeObserver.observe(container);
+
+    return () => resizeObserver.disconnect();
+  }, []);
+
+  useEffect(() => {
+    if (containerWidth === 0) return;
+
+    // Character dimensions - measure actual rendered size
+    // Monospace chars at this size are roughly 0.6 width:height ratio
+    const charWidthRatio = 0.6;
+    const charWidth = fontSize * charWidthRatio;
+    const charHeight = fontSize; // line-height = 1
+    
+    // Calculate grid size to fill container
+    const cols = Math.floor(containerWidth / charWidth);
+    const containerHeight = Math.round(containerWidth * (5 / 4));
+    const rows = Math.floor(containerHeight / charHeight);
+
+    // The image aspect ratio we need to sample
+    // Container is 4:5, and each char cell is charWidth:charHeight
+    // Rendered aspect = (cols * charWidth) / (rows * charHeight)
+    // We want this to equal 4/5, so sample aspect needs to compensate
+    const charCellAspect = charWidth / charHeight; // ~0.6
+    const containerAspect = 4 / 5; // 0.8
+    
+    // Sample aspect = container aspect / char cell aspect
+    // This ensures rendered output matches container
+    const sampleAspect = containerAspect / charCellAspect;
+    
+    // Sample dimensions
+    const sampleCols = cols;
+    const sampleRows = Math.round(cols / sampleAspect);
+
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.onload = () => {
+      canvas.width = sampleCols;
+      canvas.height = sampleRows;
+
+      // Draw with cover behavior for 4:5 crop
+      const imgAspect = img.naturalWidth / img.naturalHeight;
+      const targetAspect = 4 / 5;
+      let sx = 0, sy = 0, sw = img.naturalWidth, sh = img.naturalHeight;
+
+      if (imgAspect > targetAspect) {
+        sw = img.naturalHeight * targetAspect;
+        sx = (img.naturalWidth - sw) / 2;
+      } else {
+        sh = img.naturalWidth / targetAspect;
+        sy = (img.naturalHeight - sh) / 2;
+      }
+
+      ctx.drawImage(img, sx, sy, sw, sh, 0, 0, sampleCols, sampleRows);
+
+      const imageData = ctx.getImageData(0, 0, sampleCols, sampleRows);
+      const data = imageData.data;
+
+      let result = "";
+      for (let y = 0; y < sampleRows; y++) {
+        for (let x = 0; x < sampleCols; x++) {
+          const i = (y * sampleCols + x) * 4;
+          const gray = 0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2];
+          const charIndex = Math.floor((gray / 255) * (ASCII_CHARS.length - 1));
+          result += ASCII_CHARS[charIndex];
+        }
+        result += "\n";
+      }
+
+      setAsciiArt(result);
+    };
+    img.src = src;
+  }, [src, containerWidth, fontSize]);
+
+  return (
+    <div ref={containerRef} className="aspect-[4/5] w-full overflow-hidden bg-[#0a0a0a]">
+      <pre
+        className="h-full w-full overflow-hidden whitespace-pre"
+        style={{
+          fontFamily: "monospace",
+          fontSize: `${fontSize}px`,
+          lineHeight: 1,
+          letterSpacing: "0px",
+          color: textColor,
+          opacity: 0.9,
+        }}
+      >
+        {asciiArt}
+      </pre>
+    </div>
+  );
+}
+
+function EffectButton({
+  label,
+  isActive,
+  onClick,
+}: {
+  label: string;
+  isActive: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className={`rounded-md px-3 py-1.5 text-[12px] font-medium transition-all duration-200 ${
+        isActive
+          ? "bg-white/[0.12] text-foreground"
+          : "text-muted-foreground hover:bg-white/[0.06] hover:text-foreground"
+      }`}
+    >
+      {label}
+    </button>
+  );
+}
+
+function DndHoverCard({ children }: { children: React.ReactNode }) {
+  const [isHovered, setIsHovered] = useState(false);
+  const triggerRef = useRef<HTMLSpanElement>(null);
+  const popoverRef = useRef<HTMLDivElement>(null);
+  const [styles, setStyles] = useState<React.CSSProperties>({});
+
+  useEffect(() => {
+    if (isHovered && triggerRef.current) {
+      const rect = triggerRef.current.getBoundingClientRect();
+      // Popover is roughly 180px wide + 32px padding = ~212px
+      const popoverWidth = 212;
+      const popoverHeight = 340; // approximate height
+      
+      setStyles({
+        position: "fixed",
+        top: rect.top - popoverHeight - 16,
+        left: rect.left + rect.width / 2 - popoverWidth / 2,
+        zIndex: 50,
+      });
+    }
+  }, [isHovered]);
+
+  return (
+    <>
+      <span
+        ref={triggerRef}
+        className="cursor-pointer border-b border-dashed border-muted-foreground/50 transition-colors hover:border-foreground hover:text-foreground"
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+      >
+        {children}
+      </span>
+      {typeof document !== "undefined" &&
+        createPortal(
+          <AnimatePresence>
+            {isHovered && (
+              <motion.div
+                ref={popoverRef}
+                initial={{ opacity: 0, y: 8, scale: 0.95 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: 8, scale: 0.95 }}
+                transition={{ duration: 0.15, ease: "easeOut" }}
+                style={styles}
+                onMouseEnter={() => setIsHovered(true)}
+                onMouseLeave={() => setIsHovered(false)}
+              >
+                <a
+                  href="https://www.dndbeyond.com/characters/159073918"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block overflow-hidden rounded-xl border border-white/10 bg-[#151413]/95 p-4 shadow-2xl backdrop-blur-xl transition-colors hover:border-white/20"
+                >
+                  {/* Character art */}
+                  <div className="relative h-[240px] w-[180px] overflow-hidden rounded-lg bg-[#1a1918]">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src="/assets/dnd-character.png"
+                      alt="Perrin Burrowfen"
+                      className="h-full w-full object-cover"
+                    />
+                  </div>
+                  {/* Character info */}
+                  <div className="mt-3 text-center">
+                    <span
+                      className="block text-[22px] text-foreground"
+                      style={{ fontFamily: "var(--font-jacquard-24)" }}
+                    >
+                      Perrin Burrowfen
+                    </span>
+                    <span className="mt-1 block font-mono text-[11px] text-muted-foreground">
+                      Level 3 Twilight Cleric
+                    </span>
+                  </div>
+                </a>
+                {/* Arrow pointing down */}
+                <div className="absolute left-1/2 top-full -translate-x-1/2">
+                  <div className="h-0 w-0 border-l-[6px] border-r-[6px] border-t-[6px] border-l-transparent border-r-transparent border-t-white/10" />
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>,
+          document.body
+        )}
+    </>
+  );
+}
 
 function ActivityIndicator() {
   return (
@@ -65,126 +523,16 @@ const workHistory: EmploymentRow[] = [
   },
 ];
 
-const resumeData: ResumeData = {
-  name: "Simon Duncan",
-  title: "Staff Product Designer",
-  location: "Madison, WI (Remote)",
-  portfolio: "simonduncan.co",
-  email: "simonfraserduncan@gmail.com",
-  phone: "612 704 0593",
-  summary: "Focused on developer tools and AI products. Strong product intuition, high judgment in ambiguity, and end-to-end execution from framing to shipped UI. Close engineering partner, often prototyping in code.",
-  sections: [
-    {
-      title: "Experience",
-      entries: [
-        {
-          company: "IBM (via DataStax acquisition)",
-          role: "Staff Product Designer",
-          location: "Madison, WI (Remote)",
-          years: "Dec 2020 – Present",
-          progression: "Senior Product Designer → Design Manager → Staff Product Designer",
-          bullets: [
-            "Design lead for Langflow, an open-source visual GenAI agent builder. Helped scale adoption from 14k to 140k+ GitHub stars by improving onboarding, templates, and the core developer experience",
-            "Led product design for Astra DB, contributing to growth from 0 to $70M+ ARR",
-            "Managed a team of 4 designers during DataStax's pivot to an AI-first company, maintaining momentum through organizational change",
-            "Defined cloud experience success metrics with product and engineering leadership to tie UX investment to measurable outcomes",
-            "Contributed to securing $115M Series E funding through product narrative, experience storytelling, and customer-ready demos",
-            "Only design IC recipient of the Ellis Award for outstanding business impact",
-          ],
-        },
-        {
-          company: "New Relic",
-          role: "Senior Product Designer",
-          location: "Portland, OR",
-          years: "2020",
-          bullets: [
-            "Redesigned the New Relic One admin portal, simplifying key platform administration workflows and improving usability for enterprise teams",
-          ],
-        },
-        {
-        company: "Scott Logic",
-        role: "Lead Product Designer",
-        location: "Edinburgh, United Kingdom",
-        years: "2019 – 2020",
-          bullets: [
-            "Led FinTech engagements across retail and institutional products, partnering with engineering to ship end-to-end improvements",
-            "Co-led a 10-person design team, supporting hiring and mentoring",
-            "Built and ran the graduate design program, including recruiting, onboarding, and coaching",
-          ],
-        },
-        {
-          company: "Branch",
-          role: "Product Designer",
-          location: "Minneapolis, MN (Remote)",
-          years: "2020",
-          bullets: [
-            "Established foundational user research practices during COVID-era volatility, capturing customer anxieties and translating insights into product decisions",
-          ],
-        },
-        {
-          company: "Trek Bicycle",
-          role: "Product Designer",
-          location: "Madison, WI",
-          years: "2018",
-          bullets: [
-            "Led UX research, experimentation, and analytics for Trekbikes.com, including A/B testing and funnel analysis to drive iterative improvements",
-          ],
-        },
-        {
-          company: "Cloudability",
-          role: "Product Designer",
-          location: "Boulder, CO",
-          years: "2017",
-          bullets: [
-            "Led design for automation and container-related experiences, with emphasis on operational clarity and data visualization",
-          ],
-        },
-        {
-          company: "IHS Markit",
-          role: "Product Designer",
-          location: "Boulder, CO",
-          years: "2015 – 2017",
-          bullets: [
-            "Led product design engagements with FinTech teams across discovery, interaction design, and shipped UI",
-          ],
-        },
-        {
-        company: "Scott Logic",
-        role: "UX Designer",
-        location: "Edinburgh, United Kingdom",
-        years: "2013 – 2015",
-          bullets: [
-            "Delivered product design for FinTech clients, from discovery through execution",
-          ],
-        },
-        {
-          company: "Great Wolf Lodge",
-          role: "Content Manager",
-          location: "Madison, WI",
-          years: "2012 – 2013",
-          bullets: [
-            "Owned A/B testing and site optimization for a high-traffic, revenue-critical site",
-          ],
-        },
-      ],
-    },
-  ],
-  education: {
-    degree: "BA, Music and Technology",
-    school: "University of East Anglia, Norwich, England",
-    honors: "First Class Honours",
-  },
-  skills: "Product strategy, problem framing, information architecture, interaction design, UI design, design systems, prototyping, discovery, qualitative research, quantitative analysis, experimentation and A/B testing, metrics definition, stakeholder management, team leadership, basic front-end development",
-  tools: [
-    "Figma, prototyping, design systems tooling",
-    "Cursor, Warp, hands-on coding and rapid iteration",
-    "Midjourney and image tooling for concept exploration and production assets",
-    "Prompting, agent-assisted workflows, and AI-enabled prototyping to accelerate exploration and delivery",
-  ],
-};
-
 export default function InfoPage() {
-  const [isResumeOpen, setIsResumeOpen] = useState(false);
+  const { openResume } = useResume();
+  const [imageEffect, setImageEffect] = useState<ImageEffect>("normal");
+  const [showControls, setShowControls] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
+  const [ditherSize, setDitherSize] = useState(16);
+  const [ditherColor, setDitherColor] = useState<EffectColor>(null);
+  const [pixelSize, setPixelSize] = useState(10);
+  const [asciiSize, setAsciiSize] = useState(6);
+  const [asciiColor, setAsciiColor] = useState<EffectColor>(null);
 
   return (
     <div className="py-20">
@@ -210,7 +558,7 @@ export default function InfoPage() {
               <div className="absolute -left-10 top-[10px] hidden lg:block">
                 <ActivityIndicator />
               </div>
-              <EmploymentTable rows={workHistory} onViewHistory={() => setIsResumeOpen(true)} />
+              <EmploymentTable rows={workHistory} onViewHistory={openResume} />
             </div>
           </BlurFade>
 
@@ -239,7 +587,8 @@ export default function InfoPage() {
                 Outside of Work
               </h2>
               <p className="text-base leading-relaxed text-muted-foreground">
-                Outside of product design, I&apos;m a parent, husband, runner, and musician.
+                Outside of product design, I&apos;m a parent, husband, runner, musician, and{" "}
+                <DndHoverCard>D&amp;D player</DndHoverCard>.
               </p>
               <p className="text-base leading-relaxed text-muted-foreground">
                 I spend a lot of time thinking about creativity, constraint, and sustainability. I make music that blends ambient, electronic, and guitar-driven textures, and I&apos;m interested in long-term lifestyle design, balancing ambition with family, health, and creative output.
@@ -250,23 +599,251 @@ export default function InfoPage() {
 
         {/* Right column: photo */}
         <BlurFade delay={0.06} className="w-full">
-          <div className="w-full overflow-hidden rounded-[24px] bg-[#121212]">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="/assets/profile.png"
-              alt="Simon Duncan"
-              className="aspect-[4/5] w-full object-cover"
-            />
+          <div className="space-y-0">
+            <div
+              className="group relative w-full overflow-hidden rounded-[24px] bg-[#121212]"
+              onMouseEnter={() => setIsHovered(true)}
+              onMouseLeave={() => setIsHovered(false)}
+            >
+              {/* Normal - standard img */}
+              {imageEffect === "normal" && (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src="/assets/profile.png"
+                  alt="Simon Duncan"
+                  className="aspect-[4/5] w-full object-cover"
+                />
+              )}
+              {/* Dither - canvas with ordered dithering */}
+              {imageEffect === "dither" && (
+                <DitheredImage src="/assets/profile.png" blockSize={ditherSize} color={ditherColor} />
+              )}
+              {/* Pixelate - canvas pixelation */}
+              {imageEffect === "pixelate" && (
+                <PixelatedImage src="/assets/profile.png" pixelSize={pixelSize} />
+              )}
+              {/* ASCII - text-based rendering */}
+              {imageEffect === "ascii" && (
+                <AsciiImage src="/assets/profile.png" fontSize={asciiSize} color={asciiColor} />
+              )}
+              {/* Edit icon - appears on hover */}
+              <motion.button
+                initial={{ opacity: 0 }}
+                animate={{ opacity: isHovered || showControls ? 1 : 0 }}
+                transition={{ duration: 0.2 }}
+                onClick={() => setShowControls(!showControls)}
+                className="absolute bottom-3 right-3 rounded-full bg-black/50 p-2 text-white/70 backdrop-blur-sm transition-colors hover:bg-black/70 hover:text-white"
+                aria-label="Image effects"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M13 7 8.7 2.7a2.41 2.41 0 0 0-3.4 0L2.7 5.3a2.41 2.41 0 0 0 0 3.4L7 13" />
+                  <path d="m8 6 2-2" />
+                  <path d="m18 16 2-2" />
+                  <path d="m17 11 4.3 4.3c.94.94.94 2.46 0 3.4l-2.6 2.6c-.94.94-2.46.94-3.4 0L11 17" />
+                  <path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z" />
+                  <path d="m15 5 4 4" />
+                </svg>
+              </motion.button>
+            </div>
+            {/* Expandable effect controls */}
+            <motion.div
+              initial={false}
+              animate={{
+                height: showControls ? "auto" : 0,
+                opacity: showControls ? 1 : 0,
+              }}
+              transition={{ duration: 0.2, ease: "easeOut" }}
+              className="overflow-hidden"
+            >
+              <div className="space-y-3 pt-3">
+                {/* Effect selector row */}
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-1">
+                    <EffectButton
+                      label="Normal"
+                      isActive={imageEffect === "normal"}
+                      onClick={() => setImageEffect("normal")}
+                    />
+                    <EffectButton
+                      label="Dither"
+                      isActive={imageEffect === "dither"}
+                      onClick={() => setImageEffect("dither")}
+                    />
+                    <EffectButton
+                      label="Pixelate"
+                      isActive={imageEffect === "pixelate"}
+                      onClick={() => setImageEffect("pixelate")}
+                    />
+                    <EffectButton
+                      label="ASCII"
+                      isActive={imageEffect === "ascii"}
+                      onClick={() => setImageEffect("ascii")}
+                    />
+                  </div>
+                  <button
+                    onClick={() => setShowControls(false)}
+                    className="rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-white/[0.06] hover:text-foreground"
+                    aria-label="Close controls"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="14"
+                      height="14"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <line x1="18" y1="6" x2="6" y2="18" />
+                      <line x1="6" y1="6" x2="18" y2="18" />
+                    </svg>
+                  </button>
+                </div>
+                {/* Dither controls */}
+                {imageEffect === "dither" && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: "auto" }}
+                    exit={{ opacity: 0, height: 0 }}
+                    transition={{ duration: 0.15 }}
+                    className="space-y-2"
+                  >
+                    <div className="flex items-center gap-3">
+                      <span className="text-[12px] text-muted-foreground">Block size</span>
+                      <input
+                        type="range"
+                        min="4"
+                        max="32"
+                        step="4"
+                        value={ditherSize}
+                        onChange={(e) => setDitherSize(Number(e.target.value))}
+                        className="h-1 flex-1 cursor-pointer appearance-none rounded-full bg-white/10 accent-white [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white"
+                      />
+                      <span className="min-w-[40px] text-right font-mono text-[12px] text-muted-foreground">
+                        {ditherSize}px
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => setDitherColor(getRandomColor())}
+                        className="flex items-center gap-1.5 rounded-md px-2 py-1 text-[12px] text-muted-foreground transition-colors hover:bg-white/[0.06] hover:text-foreground"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8" />
+                          <path d="M21 3v5h-5" />
+                        </svg>
+                        Random color
+                      </button>
+                      {ditherColor && (
+                        <>
+                          <div
+                            className="h-4 w-4 rounded-full border border-white/20"
+                            style={{ backgroundColor: `rgb(${ditherColor.r}, ${ditherColor.g}, ${ditherColor.b})` }}
+                          />
+                          <button
+                            onClick={() => setDitherColor(null)}
+                            className="text-[11px] text-muted-foreground/70 hover:text-muted-foreground"
+                          >
+                            Reset
+                          </button>
+                        </>
+                      )}
+                    </div>
+                  </motion.div>
+                )}
+                {/* Pixelate controls */}
+                {imageEffect === "pixelate" && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: "auto" }}
+                    exit={{ opacity: 0, height: 0 }}
+                    transition={{ duration: 0.15 }}
+                    className="flex items-center gap-3"
+                  >
+                    <span className="text-[12px] text-muted-foreground">Pixel size</span>
+                    <input
+                      type="range"
+                      min="4"
+                      max="24"
+                      step="2"
+                      value={pixelSize}
+                      onChange={(e) => setPixelSize(Number(e.target.value))}
+                      className="h-1 flex-1 cursor-pointer appearance-none rounded-full bg-white/10 accent-white [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white"
+                    />
+                    <span className="min-w-[40px] text-right font-mono text-[12px] text-muted-foreground">
+                      {pixelSize}px
+                    </span>
+                  </motion.div>
+                )}
+                {/* ASCII controls */}
+                {imageEffect === "ascii" && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: "auto" }}
+                    exit={{ opacity: 0, height: 0 }}
+                    transition={{ duration: 0.15 }}
+                    className="space-y-2"
+                  >
+                    <div className="flex items-center gap-3">
+                      <span className="text-[12px] text-muted-foreground">Font size</span>
+                      <input
+                        type="range"
+                        min="3"
+                        max="10"
+                        step="1"
+                        value={asciiSize}
+                        onChange={(e) => setAsciiSize(Number(e.target.value))}
+                        className="h-1 flex-1 cursor-pointer appearance-none rounded-full bg-white/10 accent-white [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white"
+                      />
+                      <span className="min-w-[40px] text-right font-mono text-[12px] text-muted-foreground">
+                        {asciiSize}px
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => setAsciiColor(getRandomColor())}
+                        className="flex items-center gap-1.5 rounded-md px-2 py-1 text-[12px] text-muted-foreground transition-colors hover:bg-white/[0.06] hover:text-foreground"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8" />
+                          <path d="M21 3v5h-5" />
+                        </svg>
+                        Random color
+                      </button>
+                      {asciiColor && (
+                        <>
+                          <div
+                            className="h-4 w-4 rounded-full border border-white/20"
+                            style={{ backgroundColor: `rgb(${asciiColor.r}, ${asciiColor.g}, ${asciiColor.b})` }}
+                          />
+                          <button
+                            onClick={() => setAsciiColor(null)}
+                            className="text-[11px] text-muted-foreground/70 hover:text-muted-foreground"
+                          >
+                            Reset
+                          </button>
+                        </>
+                      )}
+                    </div>
+                  </motion.div>
+                )}
+              </div>
+            </motion.div>
           </div>
         </BlurFade>
       </section>
-
-      <ResumeTakeover
-        isOpen={isResumeOpen}
-        onClose={() => setIsResumeOpen(false)}
-        data={resumeData}
-        resumeUrl="/assets/resume.pdf"
-      />
     </div>
   );
 }

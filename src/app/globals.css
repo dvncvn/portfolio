@@ -183,8 +183,15 @@ html {
 }
 
 /* Generic scrollbar hide utility */
-.scrollbar-hide::-webkit-scrollbar {
+.scrollbar-hide::-webkit-scrollbar,
+.scrollbar-none::-webkit-scrollbar {
   display: none;
+}
+
+.scrollbar-hide,
+.scrollbar-none {
+  -ms-overflow-style: none; /* IE/Edge */
+  scrollbar-width: none; /* Firefox */
 }
 
 /* Play card hover surface (theme aware) */
@@ -264,4 +271,175 @@ html {
   body {
     @apply bg-background text-foreground;
   }
+}
+
+/* 🐀 RAT MODE 🐀 */
+@keyframes rainbow-shift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes wobble {
+  0%, 100% { transform: rotate(-2deg); }
+  50% { transform: rotate(2deg); }
+}
+
+@keyframes crazy-wobble {
+  0% { transform: rotate(-3deg) scale(1); }
+  25% { transform: rotate(2deg) scale(1.02); }
+  50% { transform: rotate(-2deg) scale(0.98); }
+  75% { transform: rotate(3deg) scale(1.01); }
+  100% { transform: rotate(-3deg) scale(1); }
+}
+
+@keyframes float-up {
+  0% { transform: translateY(100vh) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(-100px) rotate(360deg); opacity: 0; }
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { text-shadow: 0 0 10px #ff0, 0 0 20px #ff0, 0 0 30px #ff0; }
+  50% { text-shadow: 0 0 20px #f0f, 0 0 40px #f0f, 0 0 60px #f0f; }
+}
+
+@keyframes skew-shake {
+  0%, 100% { transform: skewX(-5deg); }
+  50% { transform: skewX(5deg); }
+}
+
+@keyframes hue-rotate {
+  from { filter: hue-rotate(0deg); }
+  to { filter: hue-rotate(360deg); }
+}
+
+.rat-mode {
+  --rat-rainbow: linear-gradient(
+    124deg,
+    #ff2400, #e81d1d, #e8b71d, #e3e81d,
+    #1de840, #1ddde8, #2b1de8, #dd00f3,
+    #dd00f3, #ff2400
+  );
+}
+
+/* COMIC SANS EVERYTHING */
+.rat-mode,
+.rat-mode *,
+.rat-mode *::before,
+.rat-mode *::after {
+  font-family: "Comic Sans MS", "Comic Sans", "Chalkboard SE", cursive !important;
+}
+
+/* RAINBOW BACKGROUND ON EVERYTHING */
+.rat-mode {
+  background: var(--rat-rainbow) !important;
+  background-size: 400% 400% !important;
+  animation: rainbow-shift 2s ease infinite !important;
+  cursor: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' style='font-size:24px'><text y='24'>🐀</text></svg>") 16 16, auto !important;
+}
+
+.rat-mode body {
+  background: var(--rat-rainbow) !important;
+  background-size: 400% 400% !important;
+  animation: rainbow-shift 2s ease infinite, wobble 0.3s ease infinite !important;
+}
+
+/* Cards and containers get the rainbow treatment + wobble */
+.rat-mode header,
+.rat-mode footer,
+.rat-mode main,
+.rat-mode div[class*="card"],
+.rat-mode div[class*="bg-"],
+.rat-mode section {
+  background: var(--rat-rainbow) !important;
+  background-size: 400% 400% !important;
+  animation: rainbow-shift 2s ease infinite, crazy-wobble 0.5s ease infinite !important;
+}
+
+/* Images go crazy */
+.rat-mode img {
+  animation: spin 3s linear infinite, hue-rotate 2s linear infinite !important;
+  border-radius: 50% !important;
+  border: 4px dashed magenta !important;
+}
+
+/* Links spin on hover */
+.rat-mode a:hover {
+  animation: spin 0.5s linear infinite !important;
+  display: inline-block;
+}
+
+/* Text gets glow effect */
+.rat-mode h1, .rat-mode h2, .rat-mode h3, .rat-mode h4 {
+  animation: pulse-glow 1s ease infinite, skew-shake 0.2s ease infinite !important;
+  color: yellow !important;
+}
+
+/* Buttons go wild */
+.rat-mode button {
+  animation: crazy-wobble 0.3s ease infinite !important;
+  background: linear-gradient(45deg, #ff00ff, #00ffff, #ffff00, #ff00ff) !important;
+  background-size: 300% 300% !important;
+  border: 3px dotted lime !important;
+  border-radius: 20px !important;
+}
+
+/* SVGs spin */
+.rat-mode svg {
+  animation: spin 2s linear infinite, hue-rotate 1s linear infinite !important;
+}
+
+/* Nav links dance */
+.rat-mode nav a {
+  animation: crazy-wobble 0.4s ease infinite !important;
+  display: inline-block;
+  color: lime !important;
+  text-shadow: 2px 2px 0 #ff00ff, -2px -2px 0 #00ffff !important;
+}
+
+/* Everything has a colorful border */
+.rat-mode * {
+  border-color: magenta !important;
+}
+
+/* Rat mode exit hint - KEEP THIS SANE */
+.rat-mode-hint,
+.rat-mode-hint * {
+  all: revert;
+  position: fixed !important;
+  bottom: 24px !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  z-index: 9999 !important;
+  background: rgba(0, 0, 0, 0.9) !important;
+  backdrop-filter: blur(8px) !important;
+  padding: 12px 24px !important;
+  border-radius: 8px !important;
+  font-family: system-ui, -apple-system, sans-serif !important;
+  font-size: 14px !important;
+  color: white !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  animation: none !important;
+  text-shadow: none !important;
+  filter: none !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5) !important;
+}
+
+/* Floating rat emojis */
+.rat-mode::after {
+  content: "🐀🐀🐀🐀🐀🐀🐀🐀🐀🐀";
+  position: fixed;
+  bottom: -50px;
+  left: 0;
+  right: 0;
+  font-size: 40px;
+  text-align: center;
+  animation: float-up 4s linear infinite;
+  pointer-events: none;
+  z-index: 9998;
 }

@@ -211,11 +211,10 @@ export function ResumeTakeover({ isOpen, onClose, data, resumeUrl }: ResumeTakeo
                 </>
               )}
             </button>
-            {resumeUrl && (
-              <a
-                href={resumeUrl}
-                download
-                className="group/btn inline-flex items-center gap-2 rounded-md bg-white/[0.06] px-4 py-2 text-[14px] text-muted-foreground transition-all duration-200 ease-out hover:bg-white/[0.1] hover:text-foreground"
+            <div className="group relative">
+              <button
+                disabled
+                className="inline-flex cursor-not-allowed items-center gap-2 rounded-md bg-white/[0.04] px-4 py-2 text-[14px] text-muted-foreground/50"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -233,8 +232,11 @@ export function ResumeTakeover({ isOpen, onClose, data, resumeUrl }: ResumeTakeo
                   <line x1="12" y1="15" x2="12" y2="3" />
                 </svg>
                 <span>Download PDF</span>
-              </a>
-            )}
+              </button>
+              <div className="pointer-events-none absolute bottom-full left-1/2 mb-2 -translate-x-1/2 whitespace-nowrap rounded-md bg-black/90 px-2 py-1 text-[12px] text-white opacity-0 transition-opacity group-hover:opacity-100">
+                PDF coming soon
+              </div>
+            </div>
           </div>
 
           {/* Content */}
@@ -242,7 +244,7 @@ export function ResumeTakeover({ isOpen, onClose, data, resumeUrl }: ResumeTakeo
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3, delay: 0.1 }}
-            className="h-full overflow-y-auto px-6 pb-24 pt-12"
+            className="h-full overflow-y-auto px-6 pb-24 pt-12 scrollbar-none"
           >
             <div className="mx-auto max-w-[1100px]">
               {/* Header */}

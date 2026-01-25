@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { IBM_Plex_Mono, Inter } from "next/font/google";
+import { IBM_Plex_Mono, Inter, Jacquard_24 } from "next/font/google";
 import { SiteShell } from "@/components/site-shell";
 import "./globals.css";
 
@@ -16,6 +16,13 @@ const ibmPlexMono = IBM_Plex_Mono({
   weight: ["400", "500", "600"],
 });
 
+const jacquard24 = Jacquard_24({
+  variable: "--font-jacquard-24",
+  subsets: ["latin"],
+  display: "swap",
+  weight: "400",
+});
+
 export const metadata: Metadata = {
   title: "Simon Duncan | Portfolio",
   description: "Staff product designer portfolio.",
@@ -27,7 +34,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${inter.variable} ${ibmPlexMono.variable}`}>
+    <html lang="en" className={`${inter.variable} ${ibmPlexMono.variable} ${jacquard24.variable}`}>
       <body className="antialiased">
         <SiteShell>{children}</SiteShell>
       </body>

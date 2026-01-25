@@ -166,15 +166,13 @@ export function WorkCard({
               />
             ) : imageSrc ? (
               <div className="absolute inset-0">
-                {/* Base art */}
+                {/* Base art - stays visible, hover art layers on top */}
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={imageSrc}
                   alt={title}
                   className={[
-                    "absolute inset-0 h-full w-full object-contain",
-                    "transition-opacity duration-700 ease-in-out",
-                    hoverImageSrc ? (isHovered ? "opacity-0" : "opacity-[0.92]") : "opacity-[0.92]",
+                    "absolute inset-0 h-full w-full object-contain opacity-[0.92]",
                     imageSrc.endsWith(".svg")
                       ? (svgPadding ?? "p-8 sm:p-10 md:p-12")
                       : "p-6 sm:p-8",
@@ -183,7 +181,7 @@ export function WorkCard({
                   draggable={false}
                 />
 
-                {/* Hover art (crossfade) */}
+                {/* Hover art - fades in on top of base to avoid brightness dip */}
                 {hoverImageSrc ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
@@ -192,8 +190,8 @@ export function WorkCard({
                     aria-hidden="true"
                     className={[
                       "absolute inset-0 h-full w-full object-contain",
-                      "transition-opacity duration-700 ease-in-out",
-                      isHovered ? "opacity-[0.92]" : "opacity-0",
+                      "transition-opacity duration-500 ease-out",
+                      isHovered ? "opacity-100" : "opacity-0",
                       hoverImageSrc.endsWith(".svg")
                         ? (svgPadding ?? "p-8 sm:p-10 md:p-12")
                         : "p-6 sm:p-8",

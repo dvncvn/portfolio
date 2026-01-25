@@ -3,45 +3,87 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
+import { useResume } from "@/contexts/resume-context";
 
 type NavItem = {
+  type: "nav";
   label: string;
   href: string;
   indent?: boolean;
 };
 
-const navItems: NavItem[] = [
-  { label: "Work", href: "/" },
-  { label: "Platform Redesign", href: "/work/langflow-platform-redesign", indent: true },
-  { label: "Astra DB", href: "/work/astra-db", indent: true },
-  { label: "Context Forge", href: "/work/context-forge", indent: true },
-  { label: "Agent Experience", href: "/work/langflow-agent-experience", indent: true },
-  { label: "Play", href: "/play" },
-  { label: "Info", href: "/info" },
+type ActionItem = {
+  type: "action";
+  label: string;
+  action: string;
+  indent?: boolean;
+};
+
+type SeparatorItem = {
+  type: "separator";
+  label: string;
+};
+
+type PaletteItem = NavItem | ActionItem | SeparatorItem;
+
+const navItems: PaletteItem[] = [
+  { type: "nav", label: "Work", href: "/" },
+  { type: "nav", label: "Platform Redesign", href: "/work/langflow-platform-redesign", indent: true },
+  { type: "nav", label: "Astra DB", href: "/work/astra-db", indent: true },
+  { type: "nav", label: "Context Forge", href: "/work/context-forge", indent: true },
+  { type: "nav", label: "Agent Experience", href: "/work/langflow-agent-experience", indent: true },
+  { type: "nav", label: "Play", href: "/play" },
+  { type: "nav", label: "Info", href: "/info" },
+  { type: "separator", label: "Actions" },
+  { type: "action", label: "View Resume", action: "openResume" },
+  { type: "action", label: "Copy Email", action: "copyEmail" },
 ];
+
+// Get selectable items only (not separators)
+const selectableItems = navItems.filter((item): item is NavItem | ActionItem => item.type !== "separator");
 
 type CommandPaletteProps = {
   isOpen: boolean;
   onClose: () => void;
 };
 
+const EMAIL = "simonfraserduncan@gmail.com";
+
 export function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
   const router = useRouter();
+  const { openResume } = useResume();
   const [selectedIndex, setSelectedIndex] = useState(0);
+  const [copiedEmail, setCopiedEmail] = useState(false);
   const listRef = useRef<HTMLDivElement>(null);
 
-  const handleNavigate = useCallback(
-    (href: string) => {
-      router.push(href);
-      onClose();
+  const handleSelect = useCallback(
+    async (item: NavItem | ActionItem) => {
+      if (item.type === "nav") {
+        router.push(item.href);
+        onClose();
+      } else if (item.type === "action") {
+        if (item.action === "openResume") {
+          openResume();
+          onClose();
+        } else if (item.action === "copyEmail") {
+          await navigator.clipboard.writeText(EMAIL);
+          setCopiedEmail(true);
+          setTimeout(() => {
+            setCopiedEmail(false);
+            onClose();
+          }, 1000);
+          return; // Don't close immediately
+        }
+      }
     },
-    [router, onClose]
+    [router, onClose, openResume]
   );
 
   // Reset selection when opened
   useEffect(() => {
     if (isOpen) {
       setSelectedIndex(0);
+      setCopiedEmail(false);
     }
   }, [isOpen]);
 
@@ -54,16 +96,16 @@ export function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
         case "ArrowDown":
         case "j":
           e.preventDefault();
-          setSelectedIndex((prev) => (prev + 1) % navItems.length);
+          setSelectedIndex((prev) => (prev + 1) % selectableItems.length);
           break;
         case "ArrowUp":
         case "k":
           e.preventDefault();
-          setSelectedIndex((prev) => (prev - 1 + navItems.length) % navItems.length);
+          setSelectedIndex((prev) => (prev - 1 + selectableItems.length) % selectableItems.length);
           break;
         case "Enter":
           e.preventDefault();
-          handleNavigate(navItems[selectedIndex].href);
+          handleSelect(selectableItems[selectedIndex]);
           break;
         case "Escape":
           e.preventDefault();
@@ -74,12 +116,12 @@ export function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [isOpen, selectedIndex, handleNavigate, onClose]);
+  }, [isOpen, selectedIndex, handleSelect, onClose]);
 
   // Scroll selected item into view
   useEffect(() => {
     if (!listRef.current) return;
-    const selectedEl = listRef.current.children[selectedIndex] as HTMLElement;
+    const selectedEl = listRef.current.querySelector(`[data-selectable-index="${selectedIndex}"]`) as HTMLElement;
     if (selectedEl) {
       selectedEl.scrollIntoView({ block: "nearest" });
     }
@@ -123,41 +165,65 @@ export function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
 
             {/* List */}
             <div ref={listRef} className="py-2">
-              {navItems.map((item, idx) => (
-                <button
-                  key={item.href}
-                  onClick={() => handleNavigate(item.href)}
-                  onMouseEnter={() => setSelectedIndex(idx)}
-                  className={`group flex w-full items-center justify-between py-2 text-left transition-colors ${
-                    item.indent ? "pl-7 pr-4" : "px-4"
-                  } ${
-                    selectedIndex === idx
-                      ? "bg-white/5"
-                      : "hover:bg-white/[0.02]"
-                  }`}
-                >
-                  <span
-                    className={`text-[13px] transition-colors ${
-                      selectedIndex === idx
-                        ? "text-foreground"
-                        : item.indent
-                        ? "text-muted-foreground/70"
-                        : "text-muted-foreground"
+              {navItems.map((item, idx) => {
+                if (item.type === "separator") {
+                  return (
+                    <div
+                      key={`sep-${item.label}`}
+                      className="border-t border-white/5 mt-2 pt-3 pb-1 px-4"
+                    >
+                      <span className="font-mono text-[11px] uppercase tracking-wider text-muted-foreground/50">
+                        {item.label}
+                      </span>
+                    </div>
+                  );
+                }
+
+                // Find the index in selectableItems for this item
+                const selectableIdx = selectableItems.findIndex(
+                  (si) => si === item
+                );
+                const isSelected = selectableIdx === selectedIndex;
+
+                return (
+                  <button
+                    key={item.type === "nav" ? item.href : item.action}
+                    data-selectable-index={selectableIdx}
+                    onClick={() => handleSelect(item)}
+                    onMouseEnter={() => setSelectedIndex(selectableIdx)}
+                    className={`group flex w-full items-center justify-between py-2 text-left transition-colors ${
+                      item.indent ? "pl-7 pr-4" : "px-4"
+                    } ${
+                      isSelected
+                        ? "bg-white/5"
+                        : "hover:bg-white/[0.02]"
                     }`}
                   >
-                    {item.label}
-                  </span>
-                  <span
-                    className={`font-mono text-[11px] transition-all ${
-                      selectedIndex === idx
-                        ? "text-[#01F8A5] opacity-100"
-                        : "opacity-0"
-                    }`}
-                  >
-                    →
-                  </span>
-                </button>
-              ))}
+                    <span
+                      className={`text-[13px] transition-colors ${
+                        isSelected
+                          ? "text-foreground"
+                          : item.indent
+                          ? "text-muted-foreground/70"
+                          : "text-muted-foreground"
+                      }`}
+                    >
+                      {item.type === "action" && item.action === "copyEmail" && copiedEmail
+                        ? "Copied!"
+                        : item.label}
+                    </span>
+                    <span
+                      className={`font-mono text-[11px] transition-all ${
+                        isSelected
+                          ? "text-[#01F8A5] opacity-100"
+                          : "opacity-0"
+                      }`}
+                    >
+                      →
+                    </span>
+                  </button>
+                );
+              })}
             </div>
 
             {/* Footer hint */}

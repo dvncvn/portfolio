@@ -8,6 +8,7 @@ type HomeProjectCard = {
   date: string;
   tall: boolean;
   imageSrc: string;
+  svgPadding?: string;
   svgAccent?: {
     matchStrokeHex?: string | string[];
     matchFillHex?: string | string[];
@@ -25,6 +26,7 @@ const projects: HomeProjectCard[] = [
     date: "Nov 2024",
     tall: true,
     imageSrc: "/assets/work/langflow-platform-redesign/lf-art.svg",
+    svgPadding: "p-0",
     // Tight scope: only this card has inline SVG accent behavior for now.
     svgAccent: {
       matchStrokeHex: "#01F8A5",
@@ -114,6 +116,7 @@ export default function Home() {
                   tall={project.tall}
                   imageSrc={project.imageSrc}
                   svgAccent={project.svgAccent}
+                  svgPadding={project.svgPadding}
                 />
               </BlurFade>
             ))}
@@ -133,6 +136,7 @@ export default function Home() {
                   tall={project.tall}
                   imageSrc={project.imageSrc}
                   svgAccent={project.svgAccent}
+                  svgPadding={project.svgPadding}
                 />
               </BlurFade>
             ))}

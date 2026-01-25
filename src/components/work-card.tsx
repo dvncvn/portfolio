@@ -30,6 +30,7 @@ type WorkCardProps = {
   imageSrc?: string;
   hoverImageSrc?: string;
   svgAccent?: SvgAccentConfig;
+  svgPadding?: string;
 };
 
 type WorkCardAnimatedProps = WorkCardProps & {
@@ -44,6 +45,7 @@ export function WorkCard({
   imageSrc,
   hoverImageSrc,
   svgAccent,
+  svgPadding,
 }: WorkCardProps) {
   const cardRef = useRef<HTMLAnchorElement>(null);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
@@ -111,7 +113,7 @@ export function WorkCard({
               <InlineSvg
                 src={imageSrc}
                 className={[
-                  "h-full w-full p-8 opacity-[0.92] sm:p-10 md:p-12",
+                  `h-full w-full opacity-[0.92] ${svgPadding ?? "p-8 sm:p-10 md:p-12"}`,
                   // Ensure the inlined <svg> fills the box and stays centered.
                   "[&>svg]:block [&>svg]:h-full [&>svg]:w-full",
                 ].join(" ")}

@@ -71,7 +71,7 @@ export function EmploymentTable({ rows, onViewHistory }: EmploymentTableProps) {
                 </div>
               </td>
 
-              <td className="py-2 pl-4 align-middle text-right font-mono tabular-nums text-muted-foreground whitespace-nowrap">
+              <td className="py-2 pl-4 align-middle text-left font-mono tabular-nums text-muted-foreground whitespace-nowrap">
                 <span className="sm:hidden">{formatYearsShort(row.years)}</span>
                 <span className="hidden sm:inline">{row.years.replace(/Now$/, "Now ")}</span>
               </td>

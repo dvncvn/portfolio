@@ -23,3 +23,13 @@ export async function getWorkProject(slug: string): Promise<WorkProject | null> 
   }
 }
 
+export async function getNextProject(
+  currentSlug: string
+): Promise<{ slug: string; title: string } | null> {
+  const currentProject = await getWorkProject(currentSlug);
+  if (!currentProject) return null;
+
+  // Use explicitly defined next project from the JSON
+  return currentProject.nextProject ?? null;
+}
+

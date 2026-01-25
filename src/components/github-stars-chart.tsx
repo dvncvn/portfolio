@@ -221,7 +221,7 @@ export function GithubStarsChart({
               <AnimatePresence>
                 {isHovered && (
                   <motion.span
-                    className="text-[12px] text-[#737373] flex items-center gap-1"
+                    className="text-[12px] text-muted-foreground flex items-center gap-1"
                     initial={{ opacity: 0, y: -4 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -4 }}

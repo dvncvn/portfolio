@@ -8,7 +8,8 @@ export type SectionLayout =
   | "carousel"
   | "bento"
   | "github-stars"
-  | "single-caption";
+  | "single-caption"
+  | "marquee";
 
 export type BentoLayoutItem = {
   colSpan?: number;
@@ -44,6 +45,13 @@ export type WorkProjectSection = {
   bento?: {
     items?: BentoLayoutItem[];
   };
+  marquee?: {
+    items?: Array<{
+      name: string;
+      title?: string;
+      body: string;
+    }>;
+  };
   githubStars?: GithubStarsConfig;
 };
 
@@ -64,6 +72,10 @@ export type WorkProject = {
   meta?: WorkProjectMeta;
   responsibilities?: string[];
   sections: WorkProjectSection[];
+  nextProject?: {
+    slug: string;
+    title: string;
+  };
 };
 
 export type PlayItem = {

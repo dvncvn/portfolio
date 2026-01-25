@@ -1,7 +1,8 @@
 import { notFound } from "next/navigation";
-import { getWorkProject, getWorkProjectSlugs } from "@/content/work";
+import { getWorkProject, getWorkProjectSlugs, getNextProject } from "@/content/work";
 import { ProjectHero } from "@/components/project-hero";
 import { SectionBlock } from "@/components/section-block";
+import { ProjectNavigator } from "@/components/project-navigator";
 import { getGithubStars } from "@/lib/github";
 import type { WorkProjectSection } from "@/content/types";
 
@@ -43,10 +44,11 @@ export default async function WorkProjectPage({
 
   // Fetch dynamic GitHub stars for sections that need it
   const sections = await enrichSectionsWithGithubStars(project.sections);
+  const nextProject = await getNextProject(slug);
 
   return (
     <div className="py-20">
-      <div className="mx-auto w-full max-w-[1400px] space-y-24">
+      <div className="mx-auto w-full max-w-[1400px] space-y-24 px-6">
         <ProjectHero
           title={project.title}
           heroAsset={project.heroAsset}
@@ -60,6 +62,8 @@ export default async function WorkProjectPage({
             <SectionBlock key={`${section.heading}-${idx}`} section={section} index={idx} />
           ))}
         </div>
+
+        <ProjectNavigator nextProject={nextProject ?? undefined} />
       </div>
     </div>
   );

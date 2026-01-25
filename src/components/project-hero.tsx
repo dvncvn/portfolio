@@ -34,8 +34,8 @@ export function ProjectHero({
 
   return (
     <motion.header
-      initial={{ opacity: 1, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
       transition={{
         duration: 0.35,
         ease: [0.25, 0.1, 0.25, 1],
@@ -71,6 +71,8 @@ export function ProjectHero({
             alt={heroAsset.alt ?? ""}
             className="h-full w-full origin-center scale-[0.8] object-contain select-none pointer-events-none md:scale-[0.95]"
             draggable={false}
+            loading="eager"
+            fetchPriority="high"
             style={{ y: shouldReduceMotion ? 0 : heroParallaxY }}
           />
         </div>

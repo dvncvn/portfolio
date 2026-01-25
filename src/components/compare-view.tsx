@@ -221,7 +221,7 @@ export function CompareView({
       </BlurFade>
       {description ? (
         <div className="text-center">
-          <p className="text-[14px] leading-relaxed text-[#737373]">{description}</p>
+          <p className="text-[14px] leading-relaxed text-muted-foreground">{description}</p>
         </div>
       ) : null}
 

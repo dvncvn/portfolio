@@ -3,6 +3,10 @@
   "title": "Langflow: Platform Redesign",
   "shortScope": "Platform redesign",
   "timeframe": "Nov 2024",
+  "nextProject": {
+    "slug": "langflow-agent-experience",
+    "title": "Langflow: Agent Experience"
+  },
   "heroAsset": {
     "type": "image",
     "src": "/assets/work/langflow-platform-redesign/project-page.svg",
@@ -104,6 +108,156 @@
           "aspectRatio": "16/9"
         }
       ]
+    },
+    {
+      "heading": "Feedback",
+      "caption": "",
+      "layout": "marquee",
+      "assets": [],
+      "marquee": {
+        "items": [
+          {
+            "name": "David Jones-Gilardi",
+            "title": "DevRel, DataStax",
+            "body": "I honestly think this is the prettiest thing I've ever seen come out of DataStax yet."
+          },
+          {
+            "name": "David Jones-Gilardi",
+            "title": "DevRel, DataStax",
+            "body": "The \"Start Building\" screen is amazing. Funny how simple, yet beautiful updates like that can be so powerful. It just feels like something I want to dig into."
+          },
+          {
+            "name": "Melverick Ng",
+            "title": "Developer",
+            "body": "Building AI agents for automation without any coding! Incredibly excited about LangFlow 1.1's release!"
+          },
+          {
+            "name": "Baraar Sreesha Sreenivas",
+            "title": "Gen AI researcher",
+            "body": "Love the new look! Easy to navigate, clean and modern. Excited to explore everything 🙌🙌"
+          },
+          {
+            "name": "Prabhat Jha",
+            "title": "Head of Engineering, DataStax",
+            "body": "Awesome work with LF design and implementation. It's truly amazing."
+          },
+          {
+            "name": "DevRel Team",
+            "title": "DataStax",
+            "body": "Great f••king work and that's not just coming from me. The excitement from the team is palpable."
+          },
+          {
+            "name": "Michel G.",
+            "title": "Digital Strategy Leader",
+            "body": "Amazing, great release"
+          },
+          {
+            "name": "Silas Sao (PX)",
+            "title": "Head of Product Experience, IBM",
+            "body": "Got something out and devrel loves it which is unheard of ;)"
+          },
+          {
+            "name": "Langflow User",
+            "title": "Developer",
+            "body": "Hey team - congrats on the new release! I checked it out a bit last night and so far, it looks incredible! Also - the new UI is 🔥"
+          },
+          {
+            "name": "Jeremy Hanna",
+            "title": "Product Manager, DataStax",
+            "body": "Great inspiration and theme. As a non-designer, it looks great and cohesive and everything."
+          },
+          {
+            "name": "Langflow User",
+            "title": "Developer",
+            "body": "Joining the live reaction train 🚂 The new Langflow is beautiful!!!"
+          },
+          {
+            "name": "Dat Daryl Ngo",
+            "title": "AI Architect",
+            "body": "The new release looks great!! Love the dark mode too!"
+          },
+          {
+            "name": "Tejas Kumar",
+            "title": "DevRel, DataStax",
+            "body": "Main thing: I cannot overstate how gorgeous the new version is. It's truly incredible and I'm honored and thankful for all the good work that has gone into this. Just wow."
+          },
+          {
+            "name": "Patrick McFadin",
+            "title": "AI Advocate, DataStax",
+            "body": "Holy shit. This is kind of the hook."
+          },
+          {
+            "name": "Phil Miesle",
+            "title": "Field, DataStax",
+            "body": "Langflow 1.1 is SUCH a better UX."
+          },
+          {
+            "name": "Brian Mortimore",
+            "title": "Principal Architect, DataStax",
+            "body": "Been building flows now for the last few hours with it.... Blown away! AI made easy and it all just works like you expect."
+          },
+          {
+            "name": "Kevin Michael Schindler",
+            "title": "Developer",
+            "body": "I love you guys and girls. This is just awesome <3"
+          },
+          {
+            "name": "Raymond Kusch",
+            "title": "Founder & CEO, American Inference",
+            "body": "I absolutely love the new look"
+          },
+          {
+            "name": "Digital Adam",
+            "title": "Developer",
+            "body": "You had to pile on with everything else this week? 😅 UI change definitely welcome, well done."
+          },
+          {
+            "name": "Chet Kapoor",
+            "title": "CEO, DataStax",
+            "body": "TY for the AWESOME work on Langflow 1.1 - LOVE the new experience"
+          },
+          {
+            "name": "Langflow User",
+            "title": "Developer",
+            "body": "Amazing guys love new the new interface!!!"
+          },
+          {
+            "name": "Carter Rabasa",
+            "title": "Head of DevRel, DataStax",
+            "body": "Incredibly proud of the design & engineering that's gone into latest edition of Langflow. It's legitimately a revelation."
+          },
+          {
+            "name": "Melissa Herrera",
+            "title": "DevRel, DataStax",
+            "body": "I'm a sucker for just the little UI things. I say it in the video but the linking points being highlighted and so easy to connect component to component was already a huge improvement in itself. Can't wait to explore and find more improvements."
+          },
+          {
+            "name": "Ed Anuff",
+            "title": "Chief Product Officer, DataStax",
+            "body": "So proud of the team on this, the UX is gorgeous and it's crazy easy to build agents with this"
+          },
+          {
+            "name": "Langflow User",
+            "title": "Developer",
+            "body": "Nice #announcements, guys. Excited for the new UI, and updates."
+          },
+          {
+            "name": "Tejas Kumar",
+            "title": "DevRel, DataStax",
+            "body": "Wow. Very impressed, and very proud to be a part of this team."
+          },
+          {
+            "name": "Langflow User",
+            "title": "Developer",
+            "body": "AWESOME 🤩🤩"
+          },
+          {
+            "name": "Ash Hopkins",
+            "title": "Staff Product Designer, IBM",
+            "body": "The new visual uplift looks SO GOOD"
+          }
+        ]
+      }
     }
   ]
 }

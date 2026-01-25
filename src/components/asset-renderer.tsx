@@ -8,6 +8,7 @@ import { CompareView } from "@/components/compare-view";
 import { BlurFade } from "@/components/ui/blur-fade";
 import { GithubStarsChart } from "@/components/github-stars-chart";
 import { DotPattern } from "@/components/ui/dot-pattern";
+import { Marquee } from "@/components/ui/marquee";
 
 type AssetRendererProps = {
   section: WorkProjectSection;
@@ -603,6 +604,55 @@ export function AssetRenderer({ section }: AssetRendererProps) {
     );
   }
 
+  // Handle marquee layout before checking assets
+  if (section.layout === "marquee") {
+    const items = section.marquee?.items ?? [];
+    const splitIndex = Math.ceil(items.length / 2);
+    const firstRow = items.slice(0, splitIndex);
+    const secondRow = items.slice(splitIndex);
+
+    const ReviewCard = ({
+      name,
+      title,
+      body,
+    }: {
+      name: string;
+      title?: string;
+      body: string;
+    }) => (
+      <figure className="h-40 w-80 flex-shrink-0 overflow-hidden rounded-[12px] border border-white/10 bg-[#121212] p-5 transition-colors duration-200 ease-out hover:bg-white/5">
+        <figcaption className="flex flex-col gap-0.5">
+          <span className="text-[14px] font-medium text-foreground">{name}</span>
+          {title ? (
+            <span className="text-[12px] text-muted-foreground">{title}</span>
+          ) : null}
+        </figcaption>
+        <blockquote className="mt-3 line-clamp-3 text-[13px] leading-relaxed text-muted-foreground">
+          {body}
+        </blockquote>
+      </figure>
+    );
+
+    return (
+      <BlurFade delay={0.15} inView inViewMargin="-100px">
+        <div className="relative flex w-full flex-col gap-4 overflow-hidden">
+          <Marquee reverse pauseOnHover speed={35}>
+            {firstRow.map((review) => (
+              <ReviewCard key={`${review.name}-${review.body}`} {...review} />
+            ))}
+          </Marquee>
+          <Marquee pauseOnHover speed={35}>
+            {secondRow.map((review) => (
+              <ReviewCard key={`${review.name}-${review.body}`} {...review} />
+            ))}
+          </Marquee>
+          <div className="pointer-events-none absolute inset-y-0 left-0 w-1/4 bg-gradient-to-r from-background md:w-1/2 md:from-40%" />
+          <div className="pointer-events-none absolute inset-y-0 right-0 w-1/4 bg-gradient-to-l from-background md:w-1/2 md:from-40%" />
+        </div>
+      </BlurFade>
+    );
+  }
+
   const assets = section.assets;
   if (assets.length === 0) return null;
 
@@ -641,7 +691,7 @@ export function AssetRenderer({ section }: AssetRendererProps) {
           </div>
           {section.caption ? (
             <div className="text-center">
-              <p className="text-[14px] leading-relaxed text-[#737373]">{section.caption}</p>
+              <p className="text-[14px] leading-relaxed text-muted-foreground">{section.caption}</p>
             </div>
           ) : null}
         </div>

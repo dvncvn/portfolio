@@ -14,6 +14,8 @@ export function WorkSectionHeader({ projects }: WorkSectionHeaderProps) {
   const introText = {
     name: "Simon Duncan",
     bio: "I'm a Staff Product Designer working on AI and developer platforms at IBM. I turn complex systems into clear, usable, and durable products. I'm experienced across OSS, startups, and enterprise.",
+    personal: "Outside of product design, I'm a parent, husband, runner, musician, and D&D player. I spend a lot of time thinking about creativity, constraint, and sustainability. I make music that blends ambient, electronic, and guitar-driven textures, and I'm interested in long-term lifestyle design, balancing ambition with family, health, and creative output.",
+    imageSrc: "/assets/profile.png",
   };
 
   return (

@@ -1,14 +1,103 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { createPortal } from "react-dom";
 import type { WorkProject } from "@/content/types";
 import { AsciiNoiseBackground } from "@/components/ascii-noise-background";
 import { CompareView } from "@/components/compare-view";
+import { GithubStarsChart } from "@/components/github-stars-chart";
+import { BentoView } from "@/components/asset-renderer";
+import type { WorkProjectAsset, BentoLayoutItem } from "@/content/types";
+
+// Hover card for D&D character
+function DndHoverCard({ children }: { children: React.ReactNode }) {
+  const [isHovered, setIsHovered] = useState(false);
+  const triggerRef = useRef<HTMLSpanElement>(null);
+  const [styles, setStyles] = useState<React.CSSProperties>({});
+
+  useEffect(() => {
+    if (isHovered && triggerRef.current) {
+      const rect = triggerRef.current.getBoundingClientRect();
+      const popoverWidth = 212;
+      const popoverHeight = 340;
+      
+      setStyles({
+        position: "fixed",
+        top: rect.top - popoverHeight - 16,
+        left: rect.left + rect.width / 2 - popoverWidth / 2,
+        zIndex: 9999,
+      });
+    }
+  }, [isHovered]);
+
+  return (
+    <>
+      <span
+        ref={triggerRef}
+        className="cursor-pointer border-b border-dashed border-muted-foreground/50 transition-colors hover:border-foreground hover:text-foreground"
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+      >
+        {children}
+      </span>
+      {typeof document !== "undefined" &&
+        createPortal(
+          <AnimatePresence>
+            {isHovered && (
+              <motion.div
+                initial={{ opacity: 0, y: 8, scale: 0.95 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: 8, scale: 0.95 }}
+                transition={{ duration: 0.15, ease: "easeOut" }}
+                style={styles}
+                onMouseEnter={() => setIsHovered(true)}
+                onMouseLeave={() => setIsHovered(false)}
+              >
+                <a
+                  href="https://www.dndbeyond.com/characters/159073918"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block overflow-hidden rounded-xl border border-white/10 bg-[#151413]/95 p-4 shadow-2xl backdrop-blur-xl transition-colors hover:border-white/20"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  {/* Character art */}
+                  <div className="relative h-[240px] w-[180px] overflow-hidden rounded-lg bg-[#1a1918]">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src="/assets/dnd-character.png"
+                      alt="Perrin Burrowfen"
+                      className="h-full w-full object-cover"
+                    />
+                  </div>
+                  {/* Character info */}
+                  <div className="mt-3 text-center">
+                    <span
+                      className="block text-[22px] text-foreground"
+                      style={{ fontFamily: "var(--font-jacquard-24)" }}
+                    >
+                      Perrin Burrowfen
+                    </span>
+                    <span className="mt-1 block font-mono text-[11px] text-muted-foreground">
+                      Level 3 Twilight Cleric
+                    </span>
+                  </div>
+                </a>
+                {/* Arrow pointing down */}
+                <div className="absolute left-1/2 top-full -translate-x-1/2">
+                  <div className="h-0 w-0 border-l-[6px] border-r-[6px] border-t-[6px] border-l-transparent border-r-transparent border-t-white/10" />
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>,
+          document.body
+        )}
+    </>
+  );
+}
 
 type Slide = {
-  type: "title" | "intro" | "project-title" | "project-summary" | "project-visual" | "project-compare" | "project-impact" | "project-highlight" | "project-feedback";
+  type: "title" | "intro" | "personal" | "project-title" | "project-summary" | "project-visual" | "project-compare" | "project-bento" | "project-chart" | "project-impact" | "project-highlight" | "project-feedback";
   projectSlug?: string;
   content?: {
     title?: string;
@@ -26,6 +115,16 @@ type Slide = {
     stat?: { value: string; label: string };
     width?: number;
     height?: number;
+    bentoAssets?: WorkProjectAsset[];
+    bentoLayout?: BentoLayoutItem[];
+    githubStars?: {
+      startStars?: number;
+      midStars?: number;
+      currentStars?: number;
+      startLabel?: string;
+      midLabel?: string;
+      endLabel?: string;
+    };
   };
 };
 
@@ -36,10 +135,12 @@ type PresentationModeProps = {
   introText: {
     name: string;
     bio: string;
+    personal?: string;
+    imageSrc?: string;
   };
 };
 
-function generateSlides(projects: WorkProject[], introText: { name: string; bio: string }): Slide[] {
+function generateSlides(projects: WorkProject[], introText: { name: string; bio: string; personal?: string; imageSrc?: string }): Slide[] {
   const slides: Slide[] = [];
 
   // Title slide
@@ -57,8 +158,21 @@ function generateSlides(projects: WorkProject[], introText: { name: string; bio:
     content: {
       title: "About",
       body: introText.bio,
+      imageSrc: introText.imageSrc,
+      imageAlt: "Simon Duncan",
     },
   });
+
+  // Personal slide
+  if (introText.personal) {
+    slides.push({
+      type: "personal",
+      content: {
+        title: "Outside of Work",
+        body: introText.personal,
+      },
+    });
+  }
 
   // Project slides
   for (const project of projects) {
@@ -105,6 +219,16 @@ function generateSlides(projects: WorkProject[], introText: { name: string; bio:
             height: section.assets[1].height || 900,
           },
         });
+      } else if (section.layout === "bento" && section.assets.length > 0) {
+        // Handle bento sections
+        slides.push({
+          type: "project-bento",
+          projectSlug: project.slug,
+          content: {
+            bentoAssets: section.assets,
+            bentoLayout: section.bento?.items,
+          },
+        });
       } else {
         const asset = section.assets[0];
         if (asset) {
@@ -122,21 +246,14 @@ function generateSlides(projects: WorkProject[], introText: { name: string; bio:
       }
     }
 
-    // Impact slide - look for impact section or github-stars
-    const impactSection = project.sections.find((s) => s.heading?.toLowerCase().includes("impact") || s.layout === "github-stars");
-    if (impactSection) {
+    // Chart slide - look for github-stars layout
+    const chartSection = project.sections.find((s) => s.layout === "github-stars" && s.githubStars);
+    if (chartSection && chartSection.githubStars) {
       slides.push({
-        type: "project-impact",
+        type: "project-chart",
         projectSlug: project.slug,
         content: {
-          title: "Impact",
-          body: impactSection.caption || undefined,
-          stat: impactSection.githubStars
-            ? {
-                value: `${Math.round((impactSection.githubStars.currentStars || 0) / 1000)}k`,
-                label: "GitHub Stars",
-              }
-            : undefined,
+          githubStars: chartSection.githubStars,
         },
       });
     }
@@ -180,7 +297,7 @@ function SlideNumber({ index, total }: { index: number; total: number }) {
   );
 }
 
-function SlideContent({ slide, slideIndex, totalSlides }: { slide: Slide; slideIndex: number; totalSlides: number }) {
+function SlideContent({ slide, slideIndex, totalSlides, onLightboxStateChange }: { slide: Slide; slideIndex: number; totalSlides: number; onLightboxStateChange?: (isOpen: boolean) => void }) {
   switch (slide.type) {
     case "title":
       return (
@@ -233,24 +350,74 @@ function SlideContent({ slide, slideIndex, totalSlides }: { slide: Slide; slideI
 
     case "intro":
       return (
-        <div className="relative flex h-full flex-col items-center justify-center px-8">
-          <div className="max-w-[800px]">
+        <div className="relative flex h-full items-center justify-center px-8 md:px-16">
+          <div className="flex w-full max-w-[1200px] flex-col items-center gap-12 md:flex-row md:items-center md:justify-between">
+            {/* Left side - Text */}
+            <div className="flex-1">
+              <motion.h2
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.1 }}
+                className="mb-6 text-[14px] font-medium uppercase tracking-wider text-muted-foreground"
+              >
+                {slide.content?.title}
+              </motion.h2>
+              <motion.p
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+                className="text-[24px] leading-relaxed text-foreground md:text-[32px]"
+              >
+                {slide.content?.body}
+              </motion.p>
+            </div>
+            {/* Right side - Image */}
+            {slide.content?.imageSrc && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.3 }}
+                className="hidden w-full max-w-[320px] flex-shrink-0 md:block"
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={slide.content.imageSrc}
+                  alt={slide.content.imageAlt || ""}
+                  className="aspect-[4/5] w-full rounded-[16px] object-cover"
+                />
+              </motion.div>
+            )}
+          </div>
+          <SlideNumber index={slideIndex} total={totalSlides} />
+        </div>
+      );
+
+    case "personal":
+      return (
+        <div className="relative flex h-full flex-col items-center justify-center px-8 md:px-16">
+          <div className="max-w-[900px]">
             <motion.h2
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
-              className="mb-8 text-[14px] font-medium uppercase tracking-wider text-muted-foreground"
+              className="mb-6 text-[14px] font-medium uppercase tracking-wider text-muted-foreground"
             >
               {slide.content?.title}
             </motion.h2>
-            <motion.p
+            <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
               className="text-[24px] leading-relaxed text-foreground md:text-[32px]"
             >
-              {slide.content?.body}
-            </motion.p>
+              <p>
+                Outside of product design, I&apos;m a parent, husband, runner, musician, and{" "}
+                <DndHoverCard>D&D player</DndHoverCard>.
+              </p>
+              <p className="mt-6">
+                I spend a lot of time thinking about creativity, constraint, and sustainability. I make music that blends ambient, electronic, and guitar-driven textures, and I&apos;m interested in long-term lifestyle design, balancing ambition with family, health, and creative output.
+              </p>
+            </motion.div>
           </div>
           <SlideNumber index={slideIndex} total={totalSlides} />
         </div>
@@ -399,6 +566,51 @@ function SlideContent({ slide, slideIndex, totalSlides }: { slide: Slide; slideI
         </div>
       );
 
+    case "project-bento":
+      return (
+        <div className="relative flex h-full flex-col items-center justify-center px-6 md:px-12">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.1 }}
+            className="w-full max-w-[1400px]"
+          >
+            {slide.content?.bentoAssets && (
+              <BentoView
+                assets={slide.content.bentoAssets}
+                layout={slide.content.bentoLayout}
+                onLightboxStateChange={onLightboxStateChange}
+              />
+            )}
+          </motion.div>
+          <SlideNumber index={slideIndex} total={totalSlides} />
+        </div>
+      );
+
+    case "project-chart":
+      return (
+        <div className="relative flex h-full flex-col items-center justify-center px-6 md:px-12">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.1 }}
+            className="w-full max-w-[1000px]"
+          >
+            {slide.content?.githubStars && (
+              <GithubStarsChart
+                startStars={slide.content.githubStars.startStars}
+                midStars={slide.content.githubStars.midStars}
+                currentStars={slide.content.githubStars.currentStars}
+                startLabel={slide.content.githubStars.startLabel}
+                midLabel={slide.content.githubStars.midLabel}
+                endLabel={slide.content.githubStars.endLabel}
+              />
+            )}
+          </motion.div>
+          <SlideNumber index={slideIndex} total={totalSlides} />
+        </div>
+      );
+
     case "project-impact":
       return (
         <div className="relative flex h-full flex-col items-center justify-center px-8">
@@ -515,6 +727,7 @@ function SlideContent({ slide, slideIndex, totalSlides }: { slide: Slide; slideI
 export function PresentationMode({ isOpen, onClose, projects, introText }: PresentationModeProps) {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [slides, setSlides] = useState<Slide[]>([]);
+  const [isLightboxOpen, setIsLightboxOpen] = useState(false);
 
   useEffect(() => {
     if (projects.length > 0) {
@@ -550,7 +763,10 @@ export function PresentationMode({ isOpen, onClose, projects, introText }: Prese
       
       switch (e.key) {
         case "Escape":
-          onClose();
+          // Only close presentation if no lightbox is open
+          if (!isLightboxOpen) {
+            onClose();
+          }
           break;
         case "ArrowRight":
         case "ArrowDown":
@@ -576,7 +792,7 @@ export function PresentationMode({ isOpen, onClose, projects, introText }: Prese
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [isOpen, onClose, goToNextSlide, goToPrevSlide, slides.length]);
+  }, [isOpen, onClose, goToNextSlide, goToPrevSlide, slides.length, isLightboxOpen]);
 
   if (typeof window === "undefined" || slides.length === 0) return null;
 
@@ -633,22 +849,11 @@ export function PresentationMode({ isOpen, onClose, projects, introText }: Prese
                   slide={slides[currentSlide]}
                   slideIndex={currentSlide}
                   totalSlides={slides.length}
+                  onLightboxStateChange={setIsLightboxOpen}
                 />
               </motion.div>
             </AnimatePresence>
           </div>
-
-          {/* Click zones for navigation */}
-          <div
-            className="fixed bottom-20 left-0 top-16 w-1/3 cursor-pointer"
-            onClick={goToPrevSlide}
-            aria-hidden="true"
-          />
-          <div
-            className="fixed bottom-20 right-0 top-16 w-1/3 cursor-pointer"
-            onClick={goToNextSlide}
-            aria-hidden="true"
-          />
         </motion.div>
       )}
     </AnimatePresence>,

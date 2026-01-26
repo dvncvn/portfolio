@@ -489,14 +489,21 @@ function getBentoLayout(
   }));
 }
 
-function BentoView({
+export function BentoView({
   assets,
   layout,
+  onLightboxStateChange,
 }: {
   assets: WorkProjectAsset[];
   layout?: BentoLayoutItem[];
+  onLightboxStateChange?: (isOpen: boolean) => void;
 }) {
   const { activeIndex, openAt, close, next, prev } = useGalleryLightbox(assets);
+
+  // Notify parent when lightbox state changes
+  useEffect(() => {
+    onLightboxStateChange?.(activeIndex !== null);
+  }, [activeIndex, onLightboxStateChange]);
   const layoutItems = getBentoLayout(assets.length, layout);
   const cardBaseClass =
     "bento-card group relative w-full cursor-pointer overflow-hidden rounded-[8px] bg-[#121212] p-4 transition-opacity duration-300 ease-out aspect-[4/3] md:aspect-auto select-none";

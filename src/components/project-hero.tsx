@@ -31,6 +31,7 @@ export function ProjectHero({
   const heroAspectRatio =
     heroAsset?.aspectRatio ??
     (heroAsset?.width && heroAsset?.height ? `${heroAsset.width}/${heroAsset.height}` : "1/1");
+  const hasHeroVignette = heroAsset?.effect === "vignette";
 
   return (
     <motion.header
@@ -62,14 +63,20 @@ export function ProjectHero({
       {heroAsset ? (
         <div
           ref={heroAssetRef}
-          className="relative z-0 mx-auto w-full max-w-[900px] -mb-14 overflow-visible md:-mb-20"
+          className={`relative z-0 mx-auto w-full max-w-[900px] -mb-14 overflow-visible md:-mb-20 ${
+            hasHeroVignette
+              ? "[mask-image:radial-gradient(ellipse_52%_46%_at_center,black_22%,transparent_68%)] [-webkit-mask-image:radial-gradient(ellipse_52%_46%_at_center,black_22%,transparent_68%)]"
+              : ""
+          }`}
           style={{ aspectRatio: heroAspectRatio }}
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <motion.img
             src={heroAsset.src}
             alt={heroAsset.alt ?? ""}
-            className="h-full w-full origin-center scale-[0.8] object-contain select-none pointer-events-none md:scale-[0.95]"
+            className={`h-full w-full origin-center object-contain select-none pointer-events-none ${
+              hasHeroVignette ? "scale-[1.15]" : "scale-[0.8] md:scale-[0.95]"
+            }`}
             draggable={false}
             loading="eager"
             fetchPriority="high"

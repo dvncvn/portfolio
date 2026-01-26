@@ -350,13 +350,13 @@ function SlideContent({ slide, slideIndex, totalSlides, onLightboxStateChange }:
             }}
           />
           {/* Content */}
-          <div className="relative z-10 flex w-full items-center justify-center px-12 md:px-24">
-            <div className="w-full max-w-[1200px]">
+          <div className="relative z-10 flex w-full items-center justify-center px-6 md:px-12 lg:px-16">
+            <div className="w-full max-w-[900px] lg:max-w-[1000px]">
               <motion.h1
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.1 }}
-                className="text-[56px] font-medium leading-tight text-foreground md:text-[72px]"
+                className="text-[40px] font-medium leading-tight text-foreground md:text-[56px] lg:text-[64px]"
               >
                 {slide.content?.title}
               </motion.h1>
@@ -364,7 +364,7 @@ function SlideContent({ slide, slideIndex, totalSlides, onLightboxStateChange }:
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2 }}
-                className="mt-4 text-[20px] text-muted-foreground md:text-[24px]"
+                className="mt-3 text-[17px] text-muted-foreground md:mt-4 md:text-[20px] lg:text-[22px]"
               >
                 {slide.content?.subtitle}
               </motion.p>
@@ -376,15 +376,15 @@ function SlideContent({ slide, slideIndex, totalSlides, onLightboxStateChange }:
 
     case "intro":
       return (
-        <div className="relative flex h-full items-center justify-center px-8 md:px-16">
-          <div className="flex w-full max-w-[1200px] flex-col items-center gap-12 md:flex-row md:items-center md:justify-between">
+        <div className="relative flex h-full items-center justify-center px-6 md:px-12 lg:px-16">
+          <div className="flex w-full max-w-[900px] flex-col items-center gap-8 md:flex-row md:items-center md:justify-between lg:max-w-[1000px] lg:gap-12">
             {/* Left side - Text */}
             <div className="flex-1">
               <motion.h2
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.1 }}
-                className="mb-6 text-[14px] font-medium uppercase tracking-wider text-muted-foreground"
+                className="mb-4 text-[13px] font-medium uppercase tracking-wider text-muted-foreground md:mb-6 md:text-[14px]"
               >
                 {slide.content?.title}
               </motion.h2>
@@ -392,7 +392,7 @@ function SlideContent({ slide, slideIndex, totalSlides, onLightboxStateChange }:
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2 }}
-                className="text-[24px] leading-relaxed text-foreground md:text-[32px]"
+                className="text-[20px] leading-relaxed text-foreground md:text-[24px] lg:text-[28px]"
               >
                 {slide.content?.body}
               </motion.p>
@@ -403,7 +403,7 @@ function SlideContent({ slide, slideIndex, totalSlides, onLightboxStateChange }:
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 0.3 }}
-                className="hidden w-full max-w-[320px] flex-shrink-0 md:block"
+                className="hidden w-full max-w-[240px] flex-shrink-0 md:block lg:max-w-[280px]"
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
@@ -420,13 +420,13 @@ function SlideContent({ slide, slideIndex, totalSlides, onLightboxStateChange }:
 
     case "personal":
       return (
-        <div className="relative flex h-full flex-col items-center justify-center px-8 md:px-16">
-          <div className="max-w-[900px]">
+        <div className="relative flex h-full flex-col items-center justify-center px-6 md:px-12 lg:px-16">
+          <div className="max-w-[700px] lg:max-w-[800px]">
             <motion.h2
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
-              className="mb-6 text-[14px] font-medium uppercase tracking-wider text-muted-foreground"
+              className="mb-4 text-[13px] font-medium uppercase tracking-wider text-muted-foreground md:mb-6 md:text-[14px]"
             >
               {slide.content?.title}
             </motion.h2>
@@ -434,13 +434,13 @@ function SlideContent({ slide, slideIndex, totalSlides, onLightboxStateChange }:
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
-              className="text-[24px] leading-relaxed text-foreground md:text-[32px]"
+              className="text-[20px] leading-relaxed text-foreground md:text-[24px] lg:text-[28px]"
             >
               <p>
                 Outside of product design, I&apos;m a parent, husband, runner, musician, and{" "}
                 <DndHoverCard>D&D player</DndHoverCard>.
               </p>
-              <p className="mt-6">
+              <p className="mt-5 md:mt-6">
                 I spend a lot of time thinking about creativity, constraint, and sustainability. I make music that blends ambient, electronic, and guitar-driven textures, and I&apos;m interested in long-term lifestyle design, balancing ambition with family, health, and creative output.
               </p>
             </motion.div>
@@ -451,21 +451,21 @@ function SlideContent({ slide, slideIndex, totalSlides, onLightboxStateChange }:
 
     case "project-title":
       return (
-        <div className="relative flex h-full items-center justify-center px-12 md:px-24">
-          <div className="flex w-full max-w-[1200px] items-center justify-between gap-12">
+        <div className="relative flex h-full items-center justify-center px-8 md:px-12 lg:px-16">
+          <div className="flex w-full max-w-[900px] items-center justify-between gap-8 lg:max-w-[1000px] lg:gap-12">
             {/* Left side - Title */}
             <div className="flex-1">
               <motion.div
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 0.1 }}
-                className="mb-6 h-1 w-16 bg-highlight"
+                className="mb-4 h-1 w-12 bg-highlight md:mb-6 md:w-16"
               />
               <motion.h2
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.15 }}
-                className="text-[40px] font-medium leading-tight text-foreground md:text-[56px]"
+                className="text-[32px] font-medium leading-tight text-foreground md:text-[40px] lg:text-[48px]"
               >
                 {slide.content?.title?.includes(": ") ? (
                   <>
@@ -481,7 +481,7 @@ function SlideContent({ slide, slideIndex, totalSlides, onLightboxStateChange }:
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.25 }}
-                className="mt-4 text-[18px] text-muted-foreground"
+                className="mt-3 text-[15px] text-muted-foreground md:mt-4 md:text-[16px]"
               >
                 {slide.content?.subtitle}
               </motion.p>
@@ -498,7 +498,7 @@ function SlideContent({ slide, slideIndex, totalSlides, onLightboxStateChange }:
                 <img
                   src={slide.content.heroImageSrc}
                   alt={slide.content?.title || ""}
-                  className="h-auto max-h-[75vh] w-full object-contain"
+                  className="h-auto max-h-[55vh] w-full object-contain lg:max-h-[60vh]"
                 />
               </motion.div>
             )}
@@ -509,13 +509,13 @@ function SlideContent({ slide, slideIndex, totalSlides, onLightboxStateChange }:
 
     case "project-summary":
       return (
-        <div className="relative flex h-full flex-col items-center justify-center px-8">
-          <div className="max-w-[800px]">
+        <div className="relative flex h-full flex-col items-center justify-center px-6 md:px-12">
+          <div className="max-w-[600px] md:max-w-[700px] lg:max-w-[750px]">
             <motion.h3
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
-              className="mb-8 text-[14px] font-medium uppercase tracking-wider text-muted-foreground"
+              className="mb-6 text-[13px] font-medium uppercase tracking-wider text-muted-foreground md:mb-8 md:text-[14px]"
             >
               Summary
             </motion.h3>
@@ -523,7 +523,7 @@ function SlideContent({ slide, slideIndex, totalSlides, onLightboxStateChange }:
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
-              className="whitespace-pre-line text-[20px] leading-relaxed text-foreground md:text-[24px]"
+              className="whitespace-pre-line text-[17px] leading-relaxed text-foreground md:text-[20px] lg:text-[22px]"
             >
               {slide.content?.body}
             </motion.p>
@@ -534,41 +534,43 @@ function SlideContent({ slide, slideIndex, totalSlides, onLightboxStateChange }:
 
     case "project-visual":
       return (
-        <div className="relative flex h-full flex-col items-center justify-center px-8">
-          <div className="flex max-h-[80vh] max-w-[1200px] flex-col items-center">
-            {slide.content?.title && (
-              <motion.h3
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.1 }}
-                className="mb-4 text-[14px] font-medium uppercase tracking-wider text-muted-foreground"
+        <div className="relative h-full w-full">
+          <div className="absolute inset-0 flex flex-col items-center justify-center px-6 md:px-12">
+            <div className="flex w-full max-w-[900px] flex-col items-center lg:max-w-[1000px]">
+              {slide.content?.title && (
+                <motion.h3
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.1 }}
+                  className="mb-4 text-[13px] font-medium uppercase tracking-wider text-muted-foreground md:text-[14px]"
+                >
+                  {slide.content.title}
+                </motion.h3>
+              )}
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.15 }}
+                className="overflow-hidden rounded-lg"
               >
-                {slide.content.title}
-              </motion.h3>
-            )}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.15 }}
-              className="overflow-hidden rounded-lg"
-            >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={slide.content?.imageSrc}
-                alt={slide.content?.imageAlt || ""}
-                className="max-h-[65vh] w-auto object-contain"
-              />
-            </motion.div>
-            {slide.content?.subtitle && (
-              <motion.p
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.25 }}
-                className="mt-4 max-w-[600px] text-center text-[14px] text-muted-foreground"
-              >
-                {slide.content.subtitle}
-              </motion.p>
-            )}
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={slide.content?.imageSrc}
+                  alt={slide.content?.imageAlt || ""}
+                  className="max-h-[50vh] w-auto object-contain md:max-h-[55vh] lg:max-h-[60vh]"
+                />
+              </motion.div>
+              {slide.content?.subtitle && (
+                <motion.p
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.25 }}
+                  className="mt-4 max-w-[500px] text-center text-[13px] text-muted-foreground md:text-[14px] lg:max-w-[600px]"
+                >
+                  {slide.content.subtitle}
+                </motion.p>
+              )}
+            </div>
           </div>
           <SlideNumber index={slideIndex} total={totalSlides} />
         </div>
@@ -576,12 +578,13 @@ function SlideContent({ slide, slideIndex, totalSlides, onLightboxStateChange }:
 
     case "project-compare":
       return (
-        <div className="relative flex h-full flex-col items-center justify-center px-6 md:px-12">
-          <div className="w-full max-w-[1400px]">
+        <div className="relative h-full w-full">
+          <div className="absolute inset-0 flex items-center justify-center px-6 md:px-12 lg:px-16">
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.1 }}
+              className="w-full max-w-[900px] lg:max-w-[1000px] [&>div]:!space-y-3"
             >
               {slide.content?.beforeSrc && slide.content?.afterSrc && (
                 <CompareView
@@ -602,34 +605,36 @@ function SlideContent({ slide, slideIndex, totalSlides, onLightboxStateChange }:
 
     case "project-bento":
       return (
-        <div className="relative flex h-full flex-col items-center justify-center px-6 md:px-12">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.1 }}
-            className="w-full max-w-[1400px]"
-          >
-            {slide.content?.bentoAssets && (
-              <BentoView
-                assets={slide.content.bentoAssets}
-                layout={slide.content.bentoLayout}
-                onLightboxStateChange={onLightboxStateChange}
-              />
-            )}
-          </motion.div>
+        <div className="relative h-full w-full">
+          <div className="absolute inset-0 flex items-center justify-center px-6 md:px-12 lg:px-16">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.1 }}
+              className="w-full max-w-[900px] lg:max-w-[1000px]"
+            >
+              {slide.content?.bentoAssets && (
+                <BentoView
+                  assets={slide.content.bentoAssets}
+                  layout={slide.content.bentoLayout}
+                  onLightboxStateChange={onLightboxStateChange}
+                />
+              )}
+            </motion.div>
+          </div>
           <SlideNumber index={slideIndex} total={totalSlides} />
         </div>
       );
 
     case "project-chart":
       return (
-        <div className="relative flex h-full flex-col items-center justify-center px-6 md:px-12">
-          <div className="w-full max-w-[1000px]">
+        <div className="relative flex h-full flex-col items-center justify-center px-6 md:px-12 lg:px-16">
+          <div className="w-full max-w-[700px] md:max-w-[800px] lg:max-w-[900px]">
             <motion.h2
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
-              className="mb-8 text-[14px] font-medium uppercase tracking-wider text-muted-foreground"
+              className="mb-6 text-[13px] font-medium uppercase tracking-wider text-muted-foreground md:mb-8 md:text-[14px]"
             >
               Impact
             </motion.h2>
@@ -696,31 +701,33 @@ function SlideContent({ slide, slideIndex, totalSlides, onLightboxStateChange }:
 
     case "project-highlight":
       return (
-        <div className="relative flex h-full flex-col items-center justify-center px-8">
-          <div className="flex max-h-[80vh] max-w-[1000px] flex-col items-center">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.1 }}
-              className="overflow-hidden rounded-lg"
-            >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={slide.content?.imageSrc}
-                alt={slide.content?.imageAlt || ""}
-                className="max-h-[60vh] w-auto object-contain"
-              />
-            </motion.div>
-            {slide.content?.highlightLabel && (
-              <motion.p
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 }}
-                className="mt-6 max-w-[600px] text-center text-[16px] text-muted-foreground"
+        <div className="relative h-full w-full">
+          <div className="absolute inset-0 flex flex-col items-center justify-center px-6 md:px-12">
+            <div className="flex w-full max-w-[800px] flex-col items-center lg:max-w-[900px]">
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.1 }}
+                className="overflow-hidden rounded-lg"
               >
-                {slide.content.highlightLabel}
-              </motion.p>
-            )}
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={slide.content?.imageSrc}
+                  alt={slide.content?.imageAlt || ""}
+                  className="max-h-[45vh] w-auto object-contain md:max-h-[50vh] lg:max-h-[55vh]"
+                />
+              </motion.div>
+              {slide.content?.highlightLabel && (
+                <motion.p
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.2 }}
+                  className="mt-5 max-w-[500px] text-center text-[14px] text-muted-foreground md:text-[15px] lg:max-w-[600px]"
+                >
+                  {slide.content.highlightLabel}
+                </motion.p>
+              )}
+            </div>
           </div>
           <SlideNumber index={slideIndex} total={totalSlides} />
         </div>

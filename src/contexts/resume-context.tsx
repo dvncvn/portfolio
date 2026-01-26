@@ -35,7 +35,7 @@ const resumeData: ResumeData = {
             "Managed a team of 4 designers during DataStax's pivot to an AI-first company, maintaining momentum through organizational change",
             "Defined cloud experience success metrics with product and engineering leadership to tie UX investment to measurable outcomes",
             "Contributed to securing $115M Series E funding through product narrative, experience storytelling, and customer-ready demos",
-            "Only design IC recipient of the Ellis Award for outstanding business impact",
+            "Recipient of the prestigious Ellis Award for outstanding business impact",
           ],
         },
         {

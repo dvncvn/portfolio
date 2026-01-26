@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { IntroBlock } from "@/components/intro-block";
 import { WorkCard } from "@/components/work-card";
 import { BlurFade } from "@/components/ui/blur-fade";
@@ -96,7 +97,13 @@ export default async function Home() {
 
       {/* Work section */}
       <section className="work-section mt-32">
-        <WorkSectionHeader projects={validProjects} />
+        <Suspense fallback={
+          <div className="mb-8 flex items-baseline justify-between">
+            <h2 className="text-[14px] font-medium uppercase tracking-wide text-[#7D7D7D]">Work</h2>
+          </div>
+        }>
+          <WorkSectionHeader projects={validProjects} />
+        </Suspense>
 
         <div className="work-grid flex flex-col gap-6 md:flex-row md:gap-8">
           <div className="flex flex-col gap-6 md:flex-1">

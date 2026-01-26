@@ -935,7 +935,7 @@ function SlideContent({ slide, slideIndex, totalSlides, onLightboxStateChange }:
             >
               <button
                 onClick={() => window.location.href = "/"}
-                className="rounded-md bg-white/[0.08] px-5 py-2.5 text-[14px] font-medium text-foreground transition-colors hover:bg-white/[0.12]"
+                className="inline-flex items-center gap-2 rounded-md bg-white/[0.06] px-4 py-2 text-[14px] text-muted-foreground transition-all duration-200 ease-out hover:bg-white/[0.1] hover:text-foreground"
               >
                 Back to Website
               </button>
@@ -944,7 +944,7 @@ function SlideContent({ slide, slideIndex, totalSlides, onLightboxStateChange }:
                   const event = new KeyboardEvent("keydown", { key: "Home" });
                   window.dispatchEvent(event);
                 }}
-                className="rounded-md border border-white/10 px-5 py-2.5 text-[14px] font-medium text-muted-foreground transition-colors hover:border-white/20 hover:text-foreground"
+                className="inline-flex items-center gap-2 rounded-md bg-white/[0.06] px-4 py-2 text-[14px] text-muted-foreground transition-all duration-200 ease-out hover:bg-white/[0.1] hover:text-foreground"
               >
                 Restart Presentation
               </button>

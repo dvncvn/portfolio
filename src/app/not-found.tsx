@@ -4,9 +4,9 @@ import Link from "next/link";
 import styles from "./not-found.module.css";
 import { AsciiNoiseBackground } from "@/components/ascii-noise-background";
 import { useSearchParams } from "next/navigation";
-import { useMemo, useState } from "react";
+import { Suspense, useMemo, useState } from "react";
 
-export default function NotFound() {
+function NotFoundContent() {
   const searchParams = useSearchParams();
   const showControls = useMemo(
     () => searchParams.get("debug") === "1",
@@ -157,6 +157,14 @@ export default function NotFound() {
         </div>
       ) : null}
     </div>
+  );
+}
+
+export default function NotFound() {
+  return (
+    <Suspense fallback={null}>
+      <NotFoundContent />
+    </Suspense>
   );
 }
 

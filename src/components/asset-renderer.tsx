@@ -626,12 +626,12 @@ export function BentoView({
       ) : isCustomTwoUp ? (
         <div className="bento-section">
           <div className="grid gap-8 md:[grid-template-columns:0.683fr_0.317fr] md:items-stretch">
-            {renderCard(assets[0], 0, "p-2 !aspect-auto h-[700px]", "scale-[0.88]", undefined, true)}
+            {renderCard(assets[0], 0, "p-2 !aspect-auto h-[700px] [&>picture]:flex [&>picture]:items-center [&>picture]:justify-center [&>picture]:h-full", "!h-auto !w-auto max-h-full max-w-full scale-[0.88]", undefined, true)}
             {renderCard(
               assets[1],
               1,
-              "!aspect-auto h-[700px] p-2",
-              "relative z-10 h-full w-full object-contain object-top",
+              "!aspect-auto h-[700px] p-2 [&>picture]:flex [&>picture]:items-center [&>picture]:justify-center [&>picture]:h-full",
+              "!h-auto !w-auto max-h-full max-w-full",
               agentExpCard2Background,
               false,
               true,

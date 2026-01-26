@@ -9,6 +9,7 @@ import { CompareView } from "@/components/compare-view";
 import { GithubStarsChart } from "@/components/github-stars-chart";
 import { BentoView } from "@/components/asset-renderer";
 import { Marquee } from "@/components/ui/marquee";
+import { DotPattern } from "@/components/ui/dot-pattern";
 
 // Larger review card for presentation mode
 function PresentationReviewCard({
@@ -21,14 +22,14 @@ function PresentationReviewCard({
   body: string;
 }) {
   return (
-    <figure className="h-56 w-[480px] flex-shrink-0 overflow-hidden rounded-[20px] border border-white/10 bg-[#121212] p-8 transition-colors duration-200 ease-out hover:bg-white/5">
+    <figure className="h-56 w-[420px] flex-shrink-0 overflow-hidden rounded-[20px] border border-white/10 bg-[#121212] p-6 transition-colors duration-200 ease-out hover:bg-white/5 xl:h-64 xl:w-[520px] xl:p-8 2xl:h-72 2xl:w-[580px]">
       <figcaption className="flex flex-col gap-1">
-        <span className="text-[18px] font-medium text-foreground">{name}</span>
+        <span className="text-[16px] font-medium text-foreground xl:text-[18px] 2xl:text-[20px]">{name}</span>
         {title ? (
-          <span className="text-[15px] text-muted-foreground">{title}</span>
+          <span className="text-[14px] text-muted-foreground xl:text-[15px] 2xl:text-[16px]">{title}</span>
         ) : null}
       </figcaption>
-      <blockquote className="mt-5 line-clamp-4 text-[16px] leading-relaxed text-muted-foreground">
+      <blockquote className="mt-4 line-clamp-4 text-[15px] leading-relaxed text-muted-foreground xl:mt-5 xl:text-[16px] 2xl:text-[17px]">
         {body}
       </blockquote>
     </figure>
@@ -123,7 +124,7 @@ function DndHoverCard({ children }: { children: React.ReactNode }) {
 }
 
 type Slide = {
-  type: "title" | "intro" | "personal" | "project-title" | "project-summary" | "project-visual" | "project-compare" | "project-bento" | "project-chart" | "project-impact" | "project-highlight" | "project-feedback";
+  type: "title" | "intro" | "personal" | "project-title" | "project-summary" | "project-visual" | "project-compare" | "project-bento" | "project-chart" | "project-impact" | "project-highlight" | "project-feedback" | "closing";
   projectSlug?: string;
   content?: {
     title?: string;
@@ -132,6 +133,8 @@ type Slide = {
     imageSrc?: string;
     imageAlt?: string;
     heroImageSrc?: string;
+    showDotGrid?: boolean;
+    showVignette?: boolean;
     beforeSrc?: string;
     afterSrc?: string;
     beforeAlt?: string;
@@ -202,14 +205,27 @@ function generateSlides(projects: WorkProject[], introText: { name: string; bio:
 
   // Project slides
   for (const project of projects) {
-    // Project title slide
+    // Project title slide - use custom art for specific projects
+    const isAgentExperience = project.slug === "langflow-agent-experience";
+    const isContextForge = project.slug === "context-forge";
+    
+    // Determine hero image - use hover art for agent-experience and context-forge
+    let heroImageSrc = project.heroAsset?.src;
+    if (isAgentExperience) {
+      heroImageSrc = "/assets/work/langflow-agent-experience/agent-art-hover.svg";
+    } else if (isContextForge) {
+      heroImageSrc = "/assets/work/context-forge/cf-art_hover.svg";
+    }
+    
     slides.push({
       type: "project-title",
       projectSlug: project.slug,
       content: {
         title: project.title,
         subtitle: project.meta?.dates || project.timeframe,
-        heroImageSrc: project.heroAsset?.src,
+        heroImageSrc,
+        showDotGrid: isAgentExperience,
+        showVignette: isContextForge,
       },
     });
 
@@ -229,6 +245,21 @@ function generateSlides(projects: WorkProject[], introText: { name: string; bio:
     );
 
     for (const section of visualSections.slice(0, 2)) {
+      // Skip the "Generative Agent Building" bento for agent-experience - handled specially below
+      if (isAgentExperience && section.heading === "Generative Agent Building on the Canvas") {
+        continue;
+      }
+      
+      // Skip compare slides for context-forge (no before/after available yet)
+      if (isContextForge && section.layout === "compare") {
+        continue;
+      }
+      
+      // Skip single-caption sections - handled separately as highlight slides
+      if (section.layout === "single-caption") {
+        continue;
+      }
+      
       // Handle compare sections specially
       if (section.layout === "compare" && section.assets.length >= 2) {
         slides.push({
@@ -272,6 +303,46 @@ function generateSlides(projects: WorkProject[], introText: { name: string; bio:
       }
     }
 
+    // Agent Experience: Add "Generative Agent Building" section slides and Impact
+    if (isAgentExperience) {
+      const genAgentSection = project.sections.find((s) => s.heading === "Generative Agent Building on the Canvas");
+      if (genAgentSection) {
+        // Text slide with heading and description
+        slides.push({
+          type: "project-summary",
+          projectSlug: project.slug,
+          content: {
+            title: genAgentSection.heading,
+            body: genAgentSection.caption,
+          },
+        });
+        // Bento slide with the assets
+        if (genAgentSection.assets && genAgentSection.assets.length > 0) {
+          slides.push({
+            type: "project-bento",
+            projectSlug: project.slug,
+            content: {
+              bentoAssets: genAgentSection.assets,
+              bentoLayout: genAgentSection.bento?.items,
+            },
+          });
+        }
+      }
+      
+      // Impact slide for Agent Experience
+      const impactSection = project.sections.find((s) => s.heading === "Impact");
+      if (impactSection) {
+        slides.push({
+          type: "project-summary",
+          projectSlug: project.slug,
+          content: {
+            title: "Impact",
+            body: impactSection.caption,
+          },
+        });
+      }
+    }
+
     // Chart slide - look for github-stars layout
     const chartSection = project.sections.find((s) => s.layout === "github-stars" && s.githubStars);
     if (chartSection && chartSection.githubStars) {
@@ -285,8 +356,9 @@ function generateSlides(projects: WorkProject[], introText: { name: string; bio:
     }
 
     // Highlight slide - look for single-caption sections (like Jensen Huang)
+    // Skip for context-forge (no highlight image ready yet)
     const highlightSection = project.sections.find((s) => s.layout === "single-caption");
-    if (highlightSection && highlightSection.assets[0]) {
+    if (highlightSection && highlightSection.assets[0] && !isContextForge) {
       slides.push({
         type: "project-highlight",
         projectSlug: project.slug,
@@ -311,6 +383,15 @@ function generateSlides(projects: WorkProject[], introText: { name: string; bio:
       });
     }
   }
+
+  // Closing slide
+  slides.push({
+    type: "closing",
+    content: {
+      title: "Thank you",
+      body: "I appreciate you taking the time to review my work. If you'd like to connect or discuss opportunities, I'd love to hear from you.",
+    },
+  });
 
   return slides;
 }
@@ -350,13 +431,13 @@ function SlideContent({ slide, slideIndex, totalSlides, onLightboxStateChange }:
             }}
           />
           {/* Content */}
-          <div className="relative z-10 flex w-full items-center justify-center px-6 md:px-12 lg:px-16">
-            <div className="w-full max-w-[900px] lg:max-w-[1000px]">
+          <div className="relative z-10 flex w-full items-center justify-center px-6 md:px-12 lg:px-16 xl:px-20 2xl:px-24">
+            <div className="w-full max-w-[900px] lg:max-w-[1000px] xl:max-w-[1100px] 2xl:max-w-[1200px]">
               <motion.h1
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.1 }}
-                className="text-[40px] font-medium leading-tight text-foreground md:text-[56px] lg:text-[64px]"
+                className="text-[40px] font-medium leading-tight text-foreground md:text-[56px] lg:text-[64px] xl:text-[72px] 2xl:text-[80px]"
               >
                 {slide.content?.title}
               </motion.h1>
@@ -364,7 +445,7 @@ function SlideContent({ slide, slideIndex, totalSlides, onLightboxStateChange }:
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2 }}
-                className="mt-3 text-[17px] text-muted-foreground md:mt-4 md:text-[20px] lg:text-[22px]"
+                className="mt-3 text-[17px] text-muted-foreground md:mt-4 md:text-[20px] lg:text-[22px] xl:text-[24px] 2xl:text-[26px]"
               >
                 {slide.content?.subtitle}
               </motion.p>
@@ -376,15 +457,15 @@ function SlideContent({ slide, slideIndex, totalSlides, onLightboxStateChange }:
 
     case "intro":
       return (
-        <div className="relative flex h-full items-center justify-center px-6 md:px-12 lg:px-16">
-          <div className="flex w-full max-w-[900px] flex-col items-center gap-8 md:flex-row md:items-center md:justify-between lg:max-w-[1000px] lg:gap-12">
+        <div className="relative flex h-full items-center justify-center px-6 md:px-12 lg:px-16 xl:px-20 2xl:px-24">
+          <div className="flex w-full max-w-[900px] flex-col items-center gap-8 md:flex-row md:items-center md:justify-between lg:max-w-[1000px] lg:gap-12 xl:max-w-[1100px] xl:gap-16 2xl:max-w-[1200px] 2xl:gap-20">
             {/* Left side - Text */}
             <div className="flex-1">
               <motion.h2
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.1 }}
-                className="mb-4 text-[13px] font-medium uppercase tracking-wider text-muted-foreground md:mb-6 md:text-[14px]"
+                className="mb-4 text-[13px] font-medium uppercase tracking-wider text-muted-foreground md:mb-6 md:text-[14px] xl:text-[15px]"
               >
                 {slide.content?.title}
               </motion.h2>
@@ -392,7 +473,7 @@ function SlideContent({ slide, slideIndex, totalSlides, onLightboxStateChange }:
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2 }}
-                className="text-[20px] leading-relaxed text-foreground md:text-[24px] lg:text-[28px]"
+                className="text-[20px] leading-relaxed text-foreground md:text-[24px] lg:text-[28px] xl:text-[32px] 2xl:text-[36px]"
               >
                 {slide.content?.body}
               </motion.p>
@@ -403,13 +484,13 @@ function SlideContent({ slide, slideIndex, totalSlides, onLightboxStateChange }:
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 0.3 }}
-                className="hidden w-full max-w-[240px] flex-shrink-0 md:block lg:max-w-[280px]"
+                className="hidden w-full max-w-[240px] flex-shrink-0 md:block lg:max-w-[280px] xl:max-w-[320px] 2xl:max-w-[360px]"
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={slide.content.imageSrc}
                   alt={slide.content.imageAlt || ""}
-                  className="aspect-[4/5] w-full rounded-[16px] object-cover"
+                  className="aspect-[4/5] w-full rounded-[16px] object-cover xl:rounded-[20px]"
                 />
               </motion.div>
             )}
@@ -420,13 +501,13 @@ function SlideContent({ slide, slideIndex, totalSlides, onLightboxStateChange }:
 
     case "personal":
       return (
-        <div className="relative flex h-full flex-col items-center justify-center px-6 md:px-12 lg:px-16">
-          <div className="max-w-[700px] lg:max-w-[800px]">
+        <div className="relative flex h-full flex-col items-center justify-center px-6 md:px-12 lg:px-16 xl:px-20 2xl:px-24">
+          <div className="max-w-[700px] lg:max-w-[800px] xl:max-w-[900px] 2xl:max-w-[1000px]">
             <motion.h2
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
-              className="mb-4 text-[13px] font-medium uppercase tracking-wider text-muted-foreground md:mb-6 md:text-[14px]"
+              className="mb-4 text-[13px] font-medium uppercase tracking-wider text-muted-foreground md:mb-6 md:text-[14px] xl:text-[15px]"
             >
               {slide.content?.title}
             </motion.h2>
@@ -434,13 +515,13 @@ function SlideContent({ slide, slideIndex, totalSlides, onLightboxStateChange }:
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
-              className="text-[20px] leading-relaxed text-foreground md:text-[24px] lg:text-[28px]"
+              className="text-[20px] leading-relaxed text-foreground md:text-[24px] lg:text-[28px] xl:text-[32px] 2xl:text-[36px]"
             >
               <p>
                 Outside of product design, I&apos;m a parent, husband, runner, musician, and{" "}
                 <DndHoverCard>D&D player</DndHoverCard>.
               </p>
-              <p className="mt-5 md:mt-6">
+              <p className="mt-5 md:mt-6 xl:mt-8">
                 I spend a lot of time thinking about creativity, constraint, and sustainability. I make music that blends ambient, electronic, and guitar-driven textures, and I&apos;m interested in long-term lifestyle design, balancing ambition with family, health, and creative output.
               </p>
             </motion.div>
@@ -451,21 +532,21 @@ function SlideContent({ slide, slideIndex, totalSlides, onLightboxStateChange }:
 
     case "project-title":
       return (
-        <div className="relative flex h-full items-center justify-center px-8 md:px-12 lg:px-16">
-          <div className="flex w-full max-w-[900px] items-center justify-between gap-8 lg:max-w-[1000px] lg:gap-12">
+        <div className="relative flex h-full items-center justify-center px-8 md:px-12 lg:px-16 xl:px-20 2xl:px-24">
+          <div className="flex w-full max-w-[900px] items-center justify-between gap-8 lg:max-w-[1000px] lg:gap-12 xl:max-w-[1200px] xl:gap-16 2xl:max-w-[1400px] 2xl:gap-20">
             {/* Left side - Title */}
             <div className="flex-1">
               <motion.div
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 0.1 }}
-                className="mb-4 h-1 w-12 bg-highlight md:mb-6 md:w-16"
+                className="mb-4 h-1 w-12 bg-highlight md:mb-6 md:w-16 xl:w-20"
               />
               <motion.h2
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.15 }}
-                className="text-[32px] font-medium leading-tight text-foreground md:text-[40px] lg:text-[48px]"
+                className="text-[32px] font-medium leading-tight text-foreground md:text-[40px] lg:text-[48px] xl:text-[56px] 2xl:text-[64px]"
               >
                 {slide.content?.title?.includes(": ") ? (
                   <>
@@ -481,7 +562,7 @@ function SlideContent({ slide, slideIndex, totalSlides, onLightboxStateChange }:
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.25 }}
-                className="mt-3 text-[15px] text-muted-foreground md:mt-4 md:text-[16px]"
+                className="mt-3 text-[15px] text-muted-foreground md:mt-4 md:text-[16px] xl:text-[18px] 2xl:text-[20px]"
               >
                 {slide.content?.subtitle}
               </motion.p>
@@ -492,14 +573,36 @@ function SlideContent({ slide, slideIndex, totalSlides, onLightboxStateChange }:
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 0.2 }}
-                className="hidden flex-[1.2] md:block"
+                className="relative hidden flex-[1.2] md:block"
               >
+                {/* Dot grid background */}
+                {slide.content?.showDotGrid && (
+                  <div className="pointer-events-none absolute inset-0 overflow-hidden rounded-xl">
+                    <DotPattern
+                      width={12}
+                      height={12}
+                      cx={1}
+                      cy={1}
+                      cr={1}
+                      className="text-white/[0.08] [mask-image:radial-gradient(ellipse_at_center,black_55%,transparent_100%)]"
+                    />
+                  </div>
+                )}
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={slide.content.heroImageSrc}
                   alt={slide.content?.title || ""}
-                  className="h-auto max-h-[55vh] w-full object-contain lg:max-h-[60vh]"
+                  className="relative h-auto max-h-[55vh] w-full object-contain lg:max-h-[60vh] xl:max-h-[65vh] 2xl:max-h-[70vh]"
                 />
+                {/* Vignette overlay */}
+                {slide.content?.showVignette && (
+                  <div
+                    className="pointer-events-none absolute inset-0 z-10"
+                    style={{
+                      background: "radial-gradient(ellipse 62% 55% at center, transparent 45%, #0B0A09 95%)",
+                    }}
+                  />
+                )}
               </motion.div>
             )}
           </div>
@@ -509,21 +612,21 @@ function SlideContent({ slide, slideIndex, totalSlides, onLightboxStateChange }:
 
     case "project-summary":
       return (
-        <div className="relative flex h-full flex-col items-center justify-center px-6 md:px-12">
-          <div className="max-w-[600px] md:max-w-[700px] lg:max-w-[750px]">
+        <div className="relative flex h-full flex-col items-center justify-center px-6 md:px-12 lg:px-16 xl:px-20 2xl:px-24">
+          <div className="max-w-[600px] md:max-w-[700px] lg:max-w-[750px] xl:max-w-[850px] 2xl:max-w-[950px]">
             <motion.h3
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
-              className="mb-6 text-[13px] font-medium uppercase tracking-wider text-muted-foreground md:mb-8 md:text-[14px]"
+              className="mb-6 text-[13px] font-medium uppercase tracking-wider text-muted-foreground md:mb-8 md:text-[14px] xl:text-[15px]"
             >
-              Summary
+              {slide.content?.title || "Summary"}
             </motion.h3>
             <motion.p
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
-              className="whitespace-pre-line text-[17px] leading-relaxed text-foreground md:text-[20px] lg:text-[22px]"
+              className="whitespace-pre-line text-[17px] leading-relaxed text-foreground md:text-[20px] lg:text-[22px] xl:text-[26px] 2xl:text-[30px]"
             >
               {slide.content?.body}
             </motion.p>
@@ -535,14 +638,14 @@ function SlideContent({ slide, slideIndex, totalSlides, onLightboxStateChange }:
     case "project-visual":
       return (
         <div className="relative h-full w-full">
-          <div className="absolute inset-x-0 inset-y-8 flex flex-col items-center justify-center px-6 md:inset-y-12 md:px-12 lg:inset-y-16">
-            <div className="flex w-full max-w-[900px] flex-col items-center lg:max-w-[1000px]">
+          <div className="absolute inset-x-0 inset-y-8 flex flex-col items-center justify-center px-6 md:inset-y-12 md:px-12 lg:inset-y-16 xl:px-16 2xl:px-20">
+            <div className="flex w-full max-w-[900px] flex-col items-center lg:max-w-[1000px] xl:max-w-[1200px] 2xl:max-w-[1400px]">
               {slide.content?.title && (
                 <motion.h3
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.1 }}
-                  className="mb-4 text-[13px] font-medium uppercase tracking-wider text-muted-foreground md:text-[14px]"
+                  className="mb-4 text-[13px] font-medium uppercase tracking-wider text-muted-foreground md:text-[14px] xl:text-[15px]"
                 >
                   {slide.content.title}
                 </motion.h3>
@@ -551,13 +654,13 @@ function SlideContent({ slide, slideIndex, totalSlides, onLightboxStateChange }:
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 0.15 }}
-                className="overflow-hidden rounded-lg"
+                className="overflow-hidden rounded-lg xl:rounded-xl"
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={slide.content?.imageSrc}
                   alt={slide.content?.imageAlt || ""}
-                  className="max-h-[50vh] w-auto object-contain md:max-h-[55vh] lg:max-h-[60vh]"
+                  className="max-h-[50vh] w-auto object-contain md:max-h-[55vh] lg:max-h-[60vh] xl:max-h-[68vh] 2xl:max-h-[72vh]"
                 />
               </motion.div>
               {slide.content?.subtitle && (
@@ -565,7 +668,7 @@ function SlideContent({ slide, slideIndex, totalSlides, onLightboxStateChange }:
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.25 }}
-                  className="mt-4 max-w-[500px] text-center text-[13px] text-muted-foreground md:text-[14px] lg:max-w-[600px]"
+                  className="mt-4 max-w-[500px] text-center text-[13px] text-muted-foreground md:text-[14px] lg:max-w-[600px] xl:max-w-[700px] xl:text-[15px] 2xl:max-w-[800px]"
                 >
                   {slide.content.subtitle}
                 </motion.p>
@@ -579,12 +682,12 @@ function SlideContent({ slide, slideIndex, totalSlides, onLightboxStateChange }:
     case "project-compare":
       return (
         <div className="relative h-full w-full">
-          <div className="absolute inset-x-0 inset-y-12 flex items-center justify-center px-6 md:inset-y-16 md:px-12 lg:inset-y-20 lg:px-16">
+          <div className="absolute inset-x-0 inset-y-12 flex items-center justify-center px-6 md:inset-y-16 md:px-12 lg:inset-y-20 lg:px-16 xl:px-20 2xl:px-24">
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.1 }}
-              className="w-full max-w-[900px] lg:max-w-[1000px] [&>div]:!space-y-3"
+              className="w-full max-w-[900px] lg:max-w-[1000px] xl:max-w-[1200px] 2xl:max-w-[1400px] [&>div]:!space-y-3"
             >
               {slide.content?.beforeSrc && slide.content?.afterSrc && (
                 <CompareView
@@ -606,12 +709,12 @@ function SlideContent({ slide, slideIndex, totalSlides, onLightboxStateChange }:
     case "project-bento":
       return (
         <div className="relative h-full w-full overflow-hidden">
-          <div className="absolute inset-x-0 inset-y-10 flex items-center justify-center px-8 md:inset-y-14 md:px-12 lg:inset-y-16 lg:px-16">
+          <div className="absolute inset-x-0 inset-y-10 flex items-center justify-center px-8 md:inset-y-14 md:px-12 lg:inset-y-16 lg:px-16 xl:px-20 2xl:px-24">
             <motion.div
               initial={{ opacity: 0, scale: 0.9 * 0.72 }}
               animate={{ opacity: 1, scale: 0.72 }}
               transition={{ delay: 0.1 }}
-              className="w-full max-w-[1400px] origin-center"
+              className="w-full max-w-[1400px] origin-center xl:max-w-[1600px] xl:scale-100 2xl:max-w-[2000px] 2xl:scale-[1.2]"
             >
               {slide.content?.bentoAssets && (
                 <BentoView
@@ -628,13 +731,13 @@ function SlideContent({ slide, slideIndex, totalSlides, onLightboxStateChange }:
 
     case "project-chart":
       return (
-        <div className="relative flex h-full flex-col items-center justify-center px-6 md:px-12 lg:px-16">
-          <div className="w-full max-w-[700px] md:max-w-[800px] lg:max-w-[900px]">
+        <div className="relative flex h-full flex-col items-center justify-center px-6 md:px-12 lg:px-16 xl:px-20 2xl:px-24">
+          <div className="flex w-full max-w-[768px] flex-col items-center xl:max-w-[900px] xl:scale-110 2xl:max-w-[1000px] 2xl:scale-125">
             <motion.h2
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
-              className="mb-6 text-[13px] font-medium uppercase tracking-wider text-muted-foreground md:mb-8 md:text-[14px]"
+              className="mb-6 self-start text-[13px] font-medium uppercase tracking-wider text-muted-foreground md:mb-8 md:text-[14px] xl:text-[15px]"
             >
               Impact
             </motion.h2>
@@ -642,6 +745,7 @@ function SlideContent({ slide, slideIndex, totalSlides, onLightboxStateChange }:
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.2 }}
+              className="w-full"
             >
               {slide.content?.githubStars && (
                 <GithubStarsChart
@@ -661,13 +765,13 @@ function SlideContent({ slide, slideIndex, totalSlides, onLightboxStateChange }:
 
     case "project-impact":
       return (
-        <div className="relative flex h-full flex-col items-center justify-center px-8">
-          <div className="max-w-[800px] text-center">
+        <div className="relative flex h-full flex-col items-center justify-center px-8 md:px-12 lg:px-16 xl:px-20 2xl:px-24">
+          <div className="max-w-[800px] text-center xl:max-w-[900px] 2xl:max-w-[1000px]">
             <motion.h3
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
-              className="mb-8 text-[14px] font-medium uppercase tracking-wider text-muted-foreground"
+              className="mb-8 text-[14px] font-medium uppercase tracking-wider text-muted-foreground xl:text-[15px]"
             >
               {slide.content?.title}
             </motion.h3>
@@ -678,10 +782,10 @@ function SlideContent({ slide, slideIndex, totalSlides, onLightboxStateChange }:
                 transition={{ delay: 0.15 }}
                 className="mb-8"
               >
-                <span className="text-[72px] font-medium text-highlight md:text-[96px]">
+                <span className="text-[72px] font-medium text-highlight md:text-[96px] xl:text-[112px] 2xl:text-[128px]">
                   {slide.content.stat.value}
                 </span>
-                <p className="text-[18px] text-muted-foreground">{slide.content.stat.label}</p>
+                <p className="text-[18px] text-muted-foreground xl:text-[20px] 2xl:text-[22px]">{slide.content.stat.label}</p>
               </motion.div>
             )}
             {slide.content?.body && (
@@ -689,7 +793,7 @@ function SlideContent({ slide, slideIndex, totalSlides, onLightboxStateChange }:
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.25 }}
-                className="whitespace-pre-line text-[18px] leading-relaxed text-foreground/80"
+                className="whitespace-pre-line text-[18px] leading-relaxed text-foreground/80 xl:text-[20px] 2xl:text-[22px]"
               >
                 {slide.content.body}
               </motion.p>
@@ -701,34 +805,30 @@ function SlideContent({ slide, slideIndex, totalSlides, onLightboxStateChange }:
 
     case "project-highlight":
       return (
-        <div className="relative h-full w-full">
-          <div className="absolute inset-x-0 inset-y-8 flex flex-col items-center justify-center px-6 md:inset-y-12 md:px-12 lg:inset-y-16">
-            <div className="flex w-full max-w-[800px] flex-col items-center lg:max-w-[900px]">
-              <motion.div
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 0.1 }}
-                className="overflow-hidden rounded-lg"
-              >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={slide.content?.imageSrc}
-                  alt={slide.content?.imageAlt || ""}
-                  className="max-h-[45vh] w-auto object-contain md:max-h-[50vh] lg:max-h-[55vh]"
-                />
-              </motion.div>
-              {slide.content?.highlightLabel && (
-                <motion.p
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.2 }}
-                  className="mt-5 max-w-[500px] text-center text-[14px] text-muted-foreground md:text-[15px] lg:max-w-[600px]"
-                >
-                  {slide.content.highlightLabel}
-                </motion.p>
-              )}
-            </div>
-          </div>
+        <div className="relative flex h-full w-full flex-col items-center justify-center px-6 py-16 md:px-12 md:py-20">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.1 }}
+            className="flex-1 overflow-hidden rounded-lg"
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={slide.content?.imageSrc}
+              alt={slide.content?.imageAlt || ""}
+              className="h-full w-auto object-contain"
+            />
+          </motion.div>
+          {slide.content?.highlightLabel && (
+            <motion.p
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+              className="mt-4 max-w-[700px] text-center text-[14px] text-muted-foreground md:text-[15px]"
+            >
+              {slide.content.highlightLabel}
+            </motion.p>
+          )}
           <SlideNumber index={slideIndex} total={totalSlides} />
         </div>
       );
@@ -757,7 +857,7 @@ function SlideContent({ slide, slideIndex, totalSlides, onLightboxStateChange }:
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="mb-10 text-[14px] font-medium uppercase tracking-wider text-muted-foreground"
+            className="mb-10 text-[14px] font-medium uppercase tracking-wider text-muted-foreground xl:mb-12 xl:text-[15px] 2xl:mb-14"
           >
             {slide.content?.title}
           </motion.h3>
@@ -765,7 +865,7 @@ function SlideContent({ slide, slideIndex, totalSlides, onLightboxStateChange }:
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.2 }}
-            className="relative flex w-full flex-col gap-6 overflow-hidden"
+            className="relative flex w-full flex-col gap-6 overflow-hidden xl:gap-8 2xl:gap-10"
           >
             <Marquee reverse pauseOnHover speed={30}>
               {firstRowItems.map((review, idx) => (
@@ -784,6 +884,74 @@ function SlideContent({ slide, slideIndex, totalSlides, onLightboxStateChange }:
         </div>
       );
     }
+
+    case "closing":
+      return (
+        <div className="relative flex h-full flex-col justify-center overflow-hidden">
+          {/* ASCII noise background */}
+          <AsciiNoiseBackground
+            className="pointer-events-none absolute inset-0 h-full w-full opacity-100"
+            alpha={0.14}
+            threshold={0.19}
+            exponent={1.25}
+            freq={0.035}
+            speed={0.115}
+            cell={12}
+            fps={30}
+          />
+          {/* Edge fade overlay */}
+          <div
+            className="pointer-events-none absolute inset-0"
+            style={{
+              background: `
+                linear-gradient(to right, rgba(11,10,9,1) 0%, rgba(11,10,9,0) 14%, rgba(11,10,9,0) 86%, rgba(11,10,9,1) 100%),
+                linear-gradient(to bottom, rgba(11,10,9,1) 0%, rgba(11,10,9,0) 14%, rgba(11,10,9,0) 86%, rgba(11,10,9,1) 100%)
+              `,
+            }}
+          />
+          {/* Content */}
+          <div className="relative z-10 flex w-full flex-col items-center justify-center px-6 text-center md:px-12 lg:px-16">
+            <motion.h1
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 }}
+              className="text-[40px] font-medium leading-tight text-foreground md:text-[56px] lg:text-[64px] xl:text-[72px]"
+            >
+              {slide.content?.title}
+            </motion.h1>
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+              className="mt-4 max-w-[600px] text-[16px] leading-relaxed text-muted-foreground md:mt-6 md:text-[18px] lg:text-[20px]"
+            >
+              {slide.content?.body}
+            </motion.p>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.8, duration: 0.4 }}
+              className="mt-10 flex items-center gap-4"
+            >
+              <button
+                onClick={() => window.location.href = "/"}
+                className="rounded-md bg-white/[0.08] px-5 py-2.5 text-[14px] font-medium text-foreground transition-colors hover:bg-white/[0.12]"
+              >
+                Back to Website
+              </button>
+              <button
+                onClick={() => {
+                  const event = new KeyboardEvent("keydown", { key: "Home" });
+                  window.dispatchEvent(event);
+                }}
+                className="rounded-md border border-white/10 px-5 py-2.5 text-[14px] font-medium text-muted-foreground transition-colors hover:border-white/20 hover:text-foreground"
+              >
+                Restart Presentation
+              </button>
+            </motion.div>
+          </div>
+        </div>
+      );
 
     default:
       return null;

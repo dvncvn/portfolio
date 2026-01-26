@@ -32,20 +32,16 @@ const projects: HomeProjectCard[] = [
     tall: true,
     imageSrc: "/assets/work/langflow-platform-redesign/lf-art_ neutral.svg",
     hoverImageSrc: "/assets/work/langflow-platform-redesign/lf-art_hover.svg",
-    svgPadding: "p-0",
+    svgPadding: "p-6 sm:p-10 md:p-14",
   },
   {
     slug: "astra-db",
     title: "Astra DB: Designing an AI-Native Database",
     date: "Aug 2023 – Jan 2024",
     tall: false,
-    imageSrc: "/assets/work/astra-db/astra-art.svg",
-    svgAccent: {
-      matchStrokeHex: "#00FFAA",
-      baseColorHex: "#E9E9E2",
-      hoverColorHex: "#00FFAA",
-      transitionMs: 850,
-    },
+    imageSrc: "/assets/work/astra-db/astra-art_neutral.svg",
+    hoverImageSrc: "/assets/work/astra-db/astra-art_hover.svg",
+    svgPadding: "p-6 sm:p-10 md:p-14",
   },
   {
     slug: "context-forge",
@@ -54,7 +50,7 @@ const projects: HomeProjectCard[] = [
     tall: false,
     imageSrc: "/assets/work/context-forge/cf-art_neutral.svg",
     hoverImageSrc: "/assets/work/context-forge/cf-art_hover.svg",
-    svgPadding: "p-0",
+    svgPadding: "p-6 sm:p-10 md:p-14",
     vignette: true,
   },
   {
@@ -62,14 +58,9 @@ const projects: HomeProjectCard[] = [
     title: "Langflow: Agent Experience",
     date: "Nov 2024 – Sep 2025",
     tall: true,
-    imageSrc: "/assets/work/langflow-agent-experience/agent-art.svg",
-    svgAccent: {
-      matchFillHex: ["#7528FC", "#FF3276", "#F480FF", "#F62B54", "#3ECF8E"],
-      matchStrokeHex: "#7078CF",
-      baseColorHex: "#E9E9E2",
-      hoverColorHex: "#3ECF8E",
-      transitionMs: 850,
-    },
+    imageSrc: "/assets/work/langflow-agent-experience/agent-art-neutral.svg",
+    hoverImageSrc: "/assets/work/langflow-agent-experience/agent-art-hover.svg",
+    svgPadding: "p-6 sm:p-10 md:p-14",
   },
 ];
 

@@ -24,8 +24,9 @@ const navLinks = [
 const footerLinks = [
   { label: "GitHub", href: "https://github.com/dvncvn" },
   { label: "LinkedIn", href: "https://linkedin.com/in/simonduncan" },
-  { label: "Email", href: "mailto:hello@simonduncan.com" },
 ];
+
+const EMAIL = "hello@simonduncan.com";
 
 function useHideOnScroll() {
   const { scrollY } = useScroll();
@@ -64,6 +65,7 @@ function SiteShellContent({ children }: SiteShellProps) {
   const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
   const [ratModeDialogOpen, setRatModeDialogOpen] = useState(false);
   const [ratModeActive, setRatModeActive] = useState(false);
+  const [emailCopied, setEmailCopied] = useState(false);
   const keySequenceRef = useRef("");
   const { isOpen: isResumeOpen, closeResume, resumeData, resumeUrl } = useResume();
 
@@ -327,36 +329,51 @@ function SiteShellContent({ children }: SiteShellProps) {
         <div className="w-full px-6">
           <div className="mx-auto flex w-full max-w-[1400px] flex-col gap-4 py-8 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
             <span className="font-mono text-[#464646]">Made in Madison WI</span>
-            <div className="flex flex-wrap gap-6">
+            <div className="flex flex-wrap items-center gap-6">
               {footerLinks.map((link) => (
                 <Link
                   key={link.label}
                   href={link.href}
-                  target={link.href.startsWith("http") ? "_blank" : undefined}
-                  rel={
-                    link.href.startsWith("http") ? "noopener noreferrer" : undefined
-                  }
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="transition-colors hover:text-foreground"
                 >
                   {link.label}
                 </Link>
               ))}
+              {/* Email - copy on desktop, mailto on mobile */}
+              <a
+                href={`mailto:${EMAIL}`}
+                onClick={(e) => {
+                  // Check if device supports hover (desktop)
+                  const isDesktop = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+                  if (isDesktop) {
+                    e.preventDefault();
+                    navigator.clipboard.writeText(EMAIL);
+                    setEmailCopied(true);
+                    setTimeout(() => setEmailCopied(false), 2000);
+                  }
+                  // On mobile, let the default mailto behavior happen
+                }}
+                className="transition-colors hover:text-foreground"
+              >
+                {emailCopied ? "Copied" : "Email"}
+              </a>
+              {/* Command Palette Trigger */}
+              {!commandPaletteOpen && !isResumeOpen && (
+                <button
+                  onClick={() => setCommandPaletteOpen(true)}
+                  className="flex h-7 w-7 cursor-pointer items-center justify-center rounded-lg border border-white/[0.06] bg-white/[0.02] font-mono text-[13px] text-white/20 transition-all hover:border-white/10 hover:bg-white/[0.04] hover:text-white/40"
+                  aria-label="Open navigator (press /)"
+                  title="Open navigator"
+                >
+                  /
+                </button>
+              )}
             </div>
           </div>
         </div>
       </footer>
-
-      {/* Command Palette Hint */}
-      {!commandPaletteOpen && !isResumeOpen && (
-        <button
-          onClick={() => setCommandPaletteOpen(true)}
-          className="fixed bottom-6 right-6 z-30 flex h-7 w-7 cursor-pointer items-center justify-center rounded-lg border border-white/[0.06] bg-white/[0.02] font-mono text-[13px] text-white/20 backdrop-blur-sm transition-all hover:border-white/10 hover:bg-white/[0.04] hover:text-white/40"
-          aria-label="Open navigator (press /)"
-          title="Open navigator"
-        >
-          /
-        </button>
-      )}
 
       {/* Command Palette */}
       <CommandPalette

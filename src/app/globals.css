@@ -30,8 +30,8 @@
   --play-card-hover-bg: #121212;
   --radius: 0.5rem;
   /* Fonts (set by next/font in layout.tsx) */
-  --font-sans: var(--font-inter);
-  --font-mono: var(--font-ibm-plex-mono);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
   color-scheme: dark;
 }
 
@@ -73,8 +73,8 @@
   --color-destructive: var(--destructive);
   --color-popover: var(--popover);
   --color-popover-foreground: var(--popover-foreground);
-  --font-sans: var(--font-inter);
-  --font-mono: var(--font-ibm-plex-mono);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);

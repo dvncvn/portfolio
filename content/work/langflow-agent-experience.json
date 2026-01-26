@@ -2,28 +2,32 @@
   "slug": "langflow-agent-experience",
   "title": "Langflow: Agent Experience",
   "shortScope": "Agent experience",
-  "timeframe": "Nov 2024 – Sep 2025",
+  "timeframe": "Oct 2024 – Oct 2025",
   "nextProject": {
     "slug": "context-forge",
     "title": "Context Forge: Reimagined"
   },
   "heroAsset": {
     "type": "image",
-    "src": "/assets/work/langflow-agent-experience/project-page.svg",
+    "src": "/assets/work/langflow-agent-experience/agent-art.svg",
     "alt": "Langflow agent experience diagram",
     "aspectRatio": "1/1"
   },
-  "summary": "TODO: Add summary of the Agent Experience project.\n\nDescribe the problem space, your role, and the key outcomes.",
+  "summary": "Langflow began as a general-purpose AI/ML workflow builder. As agents emerged as the dominant pattern for building with AI, the product pivoted toward an agent-first experience. I led the design of Langflow’s first native agent model and helped re-architect the canvas to better reflect how agents are actually built, reasoned about, and extended.",
   "meta": {
-    "company": "DataStax",
-    "dates": "Nov 2024 – Sep 2025",
+    "company": "DataStax / IBM",
+    "dates": "Oct 2024 – Oct 2025",
     "role": "Design Lead",
-    "team": ["TODO: team composition"]
+    "team": ["2 designers, 6 engineers"]
   },
-  "responsibilities": [
-    "TODO: Add responsibilities"
-  ],
+  "responsibilities": [],
   "sections": [
+    {
+      "heading": "Reframing the Agent Mental Model",
+      "caption": "Langflow’s early flexibility came from treating everything as a component. As agents became more central, this flat hierarchy started to break down. It became difficult to distinguish the agent itself from its tools, models, and data sources.\n\nWe evolved the canvas to make agents first-class citizens with clear structure. An agent owns its model, tools, and data, and the UI needed to reflect that relationship explicitly. This shift aligned the product with developers’ mental models and made complex agent workflows easier to understand, debug, and scale.",
+      "layout": "single",
+      "assets": []
+    },
     {
       "heading": "",
       "caption": "Before / After",
@@ -46,8 +50,8 @@
       ]
     },
     {
-      "heading": "TODO: Bento heading",
-      "caption": "TODO: Bento caption",
+      "heading": "Generative Agent Building on the Canvas",
+      "caption": "Rather than relying solely on a copilot-style sidebar, we embedded agentic building directly into the visual canvas. Langflow’s visual surface allowed us to support AI generation in-place, letting users create and modify agents, tools, and behavior where they live.\n\nThis reduced reliance on long text exchanges, avoided common assistant fatigue, and leveraged the canvas as the primary interface for reasoning about agent systems.",
       "layout": "bento",
       "assets": [
         {
@@ -63,8 +67,14 @@
       ]
     },
     {
+      "heading": "Extensibility and MCP Integration",
+      "caption": "We moved quickly to support emerging standards. Langflow was an early adopter of MCP tooling, enabling agents to consume MCP tools directly. We also introduced the ability to expose Langflow flows as MCP servers, allowing agents built in Langflow to be used from external clients and environments.\n\nThis positioned Langflow as both a builder and a piece of agent infrastructure.",
+      "layout": "single",
+      "assets": []
+    },
+    {
       "heading": "Impact",
-      "caption": "TODO: Add impact description and key metrics.",
+      "caption": "This work helped transition Langflow from a generic AI/ML workflow tool into an agent-focused platform. The shift significantly changed how the product was positioned, sold, and adopted, and made Langflow a stronger strategic asset during its acquisition by IBM.\n\nWorking closely with another designer, I helped drive core product strategy. Our agent-first approach was more than a year ahead of comparable offerings and informed long-term roadmap planning across the Langflow product organization.",
       "layout": "single",
       "assets": []
     }

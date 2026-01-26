@@ -13,12 +13,12 @@
     "alt": "Context Forge project artwork",
     "aspectRatio": "1/1"
   },
-  "summary": "Langflow had accumulated years of experience debt. The UI was dated, the mental model was inconsistent, and the product no longer reflected the pace or expectations of modern AI development.\n\nIn parallel with a brand refresh, I led a full end-to-end redesign of the platform to modernize Langflow quickly and decisively.\n\nI owned the entire product surface. Information architecture, interaction patterns, visual language, and shipped quality.",
+  "summary": "Context Forge was growing quickly, but the experience hadn't caught up to the underlying capabilities. I was the first designer on the project, brought in to align it with IBM's Open Agentic Platform alongside Langflow and OpenRAG.\n\nI led a redesign and visual uplift, consolidated a fragmented information architecture, and streamlined core workflows. The result was a clearer builder experience for configuring secure MCP gateways and managing reusable servers, tools, resources, and prompts.",
   "meta": {
-    "company": "DataStax",
-    "dates": "Oct – Dec 2024",
-    "role": "Design Lead + Product leader",
-    "team": ["2 designers", "6 engineers"]
+    "company": "IBM",
+    "dates": "Dec 2025",
+    "role": "Design Lead, first designer on the project",
+    "team": ["1 designer (me)"]
   },
   "responsibilities": [
     "Information architecture",

@@ -45,16 +45,25 @@ const selectableItems = navItems.filter((item): item is NavItem | ActionItem => 
 type CommandPaletteProps = {
   isOpen: boolean;
   onClose: () => void;
+  currentPath?: string;
 };
 
 const EMAIL = "simonfraserduncan@gmail.com";
 
-export function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
+export function CommandPalette({ isOpen, onClose, currentPath = "/" }: CommandPaletteProps) {
   const router = useRouter();
   const { openResume } = useResume();
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [copiedEmail, setCopiedEmail] = useState(false);
   const listRef = useRef<HTMLDivElement>(null);
+
+  // Determine if a nav item matches the current path
+  const isCurrentPage = (item: NavItem) => {
+    if (item.href === "/") {
+      return currentPath === "/";
+    }
+    return currentPath === item.href || currentPath.startsWith(item.href + "/");
+  };
 
   const handleSelect = useCallback(
     async (item: NavItem | ActionItem) => {
@@ -185,6 +194,8 @@ export function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
                 );
                 const isSelected = selectableIdx === selectedIndex;
 
+                const isCurrent = item.type === "nav" && isCurrentPage(item);
+
                 return (
                   <button
                     key={item.type === "nav" ? item.href : item.action}
@@ -199,18 +210,27 @@ export function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
                         : "hover:bg-white/[0.02]"
                     }`}
                   >
-                    <span
-                      className={`text-[13px] transition-colors ${
-                        isSelected
-                          ? "text-foreground"
-                          : item.indent
-                          ? "text-muted-foreground/70"
-                          : "text-muted-foreground"
-                      }`}
-                    >
-                      {item.type === "action" && item.action === "copyEmail" && copiedEmail
-                        ? "Copied!"
-                        : item.label}
+                    <span className="flex items-center gap-2">
+                      <span
+                        className={`text-[13px] transition-colors ${
+                          isCurrent
+                            ? "text-[#01F8A5]"
+                            : isSelected
+                            ? "text-foreground"
+                            : item.indent
+                            ? "text-muted-foreground/70"
+                            : "text-muted-foreground"
+                        }`}
+                      >
+                        {item.type === "action" && item.action === "copyEmail" && copiedEmail
+                          ? "Copied!"
+                          : item.label}
+                      </span>
+                      {isCurrent && (
+                        <span className="font-mono text-[10px] text-[#01F8A5]/60 uppercase tracking-wider">
+                          here
+                        </span>
+                      )}
                     </span>
                     <span
                       className={`font-mono text-[11px] transition-all ${

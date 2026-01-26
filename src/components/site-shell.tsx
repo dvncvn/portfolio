@@ -346,10 +346,23 @@ function SiteShellContent({ children }: SiteShellProps) {
         </div>
       </footer>
 
+      {/* Command Palette Hint */}
+      {!commandPaletteOpen && !isResumeOpen && (
+        <button
+          onClick={() => setCommandPaletteOpen(true)}
+          className="fixed bottom-6 right-6 z-30 flex h-7 w-7 cursor-pointer items-center justify-center rounded-lg border border-white/[0.06] bg-white/[0.02] font-mono text-[13px] text-white/20 backdrop-blur-sm transition-all hover:border-white/10 hover:bg-white/[0.04] hover:text-white/40"
+          aria-label="Open navigator (press /)"
+          title="Open navigator"
+        >
+          /
+        </button>
+      )}
+
       {/* Command Palette */}
       <CommandPalette
         isOpen={commandPaletteOpen}
         onClose={() => setCommandPaletteOpen(false)}
+        currentPath={pathname}
       />
 
       {/* Rat Mode Dialog */}

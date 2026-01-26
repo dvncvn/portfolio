@@ -516,12 +516,14 @@ export function BentoView({
     showDotGrid = false,
     insetBackground = false,
     verticalFadeDotGrid = false,
+    style?: React.CSSProperties,
   ) => (
     <button
       key={`${asset.src}-${idx}`}
       type="button"
       onClick={() => openAt(idx)}
       className={`${cardBaseClass} ${className}`}
+      style={style}
     >
       {backgroundSrc ? (
         insetBackground ? (
@@ -563,13 +565,18 @@ export function BentoView({
         </div>
       ) : null}
       {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src={asset.src}
-        alt={asset.alt ?? ""}
-        className={`relative z-10 h-full w-full object-contain ${contentClassName}`}
-        loading="lazy"
-        draggable={false}
-      />
+      <picture>
+        {asset.mobileSrc ? (
+          <source media="(max-width: 768px)" srcSet={asset.mobileSrc} />
+        ) : null}
+        <img
+          src={asset.src}
+          alt={asset.alt ?? ""}
+          className={`relative z-10 h-full w-full object-contain ${contentClassName}`}
+          loading="lazy"
+          draggable={false}
+        />
+      </picture>
     </button>
   );
   const isCustomFiveUp = assets.length === 5 && (!layout || layout.length === 0);
@@ -655,10 +662,33 @@ export function BentoView({
             const layoutItem = layoutItems[idx] ?? {};
             const colSpan = layoutItem.colSpan ?? 3;
             const rowSpan = layoutItem.rowSpan ?? 1;
+            const height = layoutItem.height;
             const colSpanClass = COL_SPAN_CLASSES[colSpan] ?? "md:col-span-3";
             const rowSpanClass = ROW_SPAN_CLASSES[rowSpan] ?? "md:row-span-1";
+            const heightStyle: React.CSSProperties | undefined = height ? { height: `${height}px` } : undefined;
+            
+            // Position-based content classes
+            const positionClasses: Record<string, string> = {
+              "center": "relative z-10 h-auto w-auto max-h-full max-w-full object-contain m-auto scale-[0.9]",
+              "bottom": "!absolute inset-0 m-auto !w-[90%] !h-auto object-contain object-center md:left-1/2 md:-translate-x-1/2 md:bottom-0 md:top-auto md:!w-[calc(100%-200px)] md:max-h-[calc(100%-48px)] md:object-bottom",
+              "bottom-right": "z-10 absolute bottom-0 right-0 top-8 left-8 h-auto max-h-full object-contain object-right-bottom scale-[1.08] -translate-y-2",
+              "bottom-left": "z-10 absolute bottom-0 left-0 top-8 right-8 h-auto max-h-full object-contain object-left-bottom",
+            };
+            const contentClassName = asset.position ? positionClasses[asset.position] ?? "" : "";
+            const hasBackground = !!asset.background?.src;
+            const insetBackground = hasBackground && (asset.background?.inset ?? 0) > 0;
 
-            return renderCard(asset, idx, `${colSpanClass} ${rowSpanClass}`);
+            return renderCard(
+              asset, 
+              idx, 
+              `${colSpanClass} ${rowSpanClass}${hasBackground ? " !p-0" : ""}`, 
+              contentClassName, 
+              asset.background?.src, 
+              false, 
+              insetBackground, 
+              false, 
+              heightStyle
+            );
           })}
         </div>
       )}

@@ -14,11 +14,13 @@ export type SectionLayout =
 export type BentoLayoutItem = {
   colSpan?: number;
   rowSpan?: number;
+  height?: number;
 };
 
 export type WorkProjectAsset = {
   type: AssetType;
   src: string;
+  mobileSrc?: string;
   alt?: string;
   fullSrc?: string;
   poster?: string;

@@ -106,6 +106,7 @@ Risks
 
 Defer list
 - Advanced hero motion; keep it static until the page is solid
+- Refactor bento layouts for consistent configuration: Currently, different projects use different patterns (implicit layouts detected by asset count vs explicit `bento.items` config). Migrate all bentos to use explicit `bento.items` with `colSpan`, `rowSpan`, and `height` for clarity and maintainability.
 
 ---
 

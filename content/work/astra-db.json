@@ -4,33 +4,82 @@
   "shortScope": "",
   "timeframe": "",
   "nextProject": {
-    "slug": "",
-    "title": ""
+    "slug": "langflow-platform-redesign",
+    "title": "Langflow: Platform Redesign"
   },
   "heroAsset": {
     "type": "image",
-    "src": "/assets/work/astra/hero.png",
-    "alt": "",
+    "src": "/assets/work/astra-db/project-page.svg",
+    "alt": "Astra DB project page graphic",
     "aspectRatio": "1/1"
   },
-  "summary": "",
+  "summary": "Astra DB needed to pivot fast when GenAI hit in 2023. I led the shift from a general-purpose cloud database experience to a vector-first platform built for AI workloads, while preserving the reliability and performance developers already trusted.",
   "meta": {
     "company": "DataStax",
-    "dates": "",
-    "role": "",
-    "team": []
+    "dates": "Aug 23 - Jan 24",
+    "role": "Product Design Manager",
+    "team": ["4 designers", "Many engineers", "Docs writers", "Marketing team"]
   },
   "responsibilities": [],
   "sections": [
     {
-      "heading": "",
-      "caption": "",
-      "layout": "single",
+      "heading": "The work",
+      "caption": "I set direction through prototypes and tight partnership with product and engineering. We redesigned core workflows to make vector search first-class: onboarding, vector configuration and indexing, query testing, and supporting docs and go-to-market surfaces. The goal was a coherent end-to-end developer experience that matched the pace of the AI ecosystem.",
+      "layout": "bento",
+      "maxWidth": 1400,
+      "bento": {
+        "items": [
+          { "colSpan": 4, "rowSpan": 1, "height": 516 },
+          { "colSpan": 2, "rowSpan": 1, "height": 516 },
+          { "colSpan": 6, "rowSpan": 1, "height": 516 }
+        ]
+      },
       "assets": [
         {
           "type": "image",
-          "src": "/assets/work/astra/section-1.png",
-          "alt": ""
+          "src": "/assets/work/astra-db/bento-assets/thumb/card-1-fg.png",
+          "alt": "Astra DB interface",
+          "position": "center",
+          "background": {
+            "src": "/assets/work/astra-db/bento-assets/thumb/card-1-bg.png",
+            "inset": 8
+          }
+        },
+        {
+          "type": "image",
+          "src": "/assets/work/astra-db/bento-assets/thumb/card-2.png",
+          "alt": "Vector configuration",
+          "position": "bottom-right"
+        },
+        {
+          "type": "image",
+          "src": "/assets/work/astra-db/bento-assets/thumb/card-3-fg.png",
+          "mobileSrc": "/assets/work/astra-db/bento-assets/thumb/card-3-fg-mobile.png",
+          "alt": "Query testing workflow",
+          "position": "bottom",
+          "background": {
+            "src": "/assets/work/astra-db/bento-assets/thumb/card-3-bg.png",
+            "inset": 0,
+            "filter": "luminosity"
+          }
+        }
+      ]
+    },
+    {
+      "heading": "Impact",
+      "caption": "Delivered a successful vector-first redesign that kept Astra relevant through the GenAI inflection.\n\nHelped ensure the experience matched the engine's quality so developers could evaluate, adopt, and ship with confidence.\n\nSupported Astra DB's growth from $0 to ~$70M ARR across the broader serverless era (including the launch I helped drive in 2020).",
+      "layout": "text-only",
+      "assets": []
+    },
+    {
+      "heading": "",
+      "caption": "Forrester Wave report identifying DataStax as a leader",
+      "layout": "single-caption",
+      "assets": [
+        {
+          "type": "image",
+          "src": "/assets/work/astra-db/impact.png",
+          "alt": "Forrester Wave report identifying DataStax as a leader"
         }
       ]
     }

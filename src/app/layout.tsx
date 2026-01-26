@@ -1,20 +1,19 @@
 import type { Metadata } from "next";
-import { IBM_Plex_Mono, Inter, Jacquard_24 } from "next/font/google";
+import { Geist, Geist_Mono, Jacquard_24 } from "next/font/google";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { SiteShell } from "@/components/site-shell";
 import "./globals.css";
 
-const inter = Inter({
-  variable: "--font-inter",
+const geistSans = Geist({
+  variable: "--font-geist-sans",
   subsets: ["latin"],
   display: "swap",
 });
 
-const ibmPlexMono = IBM_Plex_Mono({
-  variable: "--font-ibm-plex-mono",
+const geistMono = Geist_Mono({
+  variable: "--font-geist-mono",
   subsets: ["latin"],
   display: "swap",
-  weight: ["400", "500", "600"],
 });
 
 const jacquard24 = Jacquard_24({
@@ -27,6 +26,9 @@ const jacquard24 = Jacquard_24({
 export const metadata: Metadata = {
   title: "Simon Duncan | Portfolio",
   description: "Staff product designer portfolio.",
+  icons: {
+    icon: "/assets/favi.svg",
+  },
 };
 
 export default function RootLayout({
@@ -35,7 +37,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${inter.variable} ${ibmPlexMono.variable} ${jacquard24.variable}`}>
+    <html
+      lang="en"
+      className={`${geistSans.variable} ${geistMono.variable} ${jacquard24.variable}`}
+    >
       <body className="antialiased">
         <SiteShell>{children}</SiteShell>
         <SpeedInsights />

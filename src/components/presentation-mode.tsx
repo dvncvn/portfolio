@@ -8,6 +8,32 @@ import { AsciiNoiseBackground } from "@/components/ascii-noise-background";
 import { CompareView } from "@/components/compare-view";
 import { GithubStarsChart } from "@/components/github-stars-chart";
 import { BentoView } from "@/components/asset-renderer";
+import { Marquee } from "@/components/ui/marquee";
+
+// Larger review card for presentation mode
+function PresentationReviewCard({
+  name,
+  title,
+  body,
+}: {
+  name: string;
+  title?: string;
+  body: string;
+}) {
+  return (
+    <figure className="h-56 w-[480px] flex-shrink-0 overflow-hidden rounded-[20px] border border-white/10 bg-[#121212] p-8 transition-colors duration-200 ease-out hover:bg-white/5">
+      <figcaption className="flex flex-col gap-1">
+        <span className="text-[18px] font-medium text-foreground">{name}</span>
+        {title ? (
+          <span className="text-[15px] text-muted-foreground">{title}</span>
+        ) : null}
+      </figcaption>
+      <blockquote className="mt-5 line-clamp-4 text-[16px] leading-relaxed text-muted-foreground">
+        {body}
+      </blockquote>
+    </figure>
+  );
+}
 import type { WorkProjectAsset, BentoLayoutItem } from "@/content/types";
 
 // Hover card for D&D character
@@ -441,7 +467,15 @@ function SlideContent({ slide, slideIndex, totalSlides, onLightboxStateChange }:
                 transition={{ delay: 0.15 }}
                 className="text-[40px] font-medium leading-tight text-foreground md:text-[56px]"
               >
-                {slide.content?.title}
+                {slide.content?.title?.includes(": ") ? (
+                  <>
+                    {slide.content.title.split(": ")[0]}:
+                    <br />
+                    {slide.content.title.split(": ").slice(1).join(": ")}
+                  </>
+                ) : (
+                  slide.content?.title
+                )}
               </motion.h2>
               <motion.p
                 initial={{ opacity: 0, y: 20 }}
@@ -458,13 +492,13 @@ function SlideContent({ slide, slideIndex, totalSlides, onLightboxStateChange }:
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 0.2 }}
-                className="hidden flex-1 md:block"
+                className="hidden flex-[1.2] md:block"
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={slide.content.heroImageSrc}
                   alt={slide.content?.title || ""}
-                  className="h-auto max-h-[60vh] w-full object-contain"
+                  className="h-auto max-h-[75vh] w-full object-contain"
                 />
               </motion.div>
             )}
@@ -590,23 +624,32 @@ function SlideContent({ slide, slideIndex, totalSlides, onLightboxStateChange }:
     case "project-chart":
       return (
         <div className="relative flex h-full flex-col items-center justify-center px-6 md:px-12">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.1 }}
-            className="w-full max-w-[1000px]"
-          >
-            {slide.content?.githubStars && (
-              <GithubStarsChart
-                startStars={slide.content.githubStars.startStars}
-                midStars={slide.content.githubStars.midStars}
-                currentStars={slide.content.githubStars.currentStars}
-                startLabel={slide.content.githubStars.startLabel}
-                midLabel={slide.content.githubStars.midLabel}
-                endLabel={slide.content.githubStars.endLabel}
-              />
-            )}
-          </motion.div>
+          <div className="w-full max-w-[1000px]">
+            <motion.h2
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 }}
+              className="mb-8 text-[14px] font-medium uppercase tracking-wider text-muted-foreground"
+            >
+              Impact
+            </motion.h2>
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.2 }}
+            >
+              {slide.content?.githubStars && (
+                <GithubStarsChart
+                  startStars={slide.content.githubStars.startStars}
+                  midStars={slide.content.githubStars.midStars}
+                  currentStars={slide.content.githubStars.currentStars}
+                  startLabel={slide.content.githubStars.startLabel}
+                  midLabel={slide.content.githubStars.midLabel}
+                  endLabel={slide.content.githubStars.endLabel}
+                />
+              )}
+            </motion.div>
+          </div>
           <SlideNumber index={slideIndex} total={totalSlides} />
         </div>
       );
@@ -683,41 +726,57 @@ function SlideContent({ slide, slideIndex, totalSlides, onLightboxStateChange }:
         </div>
       );
 
-    case "project-feedback":
+    case "project-feedback": {
+      const items = slide.content?.feedbackItems ?? [];
+      const splitIndex = Math.ceil(items.length / 2);
+      const firstRow = items.slice(0, splitIndex);
+      const secondRow = items.slice(splitIndex);
+      
+      // Duplicate items to ensure enough cards to fill the screen
+      const duplicateItems = <T,>(arr: T[], times: number): T[] => {
+        const result: T[] = [];
+        for (let i = 0; i < times; i++) {
+          result.push(...arr);
+        }
+        return result;
+      };
+      
+      const firstRowItems = duplicateItems(firstRow, 3);
+      const secondRowItems = duplicateItems(secondRow, 3);
+
       return (
-        <div className="relative flex h-full flex-col items-center justify-center px-8">
-          <div className="max-w-[1000px]">
-            <motion.h3
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 }}
-              className="mb-10 text-center text-[14px] font-medium uppercase tracking-wider text-muted-foreground"
-            >
-              {slide.content?.title}
-            </motion.h3>
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {slide.content?.feedbackItems?.map((item, idx) => (
-                <motion.div
-                  key={idx}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.15 + idx * 0.05 }}
-                  className="rounded-lg bg-white/[0.03] p-4"
-                >
-                  <p className="mb-3 text-[14px] leading-relaxed text-foreground/90">
-                    &ldquo;{item.body}&rdquo;
-                  </p>
-                  <div className="text-[12px] text-muted-foreground">
-                    <span className="font-medium text-foreground/70">{item.name}</span>
-                    {item.title && <span> · {item.title}</span>}
-                  </div>
-                </motion.div>
+        <div className="relative flex h-full flex-col items-center justify-center">
+          <motion.h3
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            className="mb-10 text-[14px] font-medium uppercase tracking-wider text-muted-foreground"
+          >
+            {slide.content?.title}
+          </motion.h3>
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.2 }}
+            className="relative flex w-full flex-col gap-6 overflow-hidden"
+          >
+            <Marquee reverse pauseOnHover speed={30}>
+              {firstRowItems.map((review, idx) => (
+                <PresentationReviewCard key={`${review.name}-${review.body}-${idx}`} {...review} />
               ))}
-            </div>
-          </div>
+            </Marquee>
+            <Marquee pauseOnHover speed={30}>
+              {secondRowItems.map((review, idx) => (
+                <PresentationReviewCard key={`${review.name}-${review.body}-${idx}`} {...review} />
+              ))}
+            </Marquee>
+            <div className="pointer-events-none absolute inset-y-0 left-0 w-[45%] bg-gradient-to-r from-background from-30%" />
+            <div className="pointer-events-none absolute inset-y-0 right-0 w-[45%] bg-gradient-to-l from-background from-30%" />
+          </motion.div>
           <SlideNumber index={slideIndex} total={totalSlides} />
         </div>
       );
+    }
 
     default:
       return null;
@@ -746,14 +805,16 @@ export function PresentationMode({ isOpen, onClose, projects, introText }: Prese
   // Lock body scroll when open
   useEffect(() => {
     if (isOpen) {
+      const originalBodyOverflow = document.body.style.overflow;
+      const originalHtmlOverflow = document.documentElement.style.overflow;
       document.body.style.overflow = "hidden";
+      document.documentElement.style.overflow = "hidden";
       setCurrentSlide(0);
-    } else {
-      document.body.style.overflow = "";
+      return () => {
+        document.body.style.overflow = originalBodyOverflow;
+        document.documentElement.style.overflow = originalHtmlOverflow;
+      };
     }
-    return () => {
-      document.body.style.overflow = "";
-    };
   }, [isOpen]);
 
   // Keyboard navigation
@@ -806,11 +867,6 @@ export function PresentationMode({ isOpen, onClose, projects, introText }: Prese
           transition={{ duration: 0.3 }}
           className="fixed inset-0 z-50 bg-background"
         >
-          {/* Slide counter */}
-          <div className="fixed left-6 top-6 z-10 text-[13px] tabular-nums text-muted-foreground">
-            {currentSlide + 1} / {slides.length}
-          </div>
-
           {/* Keyboard hints - top right */}
           <div className="fixed right-6 top-6 z-10 flex items-center gap-4 text-[12px] text-muted-foreground/60">
             <span className="flex items-center gap-1">

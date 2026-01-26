@@ -86,10 +86,28 @@ export type WorkProject = {
   };
 };
 
+export type PlayItemAsset = {
+  type: "image" | "video";
+  src: string;
+  alt?: string;
+};
+
 export type PlayItem = {
+  slug: string;
   title: string;
   description: string;
   thumbnail: string;
-  href: string;
+  /** Full summary shown in lightbox */
+  summary?: string;
+  /** Images/videos shown in lightbox carousel */
+  assets?: PlayItemAsset[];
+  /** External link to view the project (optional) */
+  href?: string;
+  /** Custom CTA button label (defaults to "View project") */
+  ctaLabel?: string;
+  /** Tool used (e.g., "Figma", "Three.js") */
+  tool?: string;
+  /** Year of project */
+  year?: string;
   tags?: string[];
 };

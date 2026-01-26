@@ -545,9 +545,7 @@ export default function InfoPage() {
               Hi, I&apos;m Simon
             </h1>
             <p className="text-base leading-relaxed text-muted-foreground lg:max-w-[768px]">
-              I&apos;m a Staff Product Designer working on AI and developer platforms
-              at IBM. I turn complex systems into products that are clear, usable, and
-              durable. I&apos;m experienced across OSS, startups, and enterprise.
+              I&apos;m a Staff Product Designer working on AI and developer platforms at IBM. I turn complex systems into clear, usable, and durable products. I&apos;m experienced across OSS, startups, and enterprise.
             </p>
           </div>
 

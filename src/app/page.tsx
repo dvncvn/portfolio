@@ -12,6 +12,7 @@ type HomeProjectCard = {
   imageSrc: string;
   hoverImageSrc?: string;
   svgPadding?: string;
+  vignette?: boolean;
   svgAccent?: {
     matchStrokeHex?: string | string[];
     matchFillHex?: string | string[];
@@ -50,13 +51,10 @@ const projects: HomeProjectCard[] = [
     title: "Context Forge: Reimagined",
     date: "Dec 2025",
     tall: false,
-    imageSrc: "/assets/work/context-forge/cf-art.svg",
-    svgAccent: {
-      matchStopColorHex: ["#FFB50B", "#FC481B", "#00FFAA", "#249361", "#3ECF8E"],
-      baseColorHex: "#E9E9E2",
-      hoverColorHex: "#00FFAA",
-      transitionMs: 850,
-    },
+    imageSrc: "/assets/work/context-forge/cf-art_neutral.svg",
+    hoverImageSrc: "/assets/work/context-forge/cf-art_hover.svg",
+    svgPadding: "p-0",
+    vignette: true,
   },
   {
     slug: "langflow-agent-experience",
@@ -83,7 +81,7 @@ export default async function Home() {
   };
 
   // Fetch full project data for presentation mode
-  const projectOrder = ["langflow-platform-redesign", "astra-db", "context-forge", "langflow-agent-experience"];
+  const projectOrder = ["langflow-platform-redesign", "langflow-agent-experience", "context-forge", "astra-db"];
   const fullProjects = await Promise.all(
     projectOrder.map((slug) => getWorkProject(slug))
   );
@@ -118,6 +116,7 @@ export default async function Home() {
                   hoverImageSrc={project.hoverImageSrc}
                   svgAccent={project.svgAccent}
                   svgPadding={project.svgPadding}
+                  vignette={project.vignette}
                 />
               </BlurFade>
             ))}
@@ -139,6 +138,7 @@ export default async function Home() {
                   hoverImageSrc={project.hoverImageSrc}
                   svgAccent={project.svgAccent}
                   svgPadding={project.svgPadding}
+                  vignette={project.vignette}
                 />
               </BlurFade>
             ))}

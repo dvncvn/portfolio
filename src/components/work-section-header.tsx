@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
 import { PresentationMode } from "@/components/presentation-mode";
 import type { WorkProject } from "@/content/types";
 
@@ -9,7 +10,26 @@ type WorkSectionHeaderProps = {
 };
 
 export function WorkSectionHeader({ projects }: WorkSectionHeaderProps) {
+  const searchParams = useSearchParams();
+  const router = useRouter();
   const [isPresentationOpen, setIsPresentationOpen] = useState(false);
+
+  // Check URL for presentation param on mount
+  useEffect(() => {
+    if (searchParams.get("presentation") === "true") {
+      setIsPresentationOpen(true);
+    }
+  }, [searchParams]);
+
+  const openPresentation = () => {
+    setIsPresentationOpen(true);
+    router.push("/?presentation=true", { scroll: false });
+  };
+
+  const closePresentation = () => {
+    setIsPresentationOpen(false);
+    router.push("/", { scroll: false });
+  };
 
   const introText = {
     name: "Simon Duncan",
@@ -25,7 +45,7 @@ export function WorkSectionHeader({ projects }: WorkSectionHeaderProps) {
           Work
         </h2>
         <button
-          onClick={() => setIsPresentationOpen(true)}
+          onClick={openPresentation}
           className="cursor-pointer text-[13px] text-muted-foreground/60 transition-colors hover:text-muted-foreground"
         >
           View as presentation
@@ -34,7 +54,7 @@ export function WorkSectionHeader({ projects }: WorkSectionHeaderProps) {
 
       <PresentationMode
         isOpen={isPresentationOpen}
-        onClose={() => setIsPresentationOpen(false)}
+        onClose={closePresentation}
         projects={projects}
         introText={introText}
       />

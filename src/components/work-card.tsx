@@ -31,6 +31,7 @@ type WorkCardProps = {
   hoverImageSrc?: string;
   svgAccent?: SvgAccentConfig;
   svgPadding?: string;
+  vignette?: boolean;
 };
 
 type WorkCardAnimatedProps = WorkCardProps & {
@@ -46,6 +47,7 @@ export function WorkCard({
   hoverImageSrc,
   svgAccent,
   svgPadding,
+  vignette,
 }: WorkCardProps) {
   const cardRef = useRef<HTMLAnchorElement>(null);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
@@ -197,6 +199,17 @@ export function WorkCard({
                         : "p-6 sm:p-8",
                     ].join(" ")}
                     draggable={false}
+                  />
+                ) : null}
+
+                {/* Vignette overlay - fades edges to background */}
+                {vignette ? (
+                  <div
+                    className="pointer-events-none absolute inset-0 z-10"
+                    style={{
+                      background:
+                        "radial-gradient(ellipse 62% 55% at center, transparent 45%, #0B0A09 95%)",
+                    }}
                   />
                 ) : null}
               </div>

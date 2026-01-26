@@ -1,39 +1,49 @@
 [
   {
-    "title": "Signal Field Study",
-    "description": "Ambient data visualization experiments.",
-    "thumbnail": "/images/langflow-preview.png",
-    "href": "https://example.com"
-  },
-  {
-    "title": "Grid Typing Posters",
-    "description": "Typography and layout explorations.",
-    "thumbnail": "/images/langflow-preview.png",
-    "href": "https://example.com"
-  },
-  {
-    "title": "Motion Clips",
-    "description": "Microinteraction tests in motion.",
-    "thumbnail": "/images/langflow-preview.png",
-    "href": "https://example.com"
-  },
-  {
-    "title": "UI Texture Pack",
-    "description": "Material and surface studies.",
-    "thumbnail": "/images/langflow-preview.png",
-    "href": "https://example.com"
-  },
-  {
+    "slug": "terra",
     "title": "Terra",
-    "description": "Generative Three.js visual with audio reactivity and ASCII textures.",
-    "thumbnail": "/images/langflow-preview.png",
-    "href": "https://example.com"
+    "description": "Three.js terrain generator with ASCII effects and audio reactivity.",
+    "summary": "A Three.js terrain generator with lots of effects. I've gravitated towards the ASCII effects, and have built in some audio reactivity. It needs a UI refactor, but that's coming soon. Built with Cursor.",
+    "thumbnail": "/assets/play/terra/thumb.png",
+    "assets": [
+      { "type": "image", "src": "/assets/play/terra/lightbox-1.png", "alt": "Terra terrain generator" },
+      { "type": "image", "src": "/assets/play/terra/lightbox-2.png", "alt": "Terra ASCII effect" },
+      { "type": "image", "src": "/assets/play/terra/lightbox-3.png", "alt": "Terra visual" }
+    ],
+    "tool": "Three.js + Cursor",
+    "year": "2026",
+    "href": "https://github.com/dvncvn/terra",
+    "ctaLabel": "View Repo",
+    "tags": ["Code"]
   },
   {
+    "slug": "a-surprising-gust-of-air",
+    "title": "A surprising gust of air",
+    "description": "Two-track ambient release on my Inverleith project.",
+    "summary": "Two-track release featuring samples of my son and wife on my 'Inverleith' project.",
+    "thumbnail": "/assets/play/a-surprising-gust-of-air/thumb.png",
+    "assets": [
+      { "type": "image", "src": "/assets/play/a-surprising-gust-of-air/lightbox-1.png", "alt": "A surprising gust of air album art" }
+    ],
+    "tool": "Ableton",
+    "year": "2024",
+    "href": "https://inverleith.bandcamp.com/album/a-surprising-gust-of-air",
+    "ctaLabel": "Listen on Bandcamp",
+    "tags": ["Music"]
+  },
+  {
+    "slug": "of-what-was",
     "title": "Of what was",
-    "description": "Ambient, tape-based album released on Bandcamp under Inverleith.",
-    "thumbnail": "/images/langflow-preview.png",
-    "href": "https://example.com"
+    "description": "Ambient pieces recorded to tape, inspired by nature.",
+    "summary": "Ambient pieces recorded to tape, inspired by nature throughout Wisconsin. Another music project for my Inverleith project.",
+    "thumbnail": "/assets/play/of-what-was/thumb.png",
+    "assets": [
+      { "type": "image", "src": "/assets/play/of-what-was/lightbox-1.png", "alt": "Of what was album art" }
+    ],
+    "tool": "Ableton + Modular + Tape",
+    "year": "2023",
+    "href": "https://inverleith.bandcamp.com/album/of-what-was",
+    "ctaLabel": "Listen on Bandcamp",
+    "tags": ["Music"]
   }
 ]
-

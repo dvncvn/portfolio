@@ -34,7 +34,7 @@ const ROW_SPAN_CLASSES: Record<number, string> = {
   3: "md:row-span-3",
 };
 
-function MarqueeReviewCard({
+export function MarqueeReviewCard({
   name,
   title,
   body,

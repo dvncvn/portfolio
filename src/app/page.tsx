@@ -1,6 +1,8 @@
 import { IntroBlock } from "@/components/intro-block";
 import { WorkCard } from "@/components/work-card";
 import { BlurFade } from "@/components/ui/blur-fade";
+import { WorkSectionHeader } from "@/components/work-section-header";
+import { getWorkProject } from "@/content/work";
 
 type HomeProjectCard = {
   slug: string;
@@ -72,13 +74,20 @@ const projects: HomeProjectCard[] = [
   },
 ];
 
-export default function Home() {
+export default async function Home() {
   const delayBySlug: Record<string, number> = {
     "langflow-platform-redesign": 0.12,
     "astra-db": 0.18,
     "context-forge": 0.24,
     "langflow-agent-experience": 0.3,
   };
+
+  // Fetch full project data for presentation mode
+  const projectOrder = ["langflow-platform-redesign", "astra-db", "context-forge", "langflow-agent-experience"];
+  const fullProjects = await Promise.all(
+    projectOrder.map((slug) => getWorkProject(slug))
+  );
+  const validProjects = fullProjects.filter((p): p is NonNullable<typeof p> => p !== null);
 
   return (
     <div className="py-20">
@@ -89,11 +98,7 @@ export default function Home() {
 
       {/* Work section */}
       <section className="work-section mt-32">
-        <div className="mb-8 flex items-baseline justify-between">
-          <h2 className="text-[14px] font-medium uppercase tracking-wide text-[#7D7D7D]">
-            Work
-          </h2>
-        </div>
+        <WorkSectionHeader projects={validProjects} />
 
         <div className="work-grid flex flex-col gap-6 md:flex-row md:gap-8">
           <div className="flex flex-col gap-6 md:flex-1">

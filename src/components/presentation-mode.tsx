@@ -331,7 +331,7 @@ function SlideContent({ slide, slideIndex, totalSlides, onLightboxStateChange }:
           {/* ASCII noise background */}
           <AsciiNoiseBackground
             className="pointer-events-none absolute inset-0 h-full w-full opacity-100"
-            alpha={0.08}
+            alpha={0.14}
             threshold={0.19}
             exponent={1.25}
             freq={0.035}
@@ -535,7 +535,7 @@ function SlideContent({ slide, slideIndex, totalSlides, onLightboxStateChange }:
     case "project-visual":
       return (
         <div className="relative h-full w-full">
-          <div className="absolute inset-0 flex flex-col items-center justify-center px-6 md:px-12">
+          <div className="absolute inset-x-0 inset-y-8 flex flex-col items-center justify-center px-6 md:inset-y-12 md:px-12 lg:inset-y-16">
             <div className="flex w-full max-w-[900px] flex-col items-center lg:max-w-[1000px]">
               {slide.content?.title && (
                 <motion.h3
@@ -579,7 +579,7 @@ function SlideContent({ slide, slideIndex, totalSlides, onLightboxStateChange }:
     case "project-compare":
       return (
         <div className="relative h-full w-full">
-          <div className="absolute inset-0 flex items-center justify-center px-6 md:px-12 lg:px-16">
+          <div className="absolute inset-x-0 inset-y-12 flex items-center justify-center px-6 md:inset-y-16 md:px-12 lg:inset-y-20 lg:px-16">
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -605,13 +605,13 @@ function SlideContent({ slide, slideIndex, totalSlides, onLightboxStateChange }:
 
     case "project-bento":
       return (
-        <div className="relative h-full w-full">
-          <div className="absolute inset-0 flex items-center justify-center px-6 md:px-12 lg:px-16">
+        <div className="relative h-full w-full overflow-hidden">
+          <div className="absolute inset-x-0 inset-y-10 flex items-center justify-center px-8 md:inset-y-14 md:px-12 lg:inset-y-16 lg:px-16">
             <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
+              initial={{ opacity: 0, scale: 0.9 * 0.72 }}
+              animate={{ opacity: 1, scale: 0.72 }}
               transition={{ delay: 0.1 }}
-              className="w-full max-w-[900px] lg:max-w-[1000px]"
+              className="w-full max-w-[1400px] origin-center"
             >
               {slide.content?.bentoAssets && (
                 <BentoView
@@ -702,7 +702,7 @@ function SlideContent({ slide, slideIndex, totalSlides, onLightboxStateChange }:
     case "project-highlight":
       return (
         <div className="relative h-full w-full">
-          <div className="absolute inset-0 flex flex-col items-center justify-center px-6 md:px-12">
+          <div className="absolute inset-x-0 inset-y-8 flex flex-col items-center justify-center px-6 md:inset-y-12 md:px-12 lg:inset-y-16">
             <div className="flex w-full max-w-[800px] flex-col items-center lg:max-w-[900px]">
               <motion.div
                 initial={{ opacity: 0, scale: 0.95 }}

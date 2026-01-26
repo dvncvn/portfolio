@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { IBM_Plex_Mono, Inter, Jacquard_24 } from "next/font/google";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import { SiteShell } from "@/components/site-shell";
 import "./globals.css";
 
@@ -37,6 +38,7 @@ export default function RootLayout({
     <html lang="en" className={`${inter.variable} ${ibmPlexMono.variable} ${jacquard24.variable}`}>
       <body className="antialiased">
         <SiteShell>{children}</SiteShell>
+        <SpeedInsights />
       </body>
     </html>
   );

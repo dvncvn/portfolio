@@ -1,9 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
+import { motion, useReducedMotion, useScroll, useTransform, MotionValue } from "framer-motion";
 import { useRef } from "react";
-import { WorkProjectAsset } from "@/content/types";
+import { WorkProjectAsset, ParallaxLayer } from "@/content/types";
+import { DotPattern } from "@/components/ui/dot-pattern";
 import type { WorkProjectMeta } from "@/content/types";
 
 type ProjectHeroProps = {
@@ -13,6 +14,55 @@ type ProjectHeroProps = {
   meta?: WorkProjectMeta;
   responsibilities?: string[];
 };
+
+// Parallax layer component to use hooks properly
+function ParallaxLayerImage({
+  layer,
+  scrollYProgress,
+  shouldReduceMotion,
+  index,
+}: {
+  layer: ParallaxLayer;
+  scrollYProgress: MotionValue<number>;
+  shouldReduceMotion: boolean | null;
+  index: number;
+}) {
+  const depth = layer.depth ?? 1;
+  const offsetX = layer.offsetX ?? 0;
+  const offsetY = layer.offsetY ?? 0;
+  
+  // Parallax Y movement
+  const layerParallaxY = useTransform(
+    scrollYProgress,
+    [0, 1],
+    [offsetY - 60 * depth, offsetY + 60 * depth]
+  );
+  
+  // Parallax X movement - spreads cards apart on scroll
+  // Cards with positive offsetX spread more right, negative spread more left
+  const spreadFactor = 25 * depth;
+  const layerParallaxX = useTransform(
+    scrollYProgress,
+    [0, 1],
+    [offsetX - spreadFactor * Math.sign(offsetX), offsetX + spreadFactor * Math.sign(offsetX)]
+  );
+
+  return (
+    // eslint-disable-next-line @next/next/no-img-element
+    <motion.img
+      src={layer.src}
+      alt=""
+      className="absolute inset-0 h-full w-full origin-center object-contain select-none pointer-events-none scale-[0.32] md:scale-[0.45]"
+      draggable={false}
+      loading={index === 0 ? "eager" : "lazy"}
+      fetchPriority={index === 0 ? "high" : "auto"}
+      style={{
+        x: shouldReduceMotion ? offsetX : layerParallaxX,
+        y: shouldReduceMotion ? offsetY : layerParallaxY,
+      }}
+    />
+  );
+}
 
 export function ProjectHero({
   title,
@@ -70,18 +120,45 @@ export function ProjectHero({
           }`}
           style={{ aspectRatio: heroAspectRatio }}
         >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <motion.img
-            src={heroAsset.src}
-            alt={heroAsset.alt ?? ""}
-            className={`h-full w-full origin-center object-contain select-none pointer-events-none ${
-              hasHeroVignette ? "scale-[1.15]" : "scale-[0.8] md:scale-[0.95]"
-            }`}
-            draggable={false}
-            loading="eager"
-            fetchPriority="high"
-            style={{ y: shouldReduceMotion ? 0 : heroParallaxY }}
-          />
+          {heroAsset.type === "parallax" && heroAsset.layers ? (
+            // Parallax layered hero
+            <div className="relative h-full w-full">
+              {/* Dot grid background with vignette - expanded beyond card area */}
+              <div className="pointer-events-none absolute -inset-y-[250px] inset-x-0 overflow-hidden">
+                <DotPattern
+                  width={18}
+                  height={18}
+                  cx={1}
+                  cy={1}
+                  cr={1.2}
+                  className="text-white/[0.12] [mask-image:radial-gradient(ellipse_55%_50%_at_center,black_40%,transparent_85%)]"
+                />
+              </div>
+              {heroAsset.layers.map((layer, idx) => (
+                <ParallaxLayerImage
+                  key={layer.src}
+                  layer={layer}
+                  scrollYProgress={scrollYProgress}
+                  shouldReduceMotion={shouldReduceMotion}
+                  index={idx}
+                />
+              ))}
+            </div>
+          ) : (
+            // Standard single image hero
+            // eslint-disable-next-line @next/next/no-img-element
+            <motion.img
+              src={heroAsset.src}
+              alt={heroAsset.alt ?? ""}
+              className={`h-full w-full origin-center object-contain select-none pointer-events-none ${
+                hasHeroVignette ? "scale-[1.15]" : "scale-[0.8] md:scale-[0.95]"
+              }`}
+              draggable={false}
+              loading="eager"
+              fetchPriority="high"
+              style={{ y: shouldReduceMotion ? 0 : heroParallaxY }}
+            />
+          )}
         </div>
       ) : null}
 

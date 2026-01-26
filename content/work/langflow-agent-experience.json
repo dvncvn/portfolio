@@ -8,10 +8,16 @@
     "title": "Context Forge: Reimagined"
   },
   "heroAsset": {
-    "type": "image",
+    "type": "parallax",
     "src": "/assets/work/langflow-agent-experience/project-page.svg",
     "alt": "Langflow agent experience diagram",
-    "aspectRatio": "1/1"
+    "aspectRatio": "1/1",
+    "layers": [
+      { "src": "/assets/work/langflow-agent-experience/parallax-assets/layer4.svg", "depth": 0.3, "offsetX": 280, "offsetY": -180 },
+      { "src": "/assets/work/langflow-agent-experience/parallax-assets/layer3.svg", "depth": 0.6, "offsetX": 110, "offsetY": -70 },
+      { "src": "/assets/work/langflow-agent-experience/parallax-assets/layer2.svg", "depth": 1.0, "offsetX": -60, "offsetY": 45 },
+      { "src": "/assets/work/langflow-agent-experience/parallax-assets/layer1.svg", "depth": 1.4, "offsetX": -230, "offsetY": 160 }
+    ]
   },
   "summary": "Langflow began as a general-purpose AI/ML workflow builder. As agents emerged as the dominant pattern for building with AI, the product pivoted toward an agent-first experience. I led the design of Langflow’s first native agent model and helped re-architect the canvas to better reflect how agents are actually built, reasoned about, and extended.",
   "meta": {

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRef, useState, useCallback, useMemo } from "react";
 import { motion } from "framer-motion";
 import { InlineSvg } from "@/components/inline-svg";
+import { DotPattern } from "@/components/ui/dot-pattern";
 
 type SvgAccentConfig = {
   /**
@@ -32,6 +33,7 @@ type WorkCardProps = {
   svgAccent?: SvgAccentConfig;
   svgPadding?: string;
   vignette?: boolean;
+  dotGrid?: boolean;
 };
 
 type WorkCardAnimatedProps = WorkCardProps & {
@@ -48,6 +50,7 @@ export function WorkCard({
   svgAccent,
   svgPadding,
   vignette,
+  dotGrid,
 }: WorkCardProps) {
   const cardRef = useRef<HTMLAnchorElement>(null);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
@@ -156,6 +159,19 @@ export function WorkCard({
         <div className="flex h-full flex-col">
           {/* Card-within-card (project art) */}
           <div className="relative flex-1 overflow-hidden rounded-[6px] bg-[#0B0A09]">
+            {/* Dot grid background */}
+            {dotGrid ? (
+              <div className="pointer-events-none absolute inset-0 overflow-hidden">
+                <DotPattern
+                  width={12}
+                  height={12}
+                  cx={1}
+                  cy={1}
+                  cr={1}
+                  className="text-white/[0.06] [mask-image:radial-gradient(ellipse_at_center,black_55%,transparent_100%)]"
+                />
+              </div>
+            ) : null}
             {imageSrc && imageSrc.endsWith(".svg") && svgAccent ? (
               <InlineSvg
                 src={imageSrc}

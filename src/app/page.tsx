@@ -14,6 +14,7 @@ type HomeProjectCard = {
   hoverImageSrc?: string;
   svgPadding?: string;
   vignette?: boolean;
+  dotGrid?: boolean;
   svgAccent?: {
     matchStrokeHex?: string | string[];
     matchFillHex?: string | string[];
@@ -36,7 +37,7 @@ const projects: HomeProjectCard[] = [
   },
   {
     slug: "astra-db",
-    title: "Astra DB: Designing an AI-Native Database",
+    title: "Astra: AI-First Database Design",
     date: "Aug 2023 – Jan 2024",
     tall: false,
     imageSrc: "/assets/work/astra-db/astra-art_neutral.svg",
@@ -61,6 +62,7 @@ const projects: HomeProjectCard[] = [
     imageSrc: "/assets/work/langflow-agent-experience/agent-art-neutral.svg",
     hoverImageSrc: "/assets/work/langflow-agent-experience/agent-art-hover.svg",
     svgPadding: "p-6 sm:p-10 md:p-14",
+    dotGrid: true,
   },
 ];
 
@@ -115,6 +117,7 @@ export default async function Home() {
                   svgAccent={project.svgAccent}
                   svgPadding={project.svgPadding}
                   vignette={project.vignette}
+                  dotGrid={project.dotGrid}
                 />
               </BlurFade>
             ))}
@@ -137,6 +140,7 @@ export default async function Home() {
                   svgAccent={project.svgAccent}
                   svgPadding={project.svgPadding}
                   vignette={project.vignette}
+                  dotGrid={project.dotGrid}
                 />
               </BlurFade>
             ))}

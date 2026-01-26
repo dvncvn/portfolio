@@ -31,7 +31,7 @@ const navItems: PaletteItem[] = [
   { type: "nav", label: "Langflow: Platform Redesign", href: "/work/langflow-platform-redesign", indent: true },
   { type: "nav", label: "Langflow: Agent Experience", href: "/work/langflow-agent-experience", indent: true },
   { type: "nav", label: "Context Forge: Reimagined", href: "/work/context-forge", indent: true },
-  { type: "nav", label: "Astra DB: AI Native Database", href: "/work/astra-db", indent: true },
+  { type: "nav", label: "Astra: AI-First Database Design", href: "/work/astra-db", indent: true },
   { type: "nav", label: "Play", href: "/play" },
   { type: "nav", label: "Info", href: "/info" },
   { type: "separator", label: "Actions" },
@@ -79,9 +79,8 @@ export function CommandPalette({ isOpen, onClose, currentPath = "/" }: CommandPa
           setCopiedEmail(true);
           setTimeout(() => {
             setCopiedEmail(false);
-            onClose();
-          }, 1000);
-          return; // Don't close immediately
+          }, 1500);
+          return; // Don't close
         }
       }
     },

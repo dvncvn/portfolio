@@ -1,4 +1,4 @@
-export type AssetType = "image" | "video";
+export type AssetType = "image" | "video" | "parallax";
 
 export type SectionLayout =
   | "single"
@@ -15,6 +15,16 @@ export type BentoLayoutItem = {
   colSpan?: number;
   rowSpan?: number;
   height?: number;
+};
+
+export type ParallaxLayer = {
+  src: string;
+  /** Parallax intensity multiplier (default 1). Higher = more movement */
+  depth?: number;
+  /** Initial X offset in pixels to create visual separation */
+  offsetX?: number;
+  /** Initial Y offset in pixels to create visual separation */
+  offsetY?: number;
 };
 
 export type WorkProjectAsset = {
@@ -35,6 +45,8 @@ export type WorkProjectAsset = {
     inset?: number;
     filter?: "grayscale";
   };
+  /** Layers for parallax type assets (back to front) */
+  layers?: ParallaxLayer[];
 };
 
 export type GithubStarsConfig = {

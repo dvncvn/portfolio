@@ -30,7 +30,15 @@ function generateDrops(): EmojiDrop[] {
 }
 
 function EmojiRain({ emoji }: { emoji: string }) {
-  const [drops] = useState<EmojiDrop[]>(generateDrops);
+  const [drops, setDrops] = useState<EmojiDrop[]>([]);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+    setDrops(generateDrops());
+  }, []);
+
+  if (!mounted) return null;
 
   return (
     <div className="pointer-events-none absolute inset-0 overflow-hidden">
@@ -107,7 +115,23 @@ type WelcomeModalProps = {
   onStartPresentation: () => void;
 };
 
+// Rat mode checkbox labels
+const RAT_CHECKBOXES = [
+  "I understand what I'm getting into",
+  "I accept the consequences",
+  "I am prepared for chaos",
+  "I promise not to blame Simon",
+  "I am definitely a rat",
+];
+
 export function WelcomeModal({ visitor, onClose, onStartPresentation }: WelcomeModalProps) {
+  const [ratChecks, setRatChecks] = useState<boolean[]>([false, false, false, false, false]);
+  const [ratModeEnabled, setRatModeEnabled] = useState(false);
+  
+  const isRatPack = visitor.id === "ratpack";
+  const visibleCheckboxes = ratChecks.filter((_, i) => i === 0 || ratChecks[i - 1]).length;
+  const allChecked = ratChecks.every(Boolean);
+
   // Lock body scroll when open
   useEffect(() => {
     document.body.style.overflow = "hidden";
@@ -124,6 +148,33 @@ export function WelcomeModal({ visitor, onClose, onStartPresentation }: WelcomeM
     window.addEventListener("keydown", handleEscape);
     return () => window.removeEventListener("keydown", handleEscape);
   }, [onClose]);
+
+  // Enable rat mode when all boxes checked
+  useEffect(() => {
+    if (allChecked && !ratModeEnabled) {
+      setRatModeEnabled(true);
+      // Trigger rat mode by simulating the key sequence
+      const event = new KeyboardEvent("keydown", { key: "r" });
+      window.dispatchEvent(event);
+      ["a", "t", "m", "o", "d", "e"].forEach((key, i) => {
+        setTimeout(() => {
+          window.dispatchEvent(new KeyboardEvent("keydown", { key }));
+        }, (i + 1) * 50);
+      });
+    }
+  }, [allChecked, ratModeEnabled]);
+
+  const handleRatCheck = (index: number) => {
+    const newChecks = [...ratChecks];
+    newChecks[index] = !newChecks[index];
+    // If unchecking, uncheck all after it too
+    if (!newChecks[index]) {
+      for (let i = index + 1; i < newChecks.length; i++) {
+        newChecks[i] = false;
+      }
+    }
+    setRatChecks(newChecks);
+  };
 
   const handleBrowse = useCallback(() => {
     onClose();
@@ -247,6 +298,48 @@ export function WelcomeModal({ visitor, onClose, onStartPresentation }: WelcomeM
               <span>Presentation Mode</span>
             </button>
           </div>
+
+          {/* Rat mode checkboxes - only for ratpack visitor */}
+          {isRatPack && (
+            <div className="space-y-3 rounded-lg border border-white/10 bg-white/[0.02] p-4">
+              <p className="font-mono text-[13px] text-muted-foreground">
+                Or... enable <RainbowText>Rat Mode</RainbowText> now:
+              </p>
+              <div className="space-y-2">
+                {RAT_CHECKBOXES.slice(0, Math.min(visibleCheckboxes + 1, RAT_CHECKBOXES.length)).map((label, i) => (
+                  <motion.label
+                    key={i}
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.2, delay: i === visibleCheckboxes ? 0.15 : 0 }}
+                    className="flex cursor-pointer items-center gap-3 font-mono text-[14px]"
+                  >
+                    <input
+                      type="checkbox"
+                      checked={ratChecks[i]}
+                      onChange={() => handleRatCheck(i)}
+                      className="h-4 w-4 cursor-pointer rounded border-white/20 bg-white/5 accent-yellow-400"
+                    />
+                    <span className={ratChecks[i] ? "text-foreground" : "text-muted-foreground"}>
+                      {label}
+                    </span>
+                    {i === RAT_CHECKBOXES.length - 1 && ratChecks[i] && (
+                      <span className="ml-2">🐀</span>
+                    )}
+                  </motion.label>
+                ))}
+              </div>
+              {allChecked && (
+                <motion.p
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="mt-3 font-mono text-[12px] text-yellow-400"
+                >
+                  🎉 Rat Mode activated! Close this screen to experience chaos.
+                </motion.p>
+              )}
+            </div>
+          )}
 
           {/* Subtle hint */}
           <p className="text-[12px] text-muted-foreground/60">

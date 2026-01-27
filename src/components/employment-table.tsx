@@ -35,9 +35,9 @@ export function EmploymentTable({ rows, onViewHistory }: EmploymentTableProps) {
     <div className="w-full max-w-[768px]">
       <table className="w-full table-fixed border-collapse text-[16px]">
         <colgroup>
-          <col className="w-[45%] sm:w-[50%]" />
+          <col className="w-auto sm:w-[50%]" />
           <col className="hidden sm:table-column sm:w-[25%]" />
-          <col className="w-[55%] sm:w-[25%]" />
+          <col className="w-[100px] sm:w-[25%]" />
         </colgroup>
         <tbody>
           {rows.map((row, idx) => (
@@ -47,7 +47,7 @@ export function EmploymentTable({ rows, onViewHistory }: EmploymentTableProps) {
             >
               <td className="py-2 pr-4 align-middle">
                 <div className="flex min-w-0 items-baseline gap-2 sm:gap-3">
-                  <span className="min-w-0 truncate font-medium text-foreground sm:whitespace-nowrap">
+                  <span className="font-medium text-foreground">
                     {row.role}
                   </span>
                   {row.roleFlag ? (
@@ -71,7 +71,7 @@ export function EmploymentTable({ rows, onViewHistory }: EmploymentTableProps) {
                 </div>
               </td>
 
-              <td className="py-2 align-middle text-right font-mono tabular-nums text-muted-foreground whitespace-nowrap">
+              <td className="py-2 align-middle text-left sm:text-right font-mono tabular-nums text-muted-foreground whitespace-nowrap">
                 <span className="sm:hidden">{formatYearsShort(row.years)}</span>
                 <span className="hidden sm:inline">{row.years.replace(/Now$/, "Now ")}</span>
               </td>

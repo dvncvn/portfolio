@@ -38,6 +38,7 @@
         {
           "type": "image",
           "src": "/assets/work/astra-db/bento-assets/thumb/card-1-fg.png",
+          "fullSrc": "/assets/work/astra-db/bento-assets/full/full-1.png",
           "alt": "Astra DB interface",
           "position": "center",
           "background": {
@@ -48,12 +49,14 @@
         {
           "type": "image",
           "src": "/assets/work/astra-db/bento-assets/thumb/card-2.png",
+          "fullSrc": "/assets/work/astra-db/bento-assets/full/full-2.png",
           "alt": "Vector configuration",
           "position": "bottom-right"
         },
         {
           "type": "image",
           "src": "/assets/work/astra-db/bento-assets/thumb/card-3-fg.png",
+          "fullSrc": "/assets/work/astra-db/bento-assets/full/full-3.png",
           "mobileSrc": "/assets/work/astra-db/bento-assets/thumb/card-3-fg-mobile.png",
           "alt": "Query testing workflow",
           "position": "bottom",

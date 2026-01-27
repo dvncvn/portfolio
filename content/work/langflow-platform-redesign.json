@@ -56,27 +56,31 @@
         {
           "type": "image",
           "src": "/assets/work/langflow-platform-redesign/bento-assets/thumbs/bento-1.png",
+          "fullSrc": "/assets/work/langflow-platform-redesign/bento-assets/full/full-1.png",
           "alt": "System-wide component upgrades"
         },
         {
           "type": "image",
           "src": "/assets/work/langflow-platform-redesign/bento-assets/thumbs/bento-2.png",
-          "alt": "Updated playground experience",
-          "fullSrc": "/assets/work/langflow-platform-redesign/bento-assets/full/card-2.png"
+          "fullSrc": "/assets/work/langflow-platform-redesign/bento-assets/full/full-2.png",
+          "alt": "Updated playground experience"
         },
         {
           "type": "image",
           "src": "/assets/work/langflow-platform-redesign/bento-assets/thumbs/bento-3.png",
+          "fullSrc": "/assets/work/langflow-platform-redesign/bento-assets/full/full-3.png",
           "alt": "Updated project management flows"
         },
         {
           "type": "image",
           "src": "/assets/work/langflow-platform-redesign/bento-assets/thumbs/bento-4.png",
+          "fullSrc": "/assets/work/langflow-platform-redesign/bento-assets/full/full-4.png",
           "alt": "Refined navigation and structure"
         },
         {
           "type": "image",
           "src": "/assets/work/langflow-platform-redesign/bento-assets/thumbs/bento-5.png",
+          "fullSrc": "/assets/work/langflow-platform-redesign/bento-assets/full/full-5.png",
           "alt": "Modernized UI surfaces"
         }
       ]

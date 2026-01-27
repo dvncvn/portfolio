@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useCallback, useState } from "react";
+import { useEffect, useCallback, useState, useRef } from "react";
 import { PlayItem } from "@/content/types";
 import { X, ChevronLeft, ChevronRight, ArrowUpRight } from "lucide-react";
 
@@ -11,22 +11,46 @@ type PlayLightboxProps = {
 
 export function PlayLightbox({ item, onClose }: PlayLightboxProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [isImageLoaded, setIsImageLoaded] = useState(false);
+  const [imageDimensions, setImageDimensions] = useState<{ width: number; height: number } | null>(null);
+  const imageRef = useRef<HTMLImageElement>(null);
 
   const assets = item?.assets ?? [];
   const hasMultipleAssets = assets.length > 1;
 
   const handlePrev = useCallback(() => {
+    setIsImageLoaded(false);
+    setImageDimensions(null);
     setCurrentIndex((prev) => (prev === 0 ? assets.length - 1 : prev - 1));
   }, [assets.length]);
 
   const handleNext = useCallback(() => {
+    setIsImageLoaded(false);
+    setImageDimensions(null);
     setCurrentIndex((prev) => (prev === assets.length - 1 ? 0 : prev + 1));
   }, [assets.length]);
 
-  // Reset index when item changes
+  // Reset state when item changes
   useEffect(() => {
     setCurrentIndex(0);
+    setIsImageLoaded(false);
+    setImageDimensions(null);
   }, [item?.slug]);
+
+  // Preload image and get dimensions
+  const currentAsset = assets[currentIndex];
+  const imageSrc = currentAsset?.src ?? item?.thumbnail;
+  
+  useEffect(() => {
+    if (!imageSrc || currentAsset?.type === "video") return;
+    
+    const img = new Image();
+    img.onload = () => {
+      setImageDimensions({ width: img.naturalWidth, height: img.naturalHeight });
+      setIsImageLoaded(true);
+    };
+    img.src = imageSrc;
+  }, [imageSrc, currentAsset?.type]);
 
   // Handle keyboard navigation
   useEffect(() => {
@@ -60,7 +84,13 @@ export function PlayLightbox({ item, onClose }: PlayLightboxProps) {
 
   if (!item) return null;
 
-  const currentAsset = assets[currentIndex];
+  // Calculate aspect ratio for proper sizing
+  const aspectRatio = imageDimensions 
+    ? imageDimensions.width / imageDimensions.height 
+    : 16 / 9;
+  
+  // Determine if image is wide or tall
+  const isWideImage = aspectRatio > 1.2;
 
   return (
     <div
@@ -72,7 +102,7 @@ export function PlayLightbox({ item, onClose }: PlayLightboxProps) {
         onClick={(e) => e.stopPropagation()}
       >
         {/* Image section */}
-        <div className="relative flex items-center justify-center bg-black/40">
+        <div className="relative flex min-h-[200px] items-center justify-center overflow-hidden bg-[#0a0a0a]">
           {/* Image counter */}
           {assets.length > 0 && (
             <div className="absolute left-4 top-4 z-10 rounded-full bg-black/60 px-3 py-1 text-xs text-white/70">
@@ -109,12 +139,26 @@ export function PlayLightbox({ item, onClose }: PlayLightboxProps) {
             </>
           )}
 
+          {/* Loading skeleton */}
+          {!isImageLoaded && currentAsset?.type !== "video" && (
+            <div 
+              className="flex items-center justify-center"
+              style={{ 
+                width: "100%",
+                aspectRatio: "16/9",
+                maxHeight: "50vh"
+              }}
+            >
+              <div className="h-6 w-6 animate-spin rounded-full border-2 border-white/20 border-t-white/60" />
+            </div>
+          )}
+
           {/* Image/Video display */}
           {currentAsset ? (
             currentAsset.type === "video" ? (
               <video
                 src={currentAsset.src}
-                className="max-h-[50vh] w-full object-contain"
+                className="max-h-[50vh] w-auto max-w-full object-contain"
                 controls
                 autoPlay
                 muted
@@ -122,24 +166,30 @@ export function PlayLightbox({ item, onClose }: PlayLightboxProps) {
             ) : (
               // eslint-disable-next-line @next/next/no-img-element
               <img
+                ref={imageRef}
                 src={currentAsset.src}
                 alt={currentAsset.alt ?? item.title}
-                className="max-h-[50vh] w-full object-contain"
+                className={`max-h-[50vh] object-contain transition-opacity duration-300 ease-out ${
+                  isImageLoaded ? "opacity-100" : "opacity-0 absolute"
+                } ${isWideImage ? "w-full" : "w-auto max-w-full"}`}
               />
             )
           ) : (
             // Fallback to thumbnail if no assets
             // eslint-disable-next-line @next/next/no-img-element
             <img
+              ref={imageRef}
               src={item.thumbnail}
               alt={item.title}
-              className="max-h-[50vh] w-full object-contain"
+              className={`max-h-[50vh] object-contain transition-opacity duration-300 ease-out ${
+                isImageLoaded ? "opacity-100" : "opacity-0 absolute"
+              } ${isWideImage ? "w-full" : "w-auto max-w-full"}`}
             />
           )}
         </div>
 
         {/* Content section */}
-        <div className="grid grid-cols-[minmax(0,1fr)_180px] gap-8 p-6">
+        <div className="grid grid-cols-1 gap-6 p-6 sm:grid-cols-[minmax(0,1fr)_180px] sm:gap-8">
           {/* Left column: Title + Summary + CTA */}
           <div className="flex flex-col gap-4">
             <h2 className="text-lg font-medium text-foreground">{item.title}</h2>

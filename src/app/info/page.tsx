@@ -603,27 +603,54 @@ export default function InfoPage() {
               onMouseEnter={() => setIsHovered(true)}
               onMouseLeave={() => setIsHovered(false)}
             >
-              {/* Normal - standard img */}
-              {imageEffect === "normal" && (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src="/assets/profile.png"
-                  alt="Simon Duncan"
-                  className="aspect-[4/5] w-full object-cover"
-                />
-              )}
-              {/* Dither - canvas with ordered dithering */}
-              {imageEffect === "dither" && (
-                <DitheredImage src="/assets/profile.png" blockSize={ditherSize} color={ditherColor} />
-              )}
-              {/* Pixelate - canvas pixelation */}
-              {imageEffect === "pixelate" && (
-                <PixelatedImage src="/assets/profile.png" pixelSize={pixelSize} />
-              )}
-              {/* ASCII - text-based rendering */}
-              {imageEffect === "ascii" && (
-                <AsciiImage src="/assets/profile.png" fontSize={asciiSize} color={asciiColor} />
-              )}
+              {/* Stack all effects and crossfade between them */}
+              <div className="relative aspect-[4/5] w-full">
+                {/* Normal - standard img */}
+                <motion.div
+                  className="absolute inset-0"
+                  initial={false}
+                  animate={{ opacity: imageEffect === "normal" ? 1 : 0 }}
+                  transition={{ duration: 0.3, ease: "easeInOut" }}
+                  style={{ pointerEvents: imageEffect === "normal" ? "auto" : "none" }}
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src="/assets/profile.png"
+                    alt="Simon Duncan"
+                    className="h-full w-full object-cover"
+                  />
+                </motion.div>
+                {/* Dither - canvas with ordered dithering */}
+                <motion.div
+                  className="absolute inset-0"
+                  initial={false}
+                  animate={{ opacity: imageEffect === "dither" ? 1 : 0 }}
+                  transition={{ duration: 0.3, ease: "easeInOut" }}
+                  style={{ pointerEvents: imageEffect === "dither" ? "auto" : "none" }}
+                >
+                  <DitheredImage src="/assets/profile.png" blockSize={ditherSize} color={ditherColor} />
+                </motion.div>
+                {/* Pixelate - canvas pixelation */}
+                <motion.div
+                  className="absolute inset-0"
+                  initial={false}
+                  animate={{ opacity: imageEffect === "pixelate" ? 1 : 0 }}
+                  transition={{ duration: 0.3, ease: "easeInOut" }}
+                  style={{ pointerEvents: imageEffect === "pixelate" ? "auto" : "none" }}
+                >
+                  <PixelatedImage src="/assets/profile.png" pixelSize={pixelSize} />
+                </motion.div>
+                {/* ASCII - text-based rendering */}
+                <motion.div
+                  className="absolute inset-0"
+                  initial={false}
+                  animate={{ opacity: imageEffect === "ascii" ? 1 : 0 }}
+                  transition={{ duration: 0.3, ease: "easeInOut" }}
+                  style={{ pointerEvents: imageEffect === "ascii" ? "auto" : "none" }}
+                >
+                  <AsciiImage src="/assets/profile.png" fontSize={asciiSize} color={asciiColor} />
+                </motion.div>
+              </div>
               {/* Edit icon - appears on hover */}
               <motion.button
                 initial={{ opacity: 0 }}

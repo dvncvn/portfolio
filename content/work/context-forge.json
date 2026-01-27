@@ -58,6 +58,7 @@
         {
           "type": "image",
           "src": "/assets/work/context-forge/bento-assets/thumb/card-1-fg.png",
+          "fullSrc": "/assets/work/context-forge/bento-assets/full/full-1.png",
           "alt": "Server cards overview",
           "width": 374,
           "height": 700,
@@ -68,6 +69,7 @@
         {
           "type": "image",
           "src": "/assets/work/context-forge/bento-assets/thumb/card-2-fg.png",
+          "fullSrc": "/assets/work/context-forge/bento-assets/full/full-2.png",
           "alt": "Dataset details template",
           "width": 994,
           "height": 700,
@@ -77,6 +79,7 @@
         {
           "type": "image",
           "src": "/assets/work/context-forge/bento-assets/thumb/card-3-fg.png",
+          "fullSrc": "/assets/work/context-forge/bento-assets/full/full-3.png",
           "alt": "Tools list with metrics",
           "width": 684,
           "height": 604,
@@ -86,6 +89,7 @@
         {
           "type": "image",
           "src": "/assets/work/context-forge/bento-assets/thumb/card-4-fg.png",
+          "fullSrc": "/assets/work/context-forge/bento-assets/full/full-4.png",
           "alt": "Export Virtual MCP Server modal",
           "width": 684,
           "height": 604,

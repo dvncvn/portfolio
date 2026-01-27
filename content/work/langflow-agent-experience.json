@@ -63,11 +63,13 @@
         {
           "type": "image",
           "src": "/assets/work/langflow-agent-experience/bento-assets/thumb/card-1-fg.png",
+          "fullSrc": "/assets/work/langflow-agent-experience/bento-assets/full/full-1.png",
           "alt": "TODO: Asset description"
         },
         {
           "type": "image",
           "src": "/assets/work/langflow-agent-experience/bento-assets/thumb/card-2-fg.png",
+          "fullSrc": "/assets/work/langflow-agent-experience/bento-assets/full/full-2.png",
           "alt": "TODO: Asset description"
         }
       ]

@@ -561,7 +561,18 @@ function SiteShellContent({ children }: SiteShellProps) {
       <footer className="mt-20">
         <div className="w-full px-6">
           <div className="mx-auto flex w-full max-w-[1400px] flex-col gap-4 py-8 text-sm text-muted-foreground min-[480px]:flex-row min-[480px]:items-center min-[480px]:justify-between">
-            <span className="font-mono text-[#464646]">Made in Madison WI</span>
+            <span className="group/madison inline-flex items-center gap-2 font-mono text-[#464646] transition-colors duration-300 hover:text-[#5bc4c4]">
+              {/* Flag - slides in from left on hover */}
+              <span className="relative h-[14px] w-0 overflow-hidden transition-all duration-300 ease-out group-hover/madison:w-[21px]">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src="/assets/madison-flag.svg"
+                  alt=""
+                  className="absolute left-0 top-0 h-[14px] w-[21px] opacity-0 transition-opacity duration-300 group-hover/madison:opacity-100"
+                />
+              </span>
+              Made in Madison WI
+            </span>
             <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
               {footerLinks.map((link) => (
                 <Link

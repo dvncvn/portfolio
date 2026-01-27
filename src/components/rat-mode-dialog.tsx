@@ -163,20 +163,32 @@ export function RatModeDialog({ isOpen, onClose, onConfirm }: RatModeDialogProps
 
             {/* Content */}
             <div className="relative z-10 p-8">
-              <div className="space-y-4">
-                <h2
-                  id="rat-mode-title"
-                  className="text-[32px] text-foreground"
-                  style={{ fontFamily: "var(--font-jacquard-24)" }}
-                >
-                  Enter <RainbowText>Rat Mode</RainbowText>?
-                </h2>
-                <p className="text-[16px] leading-relaxed text-muted-foreground">
-                  Proceed with <span className="text-foreground">caution</span>. There is no going back.
-                </p>
-                <p className="text-[13px] text-muted-foreground/60">
-                  (Just kidding. Press ESC to exit anytime.)
-                </p>
+              <div className="flex gap-6">
+                {/* Rat image */}
+                <div className="flex-shrink-0">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src="/assets/rat.png"
+                    alt="Rat"
+                    className="h-[100px] w-[100px] object-contain"
+                    style={{ imageRendering: "pixelated" }}
+                  />
+                </div>
+                <div className="space-y-3">
+                  <h2
+                    id="rat-mode-title"
+                    className="text-[28px] text-foreground"
+                    style={{ fontFamily: "var(--font-jacquard-24)" }}
+                  >
+                    Enter <RainbowText>Rat Mode</RainbowText>?
+                  </h2>
+                  <p className="text-[15px] leading-relaxed text-muted-foreground">
+                    Proceed with <span className="text-foreground">caution</span>.
+                  </p>
+                  <p className="text-[12px] text-muted-foreground/60">
+                    (Press ESC to exit anytime.)
+                  </p>
+                </div>
               </div>
             </div>
 

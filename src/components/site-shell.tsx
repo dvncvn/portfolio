@@ -67,6 +67,7 @@ function SiteShellContent({ children }: SiteShellProps) {
   const [ratModeDialogOpen, setRatModeDialogOpen] = useState(false);
   const [ratModeActive, setRatModeActive] = useState(false);
   const [emailCopied, setEmailCopied] = useState(false);
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const keySequenceRef = useRef("");
   const { isOpen: isResumeOpen, closeResume, resumeData } = useResume();
 
@@ -160,6 +161,18 @@ function SiteShellContent({ children }: SiteShellProps) {
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [ratModeActive]);
+
+  // Track mouse for rat follower
+  useEffect(() => {
+    if (!ratModeActive) return;
+
+    const handleMouseMove = (e: MouseEvent) => {
+      setMousePos({ x: e.clientX, y: e.clientY });
+    };
+
+    window.addEventListener("mousemove", handleMouseMove);
+    return () => window.removeEventListener("mousemove", handleMouseMove);
   }, [ratModeActive]);
 
   // Apply rat-mode class to html element for full effect
@@ -612,9 +625,31 @@ function SiteShellContent({ children }: SiteShellProps) {
       {/* Rat Mode Exit Hint - rendered via portal to escape transformed parents */}
       {ratModeActive && typeof document !== "undefined" &&
         createPortal(
-          <div className="rat-mode-hint">
-            🐀 Press ESC to exit rat mode
-          </div>,
+          <>
+            <div className="rat-mode-hint">
+              🐀 Press ESC to exit rat mode
+            </div>
+            {/* Cursor-following rat */}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/assets/rat.png"
+              alt=""
+              style={{
+                position: "fixed",
+                left: mousePos.x + 20,
+                top: mousePos.y - 30,
+                width: "60px",
+                height: "60px",
+                objectFit: "contain",
+                imageRendering: "pixelated",
+                pointerEvents: "none",
+                zIndex: 9999,
+                filter: "drop-shadow(0 0 10px rgba(255, 255, 0, 0.8))",
+                transition: "left 0.1s ease-out, top 0.1s ease-out",
+                transform: mousePos.x > (typeof window !== "undefined" ? window.innerWidth / 2 : 500) ? "scaleX(-1)" : "scaleX(1)",
+              }}
+            />
+          </>,
           document.body
         )
       }

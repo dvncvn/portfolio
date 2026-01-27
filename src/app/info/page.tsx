@@ -444,7 +444,7 @@ export default function InfoPage() {
   const [ditherSize, setDitherSize] = useState(16);
   const [ditherColor, setDitherColor] = useState<EffectColor>(null);
   const [pixelSize, setPixelSize] = useState(10);
-  const [asciiSize, setAsciiSize] = useState(6);
+  const [asciiSize, setAsciiSize] = useState(12);
   const [asciiColor, setAsciiColor] = useState<EffectColor>(null);
 
   return (
@@ -740,9 +740,9 @@ export default function InfoPage() {
                       <span className="text-[12px] text-muted-foreground">Font size</span>
                       <input
                         type="range"
-                        min="3"
-                        max="10"
-                        step="1"
+                        min="4"
+                        max="20"
+                        step="2"
                         value={asciiSize}
                         onChange={(e) => setAsciiSize(Number(e.target.value))}
                         className="h-1 flex-1 cursor-pointer appearance-none rounded-full bg-white/10 accent-white [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white"

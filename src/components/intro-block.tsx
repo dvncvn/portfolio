@@ -9,6 +9,8 @@ export function IntroBlock({ animate = true }: { animate?: boolean }) {
 
   const content = (
     <>
+      {/* Spacer for visual symmetry with the More Info button below */}
+      <div className="h-9" aria-hidden="true" />
       <h1 className="text-[20px] font-medium leading-tight text-foreground">
         Hi, I&apos;m Simon
       </h1>

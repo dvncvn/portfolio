@@ -2,7 +2,7 @@
   "slug": "langflow-platform-redesign",
   "title": "Langflow: Platform Redesign",
   "shortScope": "Platform redesign",
-  "timeframe": "Nov 2024",
+  "timeframe": "Aug 2024 – Oct 2025",
   "nextProject": {
     "slug": "langflow-agent-experience",
     "title": "Langflow: Agent Experience"
@@ -16,7 +16,7 @@
   "summary": "Langflow had accumulated years of experience debt. The UI was dated, the mental model was inconsistent, and the product no longer reflected the pace or expectations of modern AI development.\n\nIn parallel with a brand refresh, I led a full end-to-end redesign of the platform to modernize Langflow quickly and decisively.\n\nI owned the entire product surface. Information architecture, interaction patterns, visual language, and shipped quality.",
   "meta": {
     "company": "DataStax",
-    "dates": "Aug 24 – Sep 25",
+    "dates": "Aug 24 – Oct 25",
     "role": "Design Lead + Product leader",
     "team": ["2 designers", "6 engineers"]
   },
@@ -86,8 +86,14 @@
       ]
     },
     {
-      "heading": "Impact",
-      "caption": "My design work helped grow Langflow from a technically capable but fragmented product into a coherent, modern platform that became DataStax's tip of the spear. It drove top-of-funnel growth and increased Astra DB consumption on our cloud platform. After the redesign, Langflow was polished and credible enough to be featured publicly, including on stage at NVIDIA GTC. During my time as lead designer, Langflow grew from 14k to 144k GitHub stars, with strong reception both internally and externally.",
+      "heading": "Driving Experience Engineering & Craft",
+      "caption": "I led an Experience Engineering squad, bridging the gap between design intent and production-ready code. By setting uncompromising craft standards and embedding myself directly in the implementation process, I ensured the final product felt like a premium developer tool rather than a technical prototype. This \"design-led engineering\" approach allowed us to move faster and build with a level of polish that is rare in the OSS space.",
+      "layout": "text",
+      "assets": []
+    },
+    {
+      "heading": "Strategic Outcomes",
+      "caption": "- The Tip of the Spear: Transformed a technically capable but fragmented tool into DataStax's primary growth lever, directly driving top-of-funnel acquisition and Astra DB consumption.\n- 10x GitHub Growth: Orchestrated the product evolution that saw Langflow scale from 14k to 144k GitHub stars, signaling a massive shift in market credibility.\n- Industry Recognition: The redesign provided the \"Enterprise-ready\" polish necessary for high-stakes public showcases, including being featured on stage at NVIDIA GTC.",
       "layout": "github-stars",
       "assets": [],
       "githubStars": {

@@ -54,7 +54,6 @@ export default async function WorkProjectPage({
           heroAsset={project.heroAsset}
           summary={project.summary}
           meta={project.meta}
-          responsibilities={project.responsibilities}
         />
 
         <div className="space-y-[88px]">

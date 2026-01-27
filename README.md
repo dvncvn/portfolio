@@ -1,36 +1,82 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+```
+     _____ ________  _______  _   _   ______  _   _ _   _  _____   ___   _   _ 
+    /  ___|_   _|  \/  |  _  || \ | |  |  _  \| | | | \ | |/  __ \ / _ \ | \ | |
+    \ `--.  | | | .  . | | | ||  \| |  | | | || | | |  \| || /  \// /_\ \|  \| |
+     `--. \ | | | |\/| | | | || . ` |  | | | || | | | . ` || |    |  _  || . ` |
+    /\__/ /_| |_| |  | \ \_/ /| |\  |  | |/ / | |_| | |\  || \__/\| | | || |\  |
+    \____/ \___/\_|  |_/\___/ \_| \_/  |___/   \___/\_| \_/ \____/\_| |_/\_| \_/
+```
+
+# Simon Duncan Portfolio
+
+Personal portfolio website showcasing product design work.
+
+## Tech Stack
+
+- **Framework**: Next.js 16 (App Router) with React 19
+- **Styling**: Tailwind CSS v4
+- **Animation**: Framer Motion
+- **Analytics**: Vercel Analytics & Speed Insights
+- **Fonts**: Geist Sans, Geist Mono, Jacquard 24
+
+## Pages
+
+- **/** – Work showcase with animated project cards
+- **/work/[slug]** – Individual project case studies
+- **/play** – Creative/side projects gallery with lightbox
+- **/info** – About page with interactive profile image effects
+
+## Features
+
+- **Command Palette** – Press `/` to open quick navigation
+- **Resume Modal** – View full work history and download resume
+- **Image Effects** – Dither, pixelate, and ASCII rendering on info page
+- **Presentation Mode** – Project slideshow for work section
+- **Dark Theme** – System-aware with smooth transitions
+- **Responsive** – Mobile-first design
+
+## Project Structure
+
+```
+src/
+├── app/              # Next.js pages and layouts
+├── components/       # React components
+│   └── ui/           # Reusable UI primitives
+├── content/          # Content loaders (work.ts, play.ts)
+├── contexts/         # React context providers
+└── lib/              # Utilities
+content/
+├── work/             # Project JSON files
+└── play/             # Play items JSON
+public/assets/        # Images, SVGs, project assets
+```
 
 ## Getting Started
 
-First, run the development server:
-
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) to view the site.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Scripts
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- `npm run dev` – Start development server
+- `npm run build` – Build for production
+- `npm run start` – Start production server
+- `npm run lint` – Run ESLint
 
-## Learn More
+---
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```
+                    .     .
+                   (\-""-/)
+                   /       \        psst... type "ratmode"
+                  { o   o  }
+                  {   ">   }
+                   \  `-' /
+                    `-..-'
+                   /`     `\
+                  / /     \ \
+```

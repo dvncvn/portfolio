@@ -40,7 +40,6 @@ type ResumeTakeoverProps = {
   isOpen: boolean;
   onClose: () => void;
   data: ResumeData;
-  resumeUrl?: string;
 };
 
 function formatResumeAsText(data: ResumeData): string {
@@ -101,7 +100,7 @@ function formatResumeAsText(data: ResumeData): string {
   return lines.join("\n");
 }
 
-export function ResumeTakeover({ isOpen, onClose, data, resumeUrl }: ResumeTakeoverProps) {
+export function ResumeTakeover({ isOpen, onClose, data }: ResumeTakeoverProps) {
   const [copied, setCopied] = useState(false);
 
   const handleCopy = async () => {

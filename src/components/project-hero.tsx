@@ -12,7 +12,6 @@ type ProjectHeroProps = {
   heroAsset?: WorkProjectAsset;
   summary: string;
   meta?: WorkProjectMeta;
-  responsibilities?: string[];
 };
 
 // Parallax layer component to use hooks properly
@@ -69,7 +68,6 @@ export function ProjectHero({
   heroAsset,
   summary,
   meta,
-  responsibilities,
 }: ProjectHeroProps) {
   const heroAssetRef = useRef<HTMLDivElement | null>(null);
   const shouldReduceMotion = useReducedMotion();

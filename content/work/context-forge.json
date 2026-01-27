@@ -69,6 +69,7 @@
         {
           "type": "image",
           "src": "/assets/work/context-forge/bento-assets/thumb/card-2-fg.png",
+          "mobileSrc": "/assets/work/context-forge/bento-assets/thumb/mobile-2.png",
           "fullSrc": "/assets/work/context-forge/bento-assets/full/full-2.png",
           "alt": "Dataset details template",
           "width": 994,

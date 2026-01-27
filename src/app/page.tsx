@@ -98,8 +98,8 @@ export default async function Home() {
           <WorkSectionHeader projects={validProjects} />
         </Suspense>
 
-        <div className="work-grid flex flex-col gap-6 md:flex-row md:gap-8">
-          <div className="flex flex-col gap-6 md:flex-1">
+        <div className="work-grid flex flex-row gap-8 max-[900px]:flex-col max-[900px]:gap-6">
+          <div className="flex flex-1 flex-col gap-6 max-[900px]:flex-none">
             {/* Left column */}
             {[projects[0], projects[1]].map((project) => (
               <BlurFade
@@ -122,7 +122,7 @@ export default async function Home() {
               </BlurFade>
             ))}
           </div>
-          <div className="flex flex-col gap-6 md:flex-1">
+          <div className="flex flex-1 flex-col gap-6 max-[900px]:flex-none">
             {/* Right column */}
             {[projects[2], projects[3]].map((project) => (
               <BlurFade

@@ -36,10 +36,6 @@ type WorkCardProps = {
   dotGrid?: boolean;
 };
 
-type WorkCardAnimatedProps = WorkCardProps & {
-  index?: number;
-};
-
 export function WorkCard({
   slug,
   title,
@@ -254,25 +250,5 @@ export function WorkCard({
         </div>
       </div>
     </Link>
-  );
-}
-
-export function WorkCardAnimated({
-  index = 0,
-  ...props
-}: WorkCardAnimatedProps) {
-  return (
-    <motion.div
-      // Keep cards visible immediately (show surfaces), but add a subtle "settle" motion.
-      initial={{ opacity: 1, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{
-        duration: 0.35,
-        delay: 0.06 + index * 0.04,
-        ease: [0.25, 0.1, 0.25, 1],
-      }}
-    >
-      <WorkCard {...props} />
-    </motion.div>
   );
 }

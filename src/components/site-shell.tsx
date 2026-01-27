@@ -56,7 +56,7 @@ function useHideOnScroll() {
   return hidden;
 }
 
-const RAT_MODE_SEQUENCE = "rat mode";
+const RAT_MODE_SEQUENCE = "ratmode";
 
 function SiteShellContent({ children }: SiteShellProps) {
   const pathname = usePathname();
@@ -327,7 +327,7 @@ function SiteShellContent({ children }: SiteShellProps) {
 
       <footer className="mt-20">
         <div className="w-full px-6">
-          <div className="mx-auto flex w-full max-w-[1400px] flex-col gap-4 py-8 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
+          <div className="mx-auto flex w-full max-w-[1400px] items-center justify-between gap-4 py-8 text-sm text-muted-foreground">
             <span className="font-mono text-[#464646]">Made in Madison WI</span>
             <div className="flex flex-wrap items-center gap-6">
               {footerLinks.map((link) => (

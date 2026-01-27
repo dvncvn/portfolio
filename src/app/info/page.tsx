@@ -452,7 +452,7 @@ export default function InfoPage() {
       {/* 2-column layout: content takes more space, image is smaller */}
       <section className="grid gap-10 lg:grid-cols-[1fr_440px] lg:gap-24">
         {/* Left column: intro (unanimated) + table immediately below */}
-        <div className="space-y-8">
+        <div className="space-y-8 max-w-[768px]">
           <div className="space-y-4">
             <h1 className="text-[20px] font-medium leading-tight text-foreground">
               Hi, I&apos;m Simon

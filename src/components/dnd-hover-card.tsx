@@ -17,13 +17,12 @@ export function DndHoverCard({ children, zIndex = 50 }: DndHoverCardProps) {
   useEffect(() => {
     if (isHovered && triggerRef.current) {
       const rect = triggerRef.current.getBoundingClientRect();
-      const popoverWidth = 212;
       const popoverHeight = 340;
       
       setStyles({
         position: "fixed",
-        top: rect.top - popoverHeight - 16,
-        left: rect.left + rect.width / 2 - popoverWidth / 2,
+        top: rect.top + rect.height / 2 - popoverHeight / 2,
+        left: rect.right + 16,
         zIndex,
       });
     }
@@ -44,9 +43,9 @@ export function DndHoverCard({ children, zIndex = 50 }: DndHoverCardProps) {
           <AnimatePresence>
             {isHovered && (
               <motion.div
-                initial={{ opacity: 0, y: 8, scale: 0.95 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, y: 8, scale: 0.95 }}
+                initial={{ opacity: 0, x: -8, scale: 0.95 }}
+                animate={{ opacity: 1, x: 0, scale: 1 }}
+                exit={{ opacity: 0, x: -8, scale: 0.95 }}
                 transition={{ duration: 0.15, ease: "easeOut" }}
                 style={styles}
                 onMouseEnter={() => setIsHovered(true)}
@@ -81,9 +80,9 @@ export function DndHoverCard({ children, zIndex = 50 }: DndHoverCardProps) {
                     </span>
                   </div>
                 </a>
-                {/* Arrow pointing down */}
-                <div className="absolute left-1/2 top-full -translate-x-1/2">
-                  <div className="h-0 w-0 border-l-[6px] border-r-[6px] border-t-[6px] border-l-transparent border-r-transparent border-t-white/10" />
+                {/* Arrow pointing left */}
+                <div className="absolute right-full top-1/2 -translate-y-1/2">
+                  <div className="h-0 w-0 border-t-[6px] border-b-[6px] border-r-[6px] border-t-transparent border-b-transparent border-r-white/10" />
                 </div>
               </motion.div>
             )}

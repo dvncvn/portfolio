@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { motion, useMotionValueEvent, useScroll } from "framer-motion";
+import { motion, useMotionValueEvent, useScroll, AnimatePresence } from "framer-motion";
 import { HyperText } from "@/components/ui/hyper-text";
 import { CommandPalette } from "@/components/command-palette";
 import { RatModeDialog } from "@/components/rat-mode-dialog";
@@ -63,11 +63,17 @@ function SiteShellContent({ children }: SiteShellProps) {
   const router = useRouter();
   const hidden = useHideOnScroll();
   const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [ratModeDialogOpen, setRatModeDialogOpen] = useState(false);
   const [ratModeActive, setRatModeActive] = useState(false);
   const [emailCopied, setEmailCopied] = useState(false);
   const keySequenceRef = useRef("");
   const { isOpen: isResumeOpen, closeResume, resumeData } = useResume();
+
+  // Close mobile menu on route change
+  useEffect(() => {
+    setMobileMenuOpen(false);
+  }, [pathname]);
 
   const isActive = (href: string) => {
     if (href === "/") {
@@ -299,7 +305,8 @@ function SiteShellContent({ children }: SiteShellProps) {
                 </HyperText>
               </Link>
             </div>
-            <nav className="flex items-center justify-end gap-6 text-[16px]">
+            {/* Desktop nav */}
+            <nav className="hidden min-[480px]:flex items-center justify-end gap-6 text-[16px]">
               {navLinks.map((link) => (
                 <Link
                   key={link.label}
@@ -314,9 +321,81 @@ function SiteShellContent({ children }: SiteShellProps) {
                 </Link>
               ))}
             </nav>
+
+            {/* Mobile hamburger button */}
+            <div className="flex min-[480px]:hidden justify-end">
+              <button
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                className="flex h-10 w-10 items-center justify-center rounded-lg -mr-2"
+                aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
+                aria-expanded={mobileMenuOpen}
+              >
+                <div className="relative w-5 h-4 flex flex-col justify-between">
+                  <span
+                    className={`block h-[2px] w-5 bg-foreground transition-all duration-300 ${
+                      mobileMenuOpen ? "translate-y-[7px] rotate-45" : ""
+                    }`}
+                  />
+                  <span
+                    className={`block h-[2px] w-5 bg-foreground transition-all duration-300 ${
+                      mobileMenuOpen ? "opacity-0" : ""
+                    }`}
+                  />
+                  <span
+                    className={`block h-[2px] w-5 bg-foreground transition-all duration-300 ${
+                      mobileMenuOpen ? "-translate-y-[7px] -rotate-45" : ""
+                    }`}
+                  />
+                </div>
+              </button>
+            </div>
           </div>
         </div>
       </motion.header>
+
+      {/* Mobile menu overlay */}
+      <AnimatePresence>
+        {mobileMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="fixed inset-0 z-30 min-[480px]:hidden"
+          >
+            {/* Backdrop */}
+            <div
+              className="absolute inset-0 bg-background/95 backdrop-blur-sm"
+              onClick={() => setMobileMenuOpen(false)}
+            />
+            
+            {/* Menu content */}
+            <nav className="relative flex flex-col items-center justify-center h-full gap-8">
+              {navLinks.map((link, idx) => (
+                <motion.div
+                  key={link.label}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 10 }}
+                  transition={{ duration: 0.3, delay: idx * 0.05 }}
+                >
+                  <Link
+                    href={link.href}
+                    onClick={() => setMobileMenuOpen(false)}
+                    className={`text-[32px] font-medium transition-colors ${
+                      isActive(link.href)
+                        ? "text-foreground"
+                        : "text-muted-foreground"
+                    }`}
+                  >
+                    {link.label}
+                  </Link>
+                </motion.div>
+              ))}
+            </nav>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Spacer for fixed header */}
       <div className="h-[72px]" />

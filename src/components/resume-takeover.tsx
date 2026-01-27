@@ -168,10 +168,10 @@ export function ResumeTakeover({ isOpen, onClose, data }: ResumeTakeoverProps) {
           </button>
 
           {/* Action buttons - fixed to bottom right */}
-          <div className="fixed bottom-6 right-6 z-10 flex items-center gap-3">
+          <div className="fixed bottom-6 right-6 z-20 flex items-center gap-3 rounded-lg bg-background p-2">
             <button
               onClick={handleCopy}
-              className="group/btn inline-flex items-center gap-2 rounded-md bg-white/[0.06] px-4 py-2 text-[14px] text-muted-foreground transition-all duration-200 ease-out hover:bg-white/[0.1] hover:text-foreground"
+              className="group/btn inline-flex items-center gap-2 rounded-md bg-[#1a1a1a] px-4 py-2 text-[14px] text-muted-foreground transition-all duration-200 ease-out hover:bg-[#252525] hover:text-foreground"
             >
               {copied ? (
                 <>
@@ -213,7 +213,7 @@ export function ResumeTakeover({ isOpen, onClose, data }: ResumeTakeoverProps) {
             <div className="group relative">
               <button
                 disabled
-                className="inline-flex cursor-not-allowed items-center gap-2 rounded-md bg-white/[0.04] px-4 py-2 text-[14px] text-muted-foreground/50"
+                className="inline-flex cursor-not-allowed items-center gap-2 rounded-md bg-[#141414] px-4 py-2 text-[14px] text-muted-foreground/50"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -245,7 +245,7 @@ export function ResumeTakeover({ isOpen, onClose, data }: ResumeTakeoverProps) {
             transition={{ duration: 0.3, delay: 0.1 }}
             className="h-full overflow-y-auto px-6 pb-24 pt-12 scrollbar-none"
           >
-            <div className="mx-auto max-w-[1100px]">
+            <div className="mx-auto max-w-[900px]">
               {/* Header */}
               <div className="mb-10 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                 <div>
@@ -261,7 +261,7 @@ export function ResumeTakeover({ isOpen, onClose, data }: ResumeTakeoverProps) {
               </div>
 
               {/* Two column layout */}
-              <div className="grid gap-12 lg:grid-cols-[1fr_320px] lg:gap-16">
+              <div className="grid gap-12 lg:grid-cols-[1fr_220px] lg:gap-16">
                 {/* Left column: Experience */}
                 <div className="space-y-10">
                   {data.sections.map((section) => (

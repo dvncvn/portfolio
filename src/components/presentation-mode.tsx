@@ -921,19 +921,25 @@ export function PresentationMode({ isOpen, onClose, projects, introText }: Prese
         case "ArrowRight":
         case "ArrowDown":
         case " ":
+          // Skip slide navigation if lightbox is open (lightbox handles its own arrow nav)
+          if (isLightboxOpen) return;
           e.preventDefault();
           goToNextSlide();
           break;
         case "ArrowLeft":
         case "ArrowUp":
+          // Skip slide navigation if lightbox is open (lightbox handles its own arrow nav)
+          if (isLightboxOpen) return;
           e.preventDefault();
           goToPrevSlide();
           break;
         case "Home":
+          if (isLightboxOpen) return;
           e.preventDefault();
           setCurrentSlide(0);
           break;
         case "End":
+          if (isLightboxOpen) return;
           e.preventDefault();
           setCurrentSlide(slides.length - 1);
           break;

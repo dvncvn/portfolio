@@ -26,7 +26,7 @@ const footerLinks = [
   { label: "LinkedIn", href: "https://www.linkedin.com/in/simonfraserduncan" },
 ];
 
-const EMAIL = "hello@simonduncan.com";
+const EMAIL = "simonfraserduncan@gmail.com";
 
 function useHideOnScroll() {
   const { scrollY } = useScroll();

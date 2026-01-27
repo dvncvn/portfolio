@@ -84,7 +84,7 @@ export function EmploymentTable({ rows, onViewHistory }: EmploymentTableProps) {
         <button
           type="button"
           onClick={onViewHistory}
-          className="group/btn -ml-3 mt-6 inline-flex items-center gap-2 rounded-md px-3 py-1.5 text-[14px] text-muted-foreground transition-all duration-200 ease-out hover:bg-white/[0.06] hover:text-foreground"
+          className="group/btn -ml-3 mt-6 inline-flex cursor-pointer items-center gap-2 rounded-md px-3 py-1.5 text-[14px] text-muted-foreground transition-all duration-200 ease-out hover:bg-white/[0.06] hover:text-foreground"
         >
           <span>View full 12 year history</span>
           <svg

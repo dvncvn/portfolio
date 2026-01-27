@@ -3,6 +3,7 @@
 import { useEffect, useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { createPortal } from "react-dom";
+import { DndCharacterOverlay } from "./dnd-character-overlay";
 
 type DndHoverCardProps = {
   children: React.ReactNode;
@@ -12,6 +13,7 @@ type DndHoverCardProps = {
 
 export function DndHoverCard({ children, zIndex = 50, position = "above" }: DndHoverCardProps) {
   const [isHovered, setIsHovered] = useState(false);
+  const [overlayOpen, setOverlayOpen] = useState(false);
   const triggerRef = useRef<HTMLSpanElement>(null);
   const [styles, setStyles] = useState<React.CSSProperties>({});
 
@@ -40,6 +42,11 @@ export function DndHoverCard({ children, zIndex = 50, position = "above" }: DndH
     }
   }, [isHovered, zIndex, position]);
 
+  const handleClick = () => {
+    setIsHovered(false);
+    setOverlayOpen(true);
+  };
+
   return (
     <>
       <span
@@ -63,12 +70,10 @@ export function DndHoverCard({ children, zIndex = 50, position = "above" }: DndH
                 onMouseEnter={() => setIsHovered(true)}
                 onMouseLeave={() => setIsHovered(false)}
               >
-                <a
-                  href="https://www.dndbeyond.com/characters/159073918"
-                  target="_blank"
-                  rel="noopener noreferrer"
+                <button
+                  type="button"
+                  onClick={handleClick}
                   className="block overflow-hidden rounded-xl border border-white/10 bg-[#151413]/95 p-4 shadow-2xl backdrop-blur-xl transition-colors hover:border-white/20"
-                  onClick={(e) => e.stopPropagation()}
                 >
                   {/* Character art */}
                   <div className="relative h-[200px] w-[200px] overflow-hidden rounded-lg bg-[#1a1918]">
@@ -91,7 +96,7 @@ export function DndHoverCard({ children, zIndex = 50, position = "above" }: DndH
                       Level 3 Twilight Cleric
                     </span>
                   </div>
-                </a>
+                </button>
                 {/* Arrow */}
                 {position === "above" ? (
                   <div className="absolute left-1/2 top-full -translate-x-1/2">
@@ -107,6 +112,9 @@ export function DndHoverCard({ children, zIndex = 50, position = "above" }: DndH
           </AnimatePresence>,
           document.body
         )}
+      
+      {/* Character overlay */}
+      <DndCharacterOverlay isOpen={overlayOpen} onClose={() => setOverlayOpen(false)} />
     </>
   );
 }

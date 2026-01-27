@@ -60,6 +60,34 @@ function EmojiRain({ emoji }: { emoji: string }) {
   );
 }
 
+// Rainbow animated text component
+function RainbowText({ children }: { children: string }) {
+  return (
+    <span
+      className="font-mono bg-clip-text text-transparent animate-rainbow-shift"
+      style={{
+        backgroundImage: "linear-gradient(90deg, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #9400d3, #ff0000)",
+        backgroundSize: "200% 100%",
+        animation: "rainbow-shift 3s linear infinite",
+      }}
+    >
+      {children}
+    </span>
+  );
+}
+
+// Parse message and render backtick content as rainbow monospace
+function renderMessage(message: string) {
+  const parts = message.split(/(`[^`]+`)/g);
+  return parts.map((part, i) => {
+    if (part.startsWith("`") && part.endsWith("`")) {
+      const code = part.slice(1, -1);
+      return <RainbowText key={i}>{code}</RainbowText>;
+    }
+    return part;
+  });
+}
+
 type WelcomeModalProps = {
   visitor: VisitorConfig;
   onClose: () => void;
@@ -155,7 +183,7 @@ export function WelcomeModal({ visitor, onClose, onStartPresentation }: WelcomeM
               {visitor.greeting} 👋
             </h1>
             <p className={`leading-relaxed text-muted-foreground ${visitor.largeText ? "text-[20px]" : "text-[15px]"}`}>
-              {visitor.message}
+              {renderMessage(visitor.message)}
             </p>
           </div>
 

@@ -73,7 +73,7 @@ export function DndHoverCard({ children, zIndex = 50, position = "above" }: DndH
                 <button
                   type="button"
                   onClick={handleClick}
-                  className="block overflow-hidden rounded-xl border border-white/10 bg-[#151413]/95 p-4 shadow-2xl backdrop-blur-xl transition-colors hover:border-white/20"
+                  className="group block cursor-pointer overflow-hidden rounded-xl border border-white/10 bg-[#151413]/95 p-4 shadow-2xl backdrop-blur-xl transition-all duration-200 hover:border-white/30 hover:scale-[1.02] hover:shadow-[0_0_30px_rgba(255,255,255,0.1)]"
                 >
                   {/* Character art */}
                   <div className="relative h-[200px] w-[200px] overflow-hidden rounded-lg bg-[#1a1918]">
@@ -81,8 +81,14 @@ export function DndHoverCard({ children, zIndex = 50, position = "above" }: DndH
                     <img
                       src="/assets/dnd-character.png"
                       alt="Perrin Burrowfen"
-                      className="h-full w-full object-cover"
+                      className="h-full w-full object-cover transition-transform duration-200 group-hover:scale-105"
                     />
+                    {/* Hover overlay */}
+                    <div className="absolute inset-0 flex items-center justify-center bg-black/0 transition-colors duration-200 group-hover:bg-black/40">
+                      <span className="font-mono text-[10px] uppercase tracking-widest text-white opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+                        View character info
+                      </span>
+                    </div>
                   </div>
                   {/* Character info */}
                   <div className="mt-3 text-center">

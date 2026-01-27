@@ -1,18 +1,10 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { WelcomeModal } from "@/components/welcome-modal";
 import type { VisitorConfig } from "@/content/visitors";
-
-// Check if we should show welcome (client-side only)
-function getInitialWelcomeState(visitor: VisitorConfig | null): boolean {
-  if (!visitor) return false;
-  if (typeof window === "undefined") return false;
-  const urlParams = new URLSearchParams(window.location.search);
-  return urlParams.get("presentation") !== "true";
-}
 
 type HomePageClientProps = {
   visitor: VisitorConfig | null;
@@ -22,9 +14,20 @@ type HomePageClientProps = {
 export function HomePageClient({ visitor, children }: HomePageClientProps) {
   const router = useRouter();
   
-  // Lazy initialization - only runs once on client
-  const [showWelcome, setShowWelcome] = useState(() => getInitialWelcomeState(visitor));
-  const [contentReady, setContentReady] = useState(() => !visitor || !getInitialWelcomeState(visitor));
+  // Initialize with consistent state for hydration (no modal on server)
+  const [showWelcome, setShowWelcome] = useState(false);
+  const [contentReady, setContentReady] = useState(!visitor);
+
+  // Check if we should show welcome modal after hydration
+  useEffect(() => {
+    if (!visitor) return;
+    const urlParams = new URLSearchParams(window.location.search);
+    const shouldShowWelcome = urlParams.get("presentation") !== "true";
+    if (shouldShowWelcome) {
+      setShowWelcome(true);
+      setContentReady(false);
+    }
+  }, [visitor]);
 
   const handleCloseWelcome = useCallback(() => {
     setShowWelcome(false);

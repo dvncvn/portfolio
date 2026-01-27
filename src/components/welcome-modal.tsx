@@ -127,10 +127,16 @@ const RAT_CHECKBOXES = [
 export function WelcomeModal({ visitor, onClose, onStartPresentation }: WelcomeModalProps) {
   const [ratChecks, setRatChecks] = useState<boolean[]>([false, false, false, false, false]);
   const [ratModeEnabled, setRatModeEnabled] = useState(false);
+  const [mounted, setMounted] = useState(false);
   
   const isRatPack = visitor.id === "ratpack";
   const visibleCheckboxes = ratChecks.filter((_, i) => i === 0 || ratChecks[i - 1]).length;
   const allChecked = ratChecks.every(Boolean);
+
+  // Mount state for portal
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Lock body scroll when open
   useEffect(() => {
@@ -188,7 +194,7 @@ export function WelcomeModal({ visitor, onClose, onStartPresentation }: WelcomeM
     }, 100);
   }, [onClose, onStartPresentation]);
 
-  if (typeof window === "undefined") return null;
+  if (!mounted) return null;
 
   return createPortal(
     <AnimatePresence>

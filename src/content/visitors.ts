@@ -19,8 +19,8 @@ export const visitors: Record<string, VisitorConfig> = {
   ratpack: {
     id: "ratpack",
     name: "Rat Pack",
-    greeting: "Welcome, Rat Pack!",
-    message: "You've unlocked rat mode. Browse the projects like a normal human, or embrace your inner rodent and scurry through presentation mode. The choice is yours, fellow rat.",
+    greeting: "Welcome rats.",
+    message: "Choose your destiny. Either browse the projects like normal, or type 'ratmode' after this screen to engage your full potential. The choice is yours.",
     emojiRain: "🐀",
     hideAsciiNoise: true,
     largeText: true,

@@ -20,7 +20,7 @@ export const visitors: Record<string, VisitorConfig> = {
     id: "ratpack",
     name: "Rat Pack",
     greeting: "Welcome rats.",
-    message: "Choose your destiny. Either browse the projects like normal, or type `ratmode` after this screen to engage your full potential. The choice is yours.",
+    message: "Choose your destiny. Either browse the projects like normal, or type `ratmode` after this screen to engage your full potential.\n\nThe choice is yours.",
     emojiRain: "🐀",
     hideAsciiNoise: true,
     largeText: true,

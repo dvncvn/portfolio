@@ -76,16 +76,29 @@ function RainbowText({ children }: { children: string }) {
   );
 }
 
-// Parse message and render backtick content as rainbow monospace
-function renderMessage(message: string) {
-  const parts = message.split(/(`[^`]+`)/g);
+// Parse inline backticks into rainbow text
+function renderInlineCode(text: string, keyPrefix: string) {
+  const parts = text.split(/(`[^`]+`)/g);
   return parts.map((part, i) => {
     if (part.startsWith("`") && part.endsWith("`")) {
       const code = part.slice(1, -1);
-      return <RainbowText key={i}>{code}</RainbowText>;
+      return <RainbowText key={`${keyPrefix}-${i}`}>{code}</RainbowText>;
     }
     return part;
   });
+}
+
+// Parse message and render backtick content as rainbow monospace, with paragraph support
+function renderMessage(message: string) {
+  const paragraphs = message.split(/\n\n+/);
+  if (paragraphs.length === 1) {
+    return renderInlineCode(message, "p0");
+  }
+  return paragraphs.map((para, i) => (
+    <span key={i} className={i > 0 ? "block mt-4" : ""}>
+      {renderInlineCode(para, `p${i}`)}
+    </span>
+  ));
 }
 
 type WelcomeModalProps = {

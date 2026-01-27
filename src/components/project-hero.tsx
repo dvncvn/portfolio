@@ -4,6 +4,7 @@ import { motion, useReducedMotion, useScroll, useTransform, MotionValue } from "
 import { useRef } from "react";
 import { WorkProjectAsset, ParallaxLayer } from "@/content/types";
 import { DotPattern } from "@/components/ui/dot-pattern";
+import { BlurFade } from "@/components/ui/blur-fade";
 import type { WorkProjectMeta } from "@/content/types";
 
 type ProjectHeroProps = {
@@ -128,15 +129,25 @@ export function ProjectHero({
                   className="text-white/[0.12] [mask-image:radial-gradient(ellipse_55%_50%_at_center,black_40%,transparent_85%)]"
                 />
               </div>
-              {heroAsset.layers.map((layer, idx) => (
-                <ParallaxLayerImage
-                  key={layer.src}
-                  layer={layer}
-                  scrollYProgress={scrollYProgress}
-                  shouldReduceMotion={shouldReduceMotion}
-                  index={idx}
-                />
-              ))}
+              {heroAsset.layers.map((layer, idx) => {
+                const totalLayers = heroAsset.layers!.length;
+                const reverseDelay = (totalLayers - 1 - idx) * 0.1;
+                return (
+                  <BlurFade
+                    key={layer.src}
+                    delay={reverseDelay}
+                    duration={0.4}
+                    className="absolute inset-0"
+                  >
+                    <ParallaxLayerImage
+                      layer={layer}
+                      scrollYProgress={scrollYProgress}
+                      shouldReduceMotion={shouldReduceMotion}
+                      index={idx}
+                    />
+                  </BlurFade>
+                );
+              })}
             </div>
           ) : (
             // Standard single image hero
@@ -158,7 +169,7 @@ export function ProjectHero({
 
       {/* Summary + metadata */}
       <div className="relative z-10 mx-auto mt-0 w-full max-w-[768px]">
-        <div className="grid gap-8 md:grid-cols-[minmax(0,1fr)_270px] md:items-start">
+        <div className="grid gap-8 md:gap-10 md:grid-cols-[minmax(0,1fr)_270px] md:items-start">
           <div className="space-y-6">
             <h2 className="text-[20px] font-medium text-foreground">Summary</h2>
             <div className="space-y-5 text-[16px] leading-relaxed text-muted-foreground">
@@ -175,19 +186,19 @@ export function ProjectHero({
           {meta ? (
             <dl className="grid gap-y-6 text-[16px]">
               {meta.company ? (
-                <div className="grid grid-cols-[1fr_1fr] gap-6">
+                <div className="grid grid-cols-[80px_1fr] gap-2">
                   <dt className="text-muted-foreground/60">Company</dt>
                   <dd className="text-foreground">{meta.company}</dd>
                 </div>
               ) : null}
               {meta.role ? (
-                <div className="grid grid-cols-[1fr_1fr] gap-6">
+                <div className="grid grid-cols-[80px_1fr] gap-2">
                   <dt className="text-muted-foreground/60">Role</dt>
                   <dd className="text-foreground">{meta.role}</dd>
                 </div>
               ) : null}
               {meta.team && meta.team.length > 0 ? (
-                <div className="grid grid-cols-[1fr_1fr] gap-6">
+                <div className="grid grid-cols-[80px_1fr] gap-2">
                   <dt className="text-muted-foreground/60">Team</dt>
                   <dd className="space-y-1 text-foreground">
                     {meta.team.map((t) => (

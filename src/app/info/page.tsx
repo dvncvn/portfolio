@@ -511,10 +511,12 @@ export default function InfoPage() {
         {/* Right column: photo */}
         <BlurFade delay={0.06} className="w-full">
           <div className="space-y-0">
-            <div
-              className="group relative w-full overflow-hidden rounded-[24px] bg-[#121212]"
+            <button
+              type="button"
+              className="group relative w-full cursor-pointer overflow-hidden rounded-[24px] bg-[#121212]"
               onMouseEnter={() => setIsHovered(true)}
               onMouseLeave={() => setIsHovered(false)}
+              onClick={() => setShowControls(true)}
             >
               {/* Stack all effects and crossfade between them */}
               <div className="relative aspect-[4/5] w-full">
@@ -565,13 +567,13 @@ export default function InfoPage() {
                 </motion.div>
               </div>
               {/* Edit icon - appears on hover */}
-              <motion.button
+              {/* Edit icon indicator */}
+              <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: isHovered || showControls ? 1 : 0 }}
                 transition={{ duration: 0.2 }}
-                onClick={() => setShowControls(!showControls)}
-                className="absolute bottom-3 right-3 rounded-full bg-black/50 p-2 text-white/70 backdrop-blur-sm transition-colors hover:bg-black/70 hover:text-white"
-                aria-label="Image effects"
+                className="pointer-events-none absolute bottom-3 right-3 rounded-full bg-black/50 p-2 text-white/70 backdrop-blur-sm"
+                aria-hidden="true"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -591,8 +593,8 @@ export default function InfoPage() {
                   <path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z" />
                   <path d="m15 5 4 4" />
                 </svg>
-              </motion.button>
-            </div>
+              </motion.div>
+            </button>
             {/* Expandable effect controls */}
             <motion.div
               initial={false}

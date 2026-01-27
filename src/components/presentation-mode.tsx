@@ -433,7 +433,7 @@ function SlideContent({ slide, slideIndex, totalSlides, onLightboxStateChange }:
             >
               <p>
                 Outside of product design, I&apos;m a parent, husband, runner, musician, and{" "}
-                <DndHoverCard zIndex={9999}>D&D player</DndHoverCard>.
+                <DndHoverCard zIndex={9999} position="below">D&D player</DndHoverCard>.
               </p>
               <p className="mt-5 md:mt-6 xl:mt-8">
                 I spend a lot of time thinking about creativity, constraint, and sustainability. I make music that blends ambient, electronic, and guitar-driven textures, and I&apos;m interested in long-term lifestyle design, balancing ambition with family, health, and creative output.

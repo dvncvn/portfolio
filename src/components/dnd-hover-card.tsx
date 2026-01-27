@@ -7,9 +7,10 @@ import { createPortal } from "react-dom";
 type DndHoverCardProps = {
   children: React.ReactNode;
   zIndex?: number;
+  position?: "above" | "below";
 };
 
-export function DndHoverCard({ children, zIndex = 50 }: DndHoverCardProps) {
+export function DndHoverCard({ children, zIndex = 50, position = "above" }: DndHoverCardProps) {
   const [isHovered, setIsHovered] = useState(false);
   const triggerRef = useRef<HTMLSpanElement>(null);
   const [styles, setStyles] = useState<React.CSSProperties>({});
@@ -17,16 +18,27 @@ export function DndHoverCard({ children, zIndex = 50 }: DndHoverCardProps) {
   useEffect(() => {
     if (isHovered && triggerRef.current) {
       const rect = triggerRef.current.getBoundingClientRect();
-      const popoverHeight = 340;
+      const popoverHeight = 300;
+      const popoverWidth = 232; // 200px image + 32px padding
+      const gap = 12;
       
-      setStyles({
-        position: "fixed",
-        top: rect.top + rect.height / 2 - popoverHeight / 2,
-        left: rect.right + 16,
-        zIndex,
-      });
+      if (position === "above") {
+        setStyles({
+          position: "fixed",
+          top: rect.top - popoverHeight - gap,
+          left: rect.left + rect.width / 2 - popoverWidth / 2,
+          zIndex,
+        });
+      } else {
+        setStyles({
+          position: "fixed",
+          top: rect.bottom + gap,
+          left: rect.left + rect.width / 2 - popoverWidth / 2,
+          zIndex,
+        });
+      }
     }
-  }, [isHovered, zIndex]);
+  }, [isHovered, zIndex, position]);
 
   return (
     <>
@@ -43,9 +55,9 @@ export function DndHoverCard({ children, zIndex = 50 }: DndHoverCardProps) {
           <AnimatePresence>
             {isHovered && (
               <motion.div
-                initial={{ opacity: 0, x: -8, scale: 0.95 }}
-                animate={{ opacity: 1, x: 0, scale: 1 }}
-                exit={{ opacity: 0, x: -8, scale: 0.95 }}
+                initial={{ opacity: 0, y: position === "above" ? 8 : -8, scale: 0.95 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: position === "above" ? 8 : -8, scale: 0.95 }}
                 transition={{ duration: 0.15, ease: "easeOut" }}
                 style={styles}
                 onMouseEnter={() => setIsHovered(true)}
@@ -59,7 +71,7 @@ export function DndHoverCard({ children, zIndex = 50 }: DndHoverCardProps) {
                   onClick={(e) => e.stopPropagation()}
                 >
                   {/* Character art */}
-                  <div className="relative h-[240px] w-[180px] overflow-hidden rounded-lg bg-[#1a1918]">
+                  <div className="relative h-[200px] w-[200px] overflow-hidden rounded-lg bg-[#1a1918]">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src="/assets/dnd-character.png"
@@ -80,10 +92,16 @@ export function DndHoverCard({ children, zIndex = 50 }: DndHoverCardProps) {
                     </span>
                   </div>
                 </a>
-                {/* Arrow pointing left */}
-                <div className="absolute right-full top-1/2 -translate-y-1/2">
-                  <div className="h-0 w-0 border-t-[6px] border-b-[6px] border-r-[6px] border-t-transparent border-b-transparent border-r-white/10" />
-                </div>
+                {/* Arrow */}
+                {position === "above" ? (
+                  <div className="absolute left-1/2 top-full -translate-x-1/2">
+                    <div className="h-0 w-0 border-l-[6px] border-r-[6px] border-t-[6px] border-l-transparent border-r-transparent border-t-white/10" />
+                  </div>
+                ) : (
+                  <div className="absolute bottom-full left-1/2 -translate-x-1/2">
+                    <div className="h-0 w-0 border-l-[6px] border-r-[6px] border-b-[6px] border-l-transparent border-r-transparent border-b-white/10" />
+                  </div>
+                )}
               </motion.div>
             )}
           </AnimatePresence>,

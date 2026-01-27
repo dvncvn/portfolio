@@ -1,5 +1,10 @@
+import type { Metadata } from "next";
 import { getPlayItems } from "@/content/play";
 import { PlayGrid } from "@/components/play-grid";
+
+export const metadata: Metadata = {
+  title: "Play | Simon Duncan",
+};
 
 export default async function PlayPage() {
   const items = await getPlayItems();

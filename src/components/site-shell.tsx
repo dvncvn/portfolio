@@ -67,7 +67,7 @@ function SiteShellContent({ children }: SiteShellProps) {
   const [ratModeActive, setRatModeActive] = useState(false);
   const [emailCopied, setEmailCopied] = useState(false);
   const keySequenceRef = useRef("");
-  const { isOpen: isResumeOpen, closeResume, resumeData, resumeUrl } = useResume();
+  const { isOpen: isResumeOpen, closeResume, resumeData } = useResume();
 
   const isActive = (href: string) => {
     if (href === "/") {
@@ -404,7 +404,6 @@ function SiteShellContent({ children }: SiteShellProps) {
         isOpen={isResumeOpen}
         onClose={closeResume}
         data={resumeData}
-        resumeUrl={resumeUrl}
       />
     </div>
   );

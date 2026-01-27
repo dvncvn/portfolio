@@ -1,10 +1,15 @@
 import { notFound } from "next/navigation";
+import type { Metadata } from "next";
 import { getWorkProject, getWorkProjectSlugs, getNextProject } from "@/content/work";
 import { ProjectHero } from "@/components/project-hero";
 import { SectionBlock } from "@/components/section-block";
 import { ProjectNavigator } from "@/components/project-navigator";
 import { getGithubStars } from "@/lib/github";
 import type { WorkProjectSection } from "@/content/types";
+
+export const metadata: Metadata = {
+  title: "Work | Simon Duncan",
+};
 
 export async function generateStaticParams() {
   const slugs = await getWorkProjectSlugs();

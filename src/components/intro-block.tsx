@@ -30,7 +30,7 @@ export function IntroBlock({ animate = true }: { animate?: boolean }) {
         >
           <Link
             href="/info"
-            className="group/btn relative inline-flex items-center gap-2 px-3 py-1.5 rounded-md text-muted-foreground transition-all duration-200 ease-out hover:text-foreground hover:bg-white/[0.06]"
+            className="group/btn relative inline-flex items-center gap-2 px-3 py-1.5 rounded-md bg-white/[0.04] text-muted-foreground transition-all duration-200 ease-out hover:text-foreground hover:bg-white/[0.08]"
             tabIndex={isHovered ? 0 : -1}
           >
             <span>More Info</span>

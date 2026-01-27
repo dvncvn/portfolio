@@ -25,7 +25,7 @@ const jacquard24 = Jacquard_24({
 });
 
 export const metadata: Metadata = {
-  title: "Simon Duncan | Portfolio",
+  title: "Simon Duncan",
   description: "Staff product designer portfolio.",
   icons: {
     icon: "/assets/favi.svg",

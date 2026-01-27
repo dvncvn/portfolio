@@ -1,9 +1,16 @@
 import { Suspense } from "react";
+import type { Metadata } from "next";
 import { IntroBlock } from "@/components/intro-block";
 import { WorkCard } from "@/components/work-card";
 import { BlurFade } from "@/components/ui/blur-fade";
 import { WorkSectionHeader } from "@/components/work-section-header";
+import { HomePageClient } from "@/components/home-page-client";
 import { getWorkProject } from "@/content/work";
+import { getVisitor } from "@/content/visitors";
+
+export const metadata: Metadata = {
+  title: "Work | Simon Duncan",
+};
 
 type HomeProjectCard = {
   slug: string;
@@ -66,7 +73,15 @@ const projects: HomeProjectCard[] = [
   },
 ];
 
-export default async function Home() {
+type HomePageProps = {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+};
+
+export default async function Home({ searchParams }: HomePageProps) {
+  const params = await searchParams;
+  const visitorParam = typeof params.visitor === "string" ? params.visitor : undefined;
+  const visitor = getVisitor(visitorParam);
+
   const delayBySlug: Record<string, number> = {
     "langflow-platform-redesign": 0.12,
     "astra-db": 0.18,
@@ -82,71 +97,73 @@ export default async function Home() {
   const validProjects = fullProjects.filter((p): p is NonNullable<typeof p> => p !== null);
 
   return (
-    <div className="py-20">
-      {/* Hero section */}
-      <section className="grid gap-16 lg:gap-24">
-        <IntroBlock animate={false} />
-      </section>
+    <HomePageClient visitor={visitor}>
+      <div className="py-20">
+        {/* Hero section */}
+        <section className="grid gap-16 lg:gap-24">
+          <IntroBlock animate={false} />
+        </section>
 
-      {/* Work section */}
-      <section className="work-section mt-32">
-        <Suspense fallback={
-          <div className="mb-8 flex items-baseline justify-between">
-            <h2 className="text-[14px] font-medium uppercase tracking-wide text-[#7D7D7D]">Work</h2>
-          </div>
-        }>
-          <WorkSectionHeader projects={validProjects} />
-        </Suspense>
+        {/* Work section */}
+        <section className="work-section mt-32">
+          <Suspense fallback={
+            <div className="mb-8 flex items-baseline justify-between">
+              <h2 className="text-[14px] font-medium uppercase tracking-wide text-[#7D7D7D]">Work</h2>
+            </div>
+          }>
+            <WorkSectionHeader projects={validProjects} />
+          </Suspense>
 
-        <div className="work-grid flex flex-row gap-8 max-[900px]:flex-col max-[900px]:gap-6">
-          <div className="flex flex-1 flex-col gap-6 max-[900px]:flex-none">
-            {/* Left column */}
-            {[projects[0], projects[1]].map((project) => (
-              <BlurFade
-                key={project.slug}
-                delay={delayBySlug[project.slug] ?? 0}
-                className="work-grid-item"
-              >
-                <WorkCard
-                  slug={project.slug}
-                  title={project.title}
-                  date={project.date}
-                  tall={project.tall}
-                  imageSrc={project.imageSrc}
-                  hoverImageSrc={project.hoverImageSrc}
-                  svgAccent={project.svgAccent}
-                  svgPadding={project.svgPadding}
-                  vignette={project.vignette}
-                  dotGrid={project.dotGrid}
-                />
-              </BlurFade>
-            ))}
+          <div className="work-grid flex flex-row gap-8 max-[900px]:flex-col max-[900px]:gap-6">
+            <div className="flex flex-1 flex-col gap-6 max-[900px]:flex-none">
+              {/* Left column */}
+              {[projects[0], projects[1]].map((project) => (
+                <BlurFade
+                  key={project.slug}
+                  delay={delayBySlug[project.slug] ?? 0}
+                  className="work-grid-item"
+                >
+                  <WorkCard
+                    slug={project.slug}
+                    title={project.title}
+                    date={project.date}
+                    tall={project.tall}
+                    imageSrc={project.imageSrc}
+                    hoverImageSrc={project.hoverImageSrc}
+                    svgAccent={project.svgAccent}
+                    svgPadding={project.svgPadding}
+                    vignette={project.vignette}
+                    dotGrid={project.dotGrid}
+                  />
+                </BlurFade>
+              ))}
+            </div>
+            <div className="flex flex-1 flex-col gap-6 max-[900px]:flex-none">
+              {/* Right column */}
+              {[projects[2], projects[3]].map((project) => (
+                <BlurFade
+                  key={project.slug}
+                  delay={delayBySlug[project.slug] ?? 0}
+                  className="work-grid-item"
+                >
+                  <WorkCard
+                    slug={project.slug}
+                    title={project.title}
+                    date={project.date}
+                    tall={project.tall}
+                    imageSrc={project.imageSrc}
+                    hoverImageSrc={project.hoverImageSrc}
+                    svgAccent={project.svgAccent}
+                    svgPadding={project.svgPadding}
+                    vignette={project.vignette}
+                    dotGrid={project.dotGrid}
+                  />
+                </BlurFade>
+              ))}
+            </div>
           </div>
-          <div className="flex flex-1 flex-col gap-6 max-[900px]:flex-none">
-            {/* Right column */}
-            {[projects[2], projects[3]].map((project) => (
-              <BlurFade
-                key={project.slug}
-                delay={delayBySlug[project.slug] ?? 0}
-                className="work-grid-item"
-              >
-                <WorkCard
-                  slug={project.slug}
-                  title={project.title}
-                  date={project.date}
-                  tall={project.tall}
-                  imageSrc={project.imageSrc}
-                  hoverImageSrc={project.hoverImageSrc}
-                  svgAccent={project.svgAccent}
-                  svgPadding={project.svgPadding}
-                  vignette={project.vignette}
-                  dotGrid={project.dotGrid}
-                />
-              </BlurFade>
-            ))}
-          </div>
-        </div>
-      </section>
-    </div>
+        </section>
+      </div>
+    </HomePageClient>
   );
 }

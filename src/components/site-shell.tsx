@@ -23,7 +23,7 @@ const navLinks = [
 
 const footerLinks = [
   { label: "GitHub", href: "https://github.com/dvncvn" },
-  { label: "LinkedIn", href: "https://linkedin.com/in/simonduncan" },
+  { label: "LinkedIn", href: "https://www.linkedin.com/in/simonfraserduncan" },
 ];
 
 const EMAIL = "hello@simonduncan.com";

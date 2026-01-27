@@ -327,9 +327,9 @@ function SiteShellContent({ children }: SiteShellProps) {
 
       <footer className="mt-20">
         <div className="w-full px-6">
-          <div className="mx-auto flex w-full max-w-[1400px] items-center justify-between gap-4 py-8 text-sm text-muted-foreground">
+          <div className="mx-auto flex w-full max-w-[1400px] flex-col gap-4 py-8 text-sm text-muted-foreground min-[480px]:flex-row min-[480px]:items-center min-[480px]:justify-between">
             <span className="font-mono text-[#464646]">Made in Madison WI</span>
-            <div className="flex flex-wrap items-center gap-6">
+            <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
               {footerLinks.map((link) => (
                 <Link
                   key={link.label}
@@ -359,10 +359,10 @@ function SiteShellContent({ children }: SiteShellProps) {
               >
                 {emailCopied ? "Copied" : "Email"}
               </a>
-              {/* Command Palette Trigger */}
+              {/* Command Palette Trigger - hidden on very small screens */}
               <button
                 onClick={() => setCommandPaletteOpen(true)}
-                className={`flex h-7 w-7 cursor-pointer items-center justify-center rounded-lg border border-white/[0.06] bg-white/[0.02] font-mono text-[13px] text-white/20 transition-all hover:border-white/10 hover:bg-white/[0.04] hover:text-white/40 ${
+                className={`hidden h-7 w-7 cursor-pointer items-center justify-center rounded-lg border border-white/[0.06] bg-white/[0.02] font-mono text-[13px] text-white/20 transition-all hover:border-white/10 hover:bg-white/[0.04] hover:text-white/40 sm:flex ${
                   commandPaletteOpen || isResumeOpen ? "invisible" : ""
                 }`}
                 aria-label="Open navigator (press /)"

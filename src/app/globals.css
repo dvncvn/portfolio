@@ -133,6 +133,17 @@ html {
   opacity: 1;
 }
 
+/* Work card vignette - tighter on mobile to hide clipped edges */
+.work-card-vignette {
+  background: radial-gradient(ellipse 50% 45% at center, transparent 30%, #0B0A09 85%);
+}
+
+@media (min-width: 640px) {
+  .work-card-vignette {
+    background: radial-gradient(ellipse 62% 55% at center, transparent 45%, #0B0A09 95%);
+  }
+}
+
 /* Bento section hover states */
 .bento-card {
   contain: content;

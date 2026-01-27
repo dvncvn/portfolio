@@ -19,6 +19,8 @@ type HomeProjectCard = {
   tall: boolean;
   imageSrc: string;
   hoverImageSrc?: string;
+  mobileImageSrc?: string;
+  mobileHoverImageSrc?: string;
   svgPadding?: string;
   vignette?: boolean;
   dotGrid?: boolean;
@@ -36,40 +38,41 @@ const projects: HomeProjectCard[] = [
   {
     slug: "langflow-platform-redesign",
     title: "Langflow: Platform Redesign",
-    date: "Nov 2024",
+    date: "Aug 24 – Oct 25",
     tall: true,
     imageSrc: "/assets/work/langflow-platform-redesign/lf-art_ neutral.svg",
     hoverImageSrc: "/assets/work/langflow-platform-redesign/lf-art_hover.svg",
-    svgPadding: "p-6 sm:p-10 md:p-14",
+    svgPadding: "p-4 sm:p-6 md:p-10",
   },
   {
     slug: "astra-db",
     title: "Astra: AI-First Database Design",
-    date: "Aug 2023 – Jan 2024",
+    date: "Aug 23 – Jan 24",
     tall: false,
     imageSrc: "/assets/work/astra-db/astra-art_neutral.svg",
     hoverImageSrc: "/assets/work/astra-db/astra-art_hover.svg",
-    svgPadding: "p-6 sm:p-10 md:p-14",
+    svgPadding: "p-4 sm:p-6 md:p-10",
   },
   {
     slug: "context-forge",
     title: "Context Forge: Reimagined",
-    date: "Dec 2025",
+    date: "Dec 25",
     tall: false,
     imageSrc: "/assets/work/context-forge/cf-art_neutral.svg",
     hoverImageSrc: "/assets/work/context-forge/cf-art_hover.svg",
-    svgPadding: "p-6 sm:p-10 md:p-14",
+    mobileImageSrc: "/assets/work/context-forge/mobile-cf-art_neutral.svg",
+    mobileHoverImageSrc: "/assets/work/context-forge/mobile-cf-art_hover.svg",
+    svgPadding: "p-4 sm:p-6 md:p-10",
     vignette: true,
   },
   {
     slug: "langflow-agent-experience",
     title: "Langflow: Agent Experience",
-    date: "Nov 2024 – Sep 2025",
+    date: "Nov 24 – Sep 25",
     tall: true,
     imageSrc: "/assets/work/langflow-agent-experience/agent-art-neutral.svg",
     hoverImageSrc: "/assets/work/langflow-agent-experience/agent-art-hover.svg",
     svgPadding: "p-6 sm:p-10 md:p-14",
-    dotGrid: true,
   },
 ];
 
@@ -130,6 +133,8 @@ export default async function Home({ searchParams }: HomePageProps) {
                     tall={project.tall}
                     imageSrc={project.imageSrc}
                     hoverImageSrc={project.hoverImageSrc}
+                    mobileImageSrc={project.mobileImageSrc}
+                    mobileHoverImageSrc={project.mobileHoverImageSrc}
                     svgAccent={project.svgAccent}
                     svgPadding={project.svgPadding}
                     vignette={project.vignette}
@@ -153,6 +158,8 @@ export default async function Home({ searchParams }: HomePageProps) {
                     tall={project.tall}
                     imageSrc={project.imageSrc}
                     hoverImageSrc={project.hoverImageSrc}
+                    mobileImageSrc={project.mobileImageSrc}
+                    mobileHoverImageSrc={project.mobileHoverImageSrc}
                     svgAccent={project.svgAccent}
                     svgPadding={project.svgPadding}
                     vignette={project.vignette}

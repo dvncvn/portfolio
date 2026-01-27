@@ -53,7 +53,7 @@ export default async function WorkProjectPage({
 
   return (
     <div className="py-20">
-      <div className="mx-auto w-full max-w-[1400px] space-y-24 px-6">
+      <div className="space-y-24">
         <ProjectHero
           title={project.title}
           heroAsset={project.heroAsset}

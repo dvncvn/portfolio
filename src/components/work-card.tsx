@@ -30,6 +30,8 @@ type WorkCardProps = {
   tall?: boolean;
   imageSrc?: string;
   hoverImageSrc?: string;
+  mobileImageSrc?: string;
+  mobileHoverImageSrc?: string;
   svgAccent?: SvgAccentConfig;
   svgPadding?: string;
   vignette?: boolean;
@@ -43,6 +45,8 @@ export function WorkCard({
   tall = false,
   imageSrc,
   hoverImageSrc,
+  mobileImageSrc,
+  mobileHoverImageSrc,
   svgAccent,
   svgPadding,
   vignette,
@@ -144,12 +148,12 @@ export function WorkCard({
         }}
       />
 
-      {/* Card content - responsive heights */}
+      {/* Card content - responsive heights (1:1 on mobile single-column, varied on desktop) */}
       <div
         className={`relative p-2 ${
           tall
-            ? "aspect-[4/3] md:aspect-[1/1]"
-            : "aspect-[4/3] md:aspect-[684/401]"
+            ? "aspect-[1/1]"
+            : "aspect-[1/1] min-[900px]:aspect-[684/401]"
         }`}
       >
         <div className="flex h-full flex-col">
@@ -180,13 +184,51 @@ export function WorkCard({
               />
             ) : imageSrc ? (
               <div className="absolute inset-0">
-                {/* Base art - stays visible, hover art layers on top */}
+                {/* Mobile-specific art (if provided) - visible when grid is single column (< 900px) */}
+                {mobileImageSrc ? (
+                  <>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={mobileImageSrc}
+                      alt={title}
+                      className={[
+                        "absolute inset-0 h-full w-full object-contain opacity-[0.92] min-[900px]:hidden",
+                        mobileImageSrc.endsWith(".svg")
+                          ? (svgPadding ?? "p-8 sm:p-10 md:p-12")
+                          : "p-6 sm:p-8",
+                      ].join(" ")}
+                      loading="lazy"
+                      draggable={false}
+                    />
+                    {/* Mobile hover art */}
+                    {(mobileHoverImageSrc || hoverImageSrc) ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={mobileHoverImageSrc || hoverImageSrc}
+                        alt=""
+                        aria-hidden="true"
+                        className={[
+                          "absolute inset-0 h-full w-full object-contain min-[900px]:hidden",
+                          "transition-opacity duration-500 ease-out",
+                          isHovered ? "opacity-100" : "opacity-0",
+                          (mobileHoverImageSrc || hoverImageSrc || "").endsWith(".svg")
+                            ? (svgPadding ?? "p-8 sm:p-10 md:p-12")
+                            : "p-6 sm:p-8",
+                        ].join(" ")}
+                        draggable={false}
+                      />
+                    ) : null}
+                  </>
+                ) : null}
+
+                {/* Desktop art - hidden when grid is single column if mobile version exists */}
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={imageSrc}
                   alt={title}
                   className={[
                     "absolute inset-0 h-full w-full object-contain opacity-[0.92]",
+                    mobileImageSrc ? "hidden min-[900px]:block" : "",
                     imageSrc.endsWith(".svg")
                       ? (svgPadding ?? "p-8 sm:p-10 md:p-12")
                       : "p-6 sm:p-8",
@@ -195,7 +237,7 @@ export function WorkCard({
                   draggable={false}
                 />
 
-                {/* Hover art - fades in on top of base to avoid brightness dip */}
+                {/* Desktop hover art - hidden when grid is single column if mobile version exists */}
                 {hoverImageSrc ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
@@ -206,6 +248,7 @@ export function WorkCard({
                       "absolute inset-0 h-full w-full object-contain",
                       "transition-opacity duration-500 ease-out",
                       isHovered ? "opacity-100" : "opacity-0",
+                      mobileImageSrc ? "hidden min-[900px]:block" : "",
                       hoverImageSrc.endsWith(".svg")
                         ? (svgPadding ?? "p-8 sm:p-10 md:p-12")
                         : "p-6 sm:p-8",
@@ -214,13 +257,13 @@ export function WorkCard({
                   />
                 ) : null}
 
-                {/* Vignette overlay - fades edges to background */}
+                {/* Vignette overlay - fades edges to background, tighter on mobile */}
                 {vignette ? (
                   <div
-                    className="pointer-events-none absolute inset-0 z-10"
+                    className="work-card-vignette pointer-events-none absolute inset-0 z-10"
                     style={{
                       background:
-                        "radial-gradient(ellipse 62% 55% at center, transparent 45%, #0B0A09 95%)",
+                        "radial-gradient(ellipse 50% 45% at center, transparent 30%, #0B0A09 85%)",
                     }}
                   />
                 ) : null}
@@ -232,7 +275,7 @@ export function WorkCard({
           <div className="flex items-baseline justify-between gap-6 px-6 pb-3 pt-5">
             <h3
               className={[
-                "text-[16px] font-medium transition-colors duration-200",
+                "text-[14px] sm:text-[16px] font-medium transition-colors duration-200",
                 isHovered ? "text-foreground" : "text-[#A3A3A3]",
               ].join(" ")}
             >
@@ -240,7 +283,7 @@ export function WorkCard({
             </h3>
             <span
               className={[
-                "font-mono text-[16px] transition-colors duration-200",
+                "font-mono text-[14px] sm:text-[16px] transition-colors duration-200",
                 isHovered ? "text-[#7D7D7D]" : "text-[#464646]",
               ].join(" ")}
             >

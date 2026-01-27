@@ -18,7 +18,7 @@ export function ProjectNavigator({ nextProject }: ProjectNavigatorProps) {
       transition={{ duration: 0.35, delay: 0.2 }}
       className="py-24"
     >
-      <div className="mx-auto flex max-w-[768px] items-center justify-between">
+      <div className="mx-auto flex max-w-[768px] flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <Link
           href="/"
           className="group flex items-center gap-2 text-[16px] text-[#737373] transition-colors hover:text-foreground"

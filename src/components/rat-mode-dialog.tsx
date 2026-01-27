@@ -9,6 +9,76 @@ type RatModeDialogProps = {
   onConfirm: () => void;
 };
 
+type EmojiDrop = {
+  id: number;
+  x: number;
+  delay: number;
+  duration: number;
+  size: number;
+};
+
+// Generate drops outside component to avoid Math.random during render
+function generateDrops(): EmojiDrop[] {
+  const items: EmojiDrop[] = [];
+  for (let i = 0; i < 30; i++) {
+    items.push({
+      id: i,
+      x: Math.random() * 100,
+      delay: Math.random() * 3,
+      duration: 2 + Math.random() * 3,
+      size: 14 + Math.random() * 14,
+    });
+  }
+  return items;
+}
+
+function EmojiRain() {
+  const [drops] = useState<EmojiDrop[]>(generateDrops);
+
+  return (
+    <div className="pointer-events-none fixed inset-0 z-50 overflow-hidden">
+      {drops.map((drop) => (
+        <motion.div
+          key={drop.id}
+          className="absolute"
+          style={{
+            left: `${drop.x}%`,
+            fontSize: drop.size,
+            top: -40,
+          }}
+          animate={{
+            y: ["0vh", "110vh"],
+          }}
+          transition={{
+            duration: drop.duration,
+            delay: drop.delay,
+            repeat: Infinity,
+            ease: "linear",
+          }}
+        >
+          🐀
+        </motion.div>
+      ))}
+    </div>
+  );
+}
+
+// Rainbow animated text component
+function RainbowText({ children }: { children: React.ReactNode }) {
+  return (
+    <span
+      className="bg-clip-text text-transparent"
+      style={{
+        backgroundImage: "linear-gradient(90deg, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #9400d3, #ff0000)",
+        backgroundSize: "200% 100%",
+        animation: "rainbow-shift 3s linear infinite",
+      }}
+    >
+      {children}
+    </span>
+  );
+}
+
 export function RatModeDialog({ isOpen, onClose, onConfirm }: RatModeDialogProps) {
   const [selectedIndex, setSelectedIndex] = useState(1); // 0 = Cancel, 1 = Enter
   const cancelRef = useRef<HTMLButtonElement>(null);
@@ -71,85 +141,89 @@ export function RatModeDialog({ isOpen, onClose, onConfirm }: RatModeDialogProps
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.15 }}
-            className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm"
+            className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm"
             onClick={onClose}
             aria-hidden="true"
           />
 
+          {/* Emoji rain across the whole screen */}
+          <EmojiRain />
+
           {/* Dialog */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.95 }}
-            transition={{ duration: 0.15, ease: [0.25, 0.1, 0.25, 1] }}
-            className="fixed left-1/2 top-1/2 z-50 w-[360px] -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-xl border border-white/10 bg-[#151413]/95 shadow-2xl backdrop-blur-xl"
+            initial={{ opacity: 0, scale: 0.9, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.9, y: 20 }}
+            transition={{ duration: 0.2, ease: [0.25, 0.1, 0.25, 1] }}
+            className="fixed left-1/2 top-1/2 z-[51] w-[400px] -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-xl border border-white/10 bg-background shadow-2xl"
             role="dialog"
             aria-modal="true"
             aria-labelledby="rat-mode-title"
           >
+
             {/* Content */}
-            <div className="p-6">
-              <h2
-                id="rat-mode-title"
-                className="font-mono text-[14px] font-medium uppercase tracking-wider text-foreground"
-              >
-                🐀 Enter Rat Mode?
-              </h2>
-              <p className="mt-3 text-[14px] leading-relaxed text-muted-foreground">
-                Proceed with caution.
-              </p>
+            <div className="relative z-10 p-8">
+              <div className="space-y-4">
+                <h2
+                  id="rat-mode-title"
+                  className="text-[32px] text-foreground"
+                  style={{ fontFamily: "var(--font-jacquard-24)" }}
+                >
+                  Enter <RainbowText>Rat Mode</RainbowText>?
+                </h2>
+                <p className="text-[16px] leading-relaxed text-muted-foreground">
+                  Proceed with <span className="text-foreground">caution</span>. There is no going back.
+                </p>
+                <p className="text-[13px] text-muted-foreground/60">
+                  (Just kidding. Press ESC to exit anytime.)
+                </p>
+              </div>
             </div>
 
             {/* Actions */}
-            <div className="flex items-center justify-end gap-3 border-t border-white/5 px-4 py-3">
+            <div className="relative z-10 flex items-center justify-end gap-3 border-t border-white/10 bg-black/20 px-6 py-4">
               <button
                 ref={cancelRef}
                 onClick={onClose}
                 onMouseEnter={() => setSelectedIndex(0)}
-                className={`rounded-lg px-4 py-2 font-mono text-[12px] transition-colors ${
+                className={`rounded-lg px-5 py-2.5 text-[14px] font-medium transition-all ${
                   selectedIndex === 0
-                    ? "bg-white/10 text-foreground ring-1 ring-white/20"
-                    : "text-muted-foreground hover:bg-white/5 hover:text-foreground"
+                    ? "bg-white/15 text-foreground ring-1 ring-white/30"
+                    : "text-muted-foreground hover:bg-white/10 hover:text-foreground"
                 }`}
               >
-                Cancel
+                Flee 🏃
               </button>
               <button
                 ref={enterRef}
                 onClick={onConfirm}
                 onMouseEnter={() => setSelectedIndex(1)}
-                className={`rounded-lg px-4 py-2 font-mono text-[12px] transition-colors ${
+                className={`rounded-lg px-5 py-2.5 text-[14px] font-medium transition-all ${
                   selectedIndex === 1
-                    ? "bg-white/20 text-foreground ring-1 ring-white/30"
-                    : "bg-white/10 text-foreground hover:bg-white/20"
+                    ? "bg-white/25 text-foreground ring-1 ring-white/40"
+                    : "bg-white/15 text-foreground hover:bg-white/25"
                 }`}
               >
-                Enter
+                Enter 🐀
               </button>
             </div>
 
             {/* Keyboard hints */}
-            <div className="flex items-center gap-4 border-t border-white/5 px-4 py-2.5">
+            <div className="relative z-10 flex items-center gap-4 border-t border-white/5 bg-black/30 px-6 py-3">
               <div className="flex items-center gap-1.5">
-                <kbd className="rounded border border-white/10 bg-white/5 px-1 py-0.5 font-mono text-[10px] text-muted-foreground">
+                <kbd className="rounded border border-white/10 bg-white/5 px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground">
                   ←
                 </kbd>
-                <kbd className="rounded border border-white/10 bg-white/5 px-1 py-0.5 font-mono text-[10px] text-muted-foreground">
+                <kbd className="rounded border border-white/10 bg-white/5 px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground">
                   →
                 </kbd>
-                <span className="font-mono text-[10px] text-[#5a5a5a]">navigate</span>
+                <span className="font-mono text-[10px] text-muted-foreground/60">navigate</span>
               </div>
               <div className="flex items-center gap-1.5">
                 <kbd className="rounded border border-white/10 bg-white/5 px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground">
                   ↵
                 </kbd>
-                <span className="font-mono text-[10px] text-[#5a5a5a]">select</span>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <kbd className="rounded border border-white/10 bg-white/5 px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground">
-                  ESC
-                </kbd>
-                <span className="font-mono text-[10px] text-[#5a5a5a]">close</span>
+                <span className="font-mono text-[10px] text-muted-foreground/60">select</span>
               </div>
             </div>
           </motion.div>

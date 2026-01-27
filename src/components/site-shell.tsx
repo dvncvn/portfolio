@@ -174,7 +174,62 @@ function SiteShellContent({ children }: SiteShellProps) {
     };
   }, [ratModeActive]);
 
-  // 🐀 RAT MODE MUSIC - chaotic chiptune generator
+  // 🐀 RAT MODE CLICK SOUND
+  useEffect(() => {
+    if (!ratModeActive) return;
+
+    let audioContext: AudioContext | null = null;
+
+    const playClick = () => {
+      if (!audioContext) {
+        audioContext = new AudioContext();
+      }
+
+      // Create a short "squeak" click
+      const osc = audioContext.createOscillator();
+      const osc2 = audioContext.createOscillator();
+      const gain = audioContext.createGain();
+
+      // Random high-pitched squeak
+      const baseFreq = 800 + Math.random() * 1200;
+      osc.type = "square";
+      osc.frequency.value = baseFreq;
+      osc2.type = "triangle";
+      osc2.frequency.value = baseFreq * 1.5;
+
+      osc.connect(gain);
+      osc2.connect(gain);
+      gain.connect(audioContext.destination);
+
+      const now = audioContext.currentTime;
+      gain.gain.setValueAtTime(0.15, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+
+      // Pitch bend up for squeak effect
+      osc.frequency.exponentialRampToValueAtTime(baseFreq * 2, now + 0.05);
+      osc2.frequency.exponentialRampToValueAtTime(baseFreq * 3, now + 0.05);
+
+      osc.start(now);
+      osc2.start(now);
+      osc.stop(now + 0.08);
+      osc2.stop(now + 0.08);
+    };
+
+    const handleClick = () => {
+      playClick();
+    };
+
+    document.addEventListener("click", handleClick);
+
+    return () => {
+      document.removeEventListener("click", handleClick);
+      if (audioContext) {
+        audioContext.close();
+      }
+    };
+  }, [ratModeActive]);
+
+  // 🐀 RAT MODE MUSIC - MAXIMUM CHAOS EDITION
   useEffect(() => {
     if (!ratModeActive) return;
 
@@ -184,63 +239,149 @@ function SiteShellContent({ children }: SiteShellProps) {
     const startMusic = () => {
       audioContext = new AudioContext();
       const masterGain = audioContext.createGain();
-      masterGain.gain.value = 0.15;
+      masterGain.gain.value = 0.12;
       masterGain.connect(audioContext.destination);
 
-      // Chaotic arpeggio notes (pentatonic for less dissonance but still chaotic)
-      const notes = [261.63, 293.66, 329.63, 392.00, 440.00, 523.25, 587.33, 659.25];
+      // Chaotic chromatic notes - embrace the dissonance
+      const notes = [
+        130.81, 146.83, 164.81, 174.61, 196.00, 220.00, 246.94, // Low octave
+        261.63, 293.66, 311.13, 349.23, 392.00, 440.00, 493.88, // Mid octave
+        523.25, 587.33, 622.25, 698.46, 783.99, 880.00, 987.77, // High octave
+      ];
       
+      // Main chaotic melody voice
       const playNote = () => {
         if (!audioContext || !isPlaying) return;
 
         const osc = audioContext.createOscillator();
         const noteGain = audioContext.createGain();
         
-        // Random waveform for variety
-        const waveforms: OscillatorType[] = ["square", "sawtooth", "triangle"];
+        const waveforms: OscillatorType[] = ["square", "sawtooth", "triangle", "square"];
         osc.type = waveforms[Math.floor(Math.random() * waveforms.length)];
         
-        // Random note from our scale, sometimes octave up
         const baseNote = notes[Math.floor(Math.random() * notes.length)];
-        osc.frequency.value = Math.random() > 0.7 ? baseNote * 2 : baseNote;
+        const octaveShift = Math.random() > 0.6 ? (Math.random() > 0.5 ? 2 : 0.5) : 1;
+        osc.frequency.value = baseNote * octaveShift;
+        osc.detune.value = (Math.random() - 0.5) * 50; // Random detune for chaos
         
         osc.connect(noteGain);
         noteGain.connect(masterGain);
         
-        // Quick attack/decay envelope
         const now = audioContext.currentTime;
-        noteGain.gain.setValueAtTime(0.3, now);
-        noteGain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
+        const duration = 0.05 + Math.random() * 0.15;
+        noteGain.gain.setValueAtTime(0.25 + Math.random() * 0.15, now);
+        noteGain.gain.exponentialRampToValueAtTime(0.01, now + duration);
+        
+        // Random pitch slide for extra chaos
+        if (Math.random() > 0.7) {
+          const targetNote = notes[Math.floor(Math.random() * notes.length)];
+          osc.frequency.exponentialRampToValueAtTime(targetNote, now + duration * 0.8);
+        }
         
         osc.start(now);
-        osc.stop(now + 0.15);
+        osc.stop(now + duration);
 
-        // Random tempo between 80-200ms for chaos
-        const nextTime = 80 + Math.random() * 120;
+        // Very erratic timing - sometimes rapid fire bursts
+        const nextTime = Math.random() > 0.85 ? 30 + Math.random() * 40 : 60 + Math.random() * 140;
         setTimeout(playNote, nextTime);
       };
 
-      // Start the chaos
-      playNote();
+      // Second chaotic voice - offset timing
+      const playNote2 = () => {
+        if (!audioContext || !isPlaying) return;
 
-      // Add a bass drone for extra ridiculousness
+        const osc = audioContext.createOscillator();
+        const noteGain = audioContext.createGain();
+        
+        osc.type = Math.random() > 0.5 ? "square" : "sawtooth";
+        const baseNote = notes[Math.floor(Math.random() * notes.length)];
+        osc.frequency.value = baseNote * (Math.random() > 0.5 ? 1.5 : 0.75);
+        osc.detune.value = (Math.random() - 0.5) * 80;
+        
+        osc.connect(noteGain);
+        noteGain.connect(masterGain);
+        
+        const now = audioContext.currentTime;
+        noteGain.gain.setValueAtTime(0.15, now);
+        noteGain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+        
+        osc.start(now);
+        osc.stop(now + 0.1);
+
+        setTimeout(playNote2, 100 + Math.random() * 200);
+      };
+
+      // Noise burst generator
+      const playNoise = () => {
+        if (!audioContext || !isPlaying) return;
+
+        const bufferSize = audioContext.sampleRate * 0.05;
+        const buffer = audioContext.createBuffer(1, bufferSize, audioContext.sampleRate);
+        const data = buffer.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) {
+          data[i] = (Math.random() * 2 - 1) * 0.5;
+        }
+
+        const noise = audioContext.createBufferSource();
+        const noiseGain = audioContext.createGain();
+        noise.buffer = buffer;
+        noise.connect(noiseGain);
+        noiseGain.connect(masterGain);
+
+        const now = audioContext.currentTime;
+        noiseGain.gain.setValueAtTime(0.08, now);
+        noiseGain.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
+
+        noise.start(now);
+
+        // Random noise bursts
+        setTimeout(playNoise, 200 + Math.random() * 800);
+      };
+
+      // Start all the chaos
+      playNote();
+      setTimeout(playNote2, 50);
+      setTimeout(playNoise, 100);
+
+      // Wobbly bass drone
       const bassOsc = audioContext.createOscillator();
       const bassGain = audioContext.createGain();
       bassOsc.type = "sawtooth";
-      bassOsc.frequency.value = 65.41; // Low C
-      bassGain.gain.value = 0.08;
+      bassOsc.frequency.value = 55; // Low A
+      bassGain.gain.value = 0.06;
       bassOsc.connect(bassGain);
       bassGain.connect(masterGain);
       bassOsc.start();
 
-      // Wobble the bass
+      // Aggressive bass wobble
       const lfo = audioContext.createOscillator();
       const lfoGain = audioContext.createGain();
-      lfo.frequency.value = 5;
-      lfoGain.gain.value = 10;
+      lfo.frequency.value = 8;
+      lfoGain.gain.value = 15;
       lfo.connect(lfoGain);
       lfoGain.connect(bassOsc.frequency);
       lfo.start();
+
+      // Second bass for thickness (detuned)
+      const bassOsc2 = audioContext.createOscillator();
+      const bassGain2 = audioContext.createGain();
+      bassOsc2.type = "square";
+      bassOsc2.frequency.value = 55.5;
+      bassGain2.gain.value = 0.04;
+      bassOsc2.connect(bassGain2);
+      bassGain2.connect(masterGain);
+      bassOsc2.start();
+
+      // Random bass note jumps
+      const jumpBass = () => {
+        if (!audioContext || !isPlaying) return;
+        const bassNotes = [55, 65.41, 73.42, 82.41, 98];
+        const newNote = bassNotes[Math.floor(Math.random() * bassNotes.length)];
+        bassOsc.frequency.value = newNote;
+        bassOsc2.frequency.value = newNote + 0.5;
+        setTimeout(jumpBass, 500 + Math.random() * 1000);
+      };
+      setTimeout(jumpBass, 500);
     };
 
     startMusic();

@@ -25,11 +25,11 @@ export function GithubStarsChart({
   const isInView = useInView(containerRef, { once: true, margin: "-100px" });
   const [isHovered, setIsHovered] = useState(false);
 
-  // Chart dimensions - 768px max width, annotation outside
+  // Chart dimensions - simplified, labels outside SVG
   const width = 768;
-  const height = 520;
-  const paddingTop = 80;
-  const paddingBottom = 50;
+  const height = 400;
+  const paddingTop = 20;
+  const paddingBottom = 20;
   const chartHeight = height - paddingTop - paddingBottom;
 
   // Scale y values - bottom is high y, top is low y in SVG
@@ -60,10 +60,23 @@ export function GithubStarsChart({
   return (
     <div ref={containerRef} className="relative w-full">
       <div className="mx-auto max-w-[768px]">
+        {/* "Design work begins" label - outside SVG, fixed size */}
+        <motion.div
+          className="text-center mb-4"
+          initial={{ opacity: 0 }}
+          animate={isInView ? { opacity: 1 } : { opacity: 0 }}
+          transition={{ duration: 0.4, delay: 1.8 }}
+        >
+          <span className="text-[14px] text-[#464646]">Design work begins</span>
+          <div className="mx-auto w-px h-4 bg-[#464646] opacity-50 mt-1" style={{ backgroundImage: 'linear-gradient(to bottom, #464646 50%, transparent 50%)', backgroundSize: '1px 6px' }} />
+        </motion.div>
+
+        {/* SVG Chart - just the lines and dots */}
         <svg
           viewBox={`0 0 ${width} ${height}`}
-          className="h-auto"
-          style={{ overflow: "visible", width: "100%", maxWidth: "768px" }}
+          className="h-auto w-full"
+          style={{ overflow: "visible", maxWidth: "768px" }}
+          preserveAspectRatio="xMidYMid meet"
         >
           {/* X-axis line - subtle, full width */}
           <line
@@ -75,12 +88,12 @@ export function GithubStarsChart({
             strokeWidth="1"
           />
 
-          {/* Dotted vertical annotation line at mid point - from axis to top */}
+          {/* Dotted vertical annotation line at mid point */}
           <motion.line
             x1={midX}
-            y1={axisY}
+            y1={0}
             x2={midX}
-            y2={paddingTop - 30}
+            y2={axisY}
             stroke="#464646"
             strokeWidth="1"
             strokeDasharray="1 6"
@@ -90,26 +103,12 @@ export function GithubStarsChart({
             transition={{ duration: 0.6, delay: 1.0, ease: "easeOut" }}
           />
 
-          {/* Design work begins label at top of chart */}
-          <motion.text
-            x={midX}
-            y={paddingTop - 40}
-            textAnchor="middle"
-            className="text-[14px]"
-            fill="#464646"
-            initial={{ opacity: 0 }}
-            animate={isInView ? { opacity: 1 } : { opacity: 0 }}
-            transition={{ duration: 0.4, delay: 1.8 }}
-          >
-            Design work begins
-          </motion.text>
-
           {/* Before line - thinner, grey */}
           <motion.path
             d={pathBefore}
             fill="none"
             stroke="#464646"
-            strokeWidth="1"
+            strokeWidth="2"
             strokeLinecap="round"
             strokeLinejoin="round"
             initial={{ pathLength: 0 }}
@@ -122,7 +121,7 @@ export function GithubStarsChart({
             d={pathAfter}
             fill="none"
             stroke="#E9E9E2"
-            strokeWidth="1.5"
+            strokeWidth="2.5"
             strokeLinecap="round"
             strokeLinejoin="round"
             initial={{ pathLength: 0 }}
@@ -134,10 +133,10 @@ export function GithubStarsChart({
           <motion.circle
             cx={startX}
             cy={startY}
-            r="5"
+            r="6"
             fill="#0B0A09"
             stroke="#737373"
-            strokeWidth="1.5"
+            strokeWidth="2"
             initial={{ opacity: 0, scale: 0 }}
             animate={isInView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0 }}
             transition={{ duration: 0.3, delay: 0.3, ease: "easeOut" }}
@@ -147,63 +146,53 @@ export function GithubStarsChart({
           <motion.circle
             cx={midX}
             cy={midY}
-            r="5"
+            r="6"
             fill="#0B0A09"
             stroke="#E9E9E2"
-            strokeWidth="1.5"
+            strokeWidth="2"
             initial={{ opacity: 0, scale: 0 }}
             animate={isInView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0 }}
             transition={{ duration: 0.3, delay: 1.2, ease: "easeOut" }}
           />
 
+          {/* End point circle */}
+          <motion.circle
+            cx={endX}
+            cy={endY}
+            r="6"
+            fill="#0B0A09"
+            stroke="#E9E9E2"
+            strokeWidth="2"
+            initial={{ opacity: 0, scale: 0 }}
+            animate={isInView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0 }}
+            transition={{ duration: 0.3, delay: 2.4, ease: "easeOut" }}
+          />
+        </svg>
 
-          {/* X-axis labels */}
-          <motion.text
-            x={0}
-            y={axisY + 28}
-            textAnchor="start"
-            className="text-[14px]"
-            fill="#464646"
+        {/* X-axis labels - outside SVG, fixed size */}
+        <div className="flex justify-between items-start mt-3">
+          {/* Start label */}
+          <motion.span
+            className="text-[14px] text-[#464646]"
             initial={{ opacity: 0 }}
             animate={isInView ? { opacity: 1 } : { opacity: 0 }}
             transition={{ duration: 0.4, delay: 0.4 }}
           >
             {startLabel}
-          </motion.text>
+          </motion.span>
 
-          {/* Apr '24 x-axis label */}
-          <motion.text
-            x={midX}
-            y={axisY + 28}
-            textAnchor="middle"
-            className="text-[14px]"
-            fill="#464646"
+          {/* Mid label */}
+          <motion.span
+            className="text-[14px] text-[#464646]"
             initial={{ opacity: 0 }}
             animate={isInView ? { opacity: 1 } : { opacity: 0 }}
             transition={{ duration: 0.4, delay: 1.0 }}
           >
             {midLabel}
-          </motion.text>
+          </motion.span>
 
-          {/* End point circle */}
-          <motion.circle
-            cx={endX}
-            cy={endY}
-            r="5"
-            fill="#0B0A09"
-            stroke="#E9E9E2"
-            strokeWidth="1.5"
-            initial={{ opacity: 0, scale: 0 }}
-            animate={isInView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0 }}
-            transition={{ duration: 0.3, delay: 2.4, ease: "easeOut" }}
-          />
-
-          {/* Today label with star count - high contrast, clickable */}
-          <motion.foreignObject
-            x={width - 180}
-            y={axisY + 10}
-            width="180"
-            height="50"
+          {/* Today label with star count */}
+          <motion.div
             initial={{ opacity: 0 }}
             animate={isInView ? { opacity: 1 } : { opacity: 0 }}
             transition={{ duration: 0.4, delay: 1.0 }}
@@ -255,9 +244,8 @@ export function GithubStarsChart({
                 )}
               </AnimatePresence>
             </a>
-          </motion.foreignObject>
-        </svg>
-
+          </motion.div>
+        </div>
       </div>
     </div>
   );

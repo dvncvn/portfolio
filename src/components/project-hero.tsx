@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { motion, useReducedMotion, useScroll, useTransform, MotionValue } from "framer-motion";
 import { useRef } from "react";
 import { WorkProjectAsset, ParallaxLayer } from "@/content/types";
@@ -91,15 +90,12 @@ export function ProjectHero({
       }}
       className="space-y-0"
     >
-      {/* Breadcrumb */}
-      <nav aria-label="Breadcrumb" className="flex justify-center">
-        <div className="flex items-center gap-2 text-[14px] text-muted-foreground">
-          <Link href="/" className="transition-colors hover:text-foreground">
-            Work
-          </Link>
-          <span className="text-muted-foreground/60">/</span>
+      {/* Project dates */}
+      {meta?.dates ? (
+        <div className="flex justify-center">
+          <span className="text-[14px] text-muted-foreground">{meta.dates}</span>
         </div>
-      </nav>
+      ) : null}
 
       {/* Title */}
       <div className="relative z-10 mx-auto mt-12 max-w-[768px] -mb-16">
@@ -182,12 +178,6 @@ export function ProjectHero({
                 <div className="grid grid-cols-[1fr_1fr] gap-6">
                   <dt className="text-muted-foreground/60">Company</dt>
                   <dd className="text-foreground">{meta.company}</dd>
-                </div>
-              ) : null}
-              {meta.dates ? (
-                <div className="grid grid-cols-[1fr_1fr] gap-6">
-                  <dt className="text-muted-foreground/60">Dates</dt>
-                  <dd className="text-foreground">{meta.dates}</dd>
                 </div>
               ) : null}
               {meta.role ? (

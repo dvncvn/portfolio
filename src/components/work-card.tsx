@@ -41,7 +41,6 @@ type WorkCardProps = {
 export function WorkCard({
   slug,
   title,
-  date,
   tall = false,
   imageSrc,
   hoverImageSrc,
@@ -281,14 +280,6 @@ export function WorkCard({
             >
               {title}
             </h3>
-            <span
-              className={[
-                "font-mono text-[14px] sm:text-[16px] transition-colors duration-200",
-                isHovered ? "text-[#7D7D7D]" : "text-[#464646]",
-              ].join(" ")}
-            >
-              {date}
-            </span>
           </div>
         </div>
       </div>

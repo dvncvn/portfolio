@@ -136,7 +136,6 @@ function generateSlides(projects: WorkProject[], introText: { name: string; bio:
       projectSlug: project.slug,
       content: {
         title: project.title,
-        subtitle: project.meta?.dates || project.timeframe,
         heroImageSrc,
         showDotGrid: isAgentExperience,
         showVignette: isContextForge,

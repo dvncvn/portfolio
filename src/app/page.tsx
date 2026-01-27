@@ -38,7 +38,6 @@ const projects: HomeProjectCard[] = [
   {
     slug: "langflow-platform-redesign",
     title: "Langflow: Platform Redesign",
-    date: "Aug 24 – Oct 25",
     tall: true,
     imageSrc: "/assets/work/langflow-platform-redesign/lf-art_ neutral.svg",
     hoverImageSrc: "/assets/work/langflow-platform-redesign/lf-art_hover.svg",
@@ -56,7 +55,6 @@ const projects: HomeProjectCard[] = [
   {
     slug: "context-forge",
     title: "Context Forge: Reimagined",
-    date: "Dec 25",
     tall: false,
     imageSrc: "/assets/work/context-forge/cf-art_neutral.svg",
     hoverImageSrc: "/assets/work/context-forge/cf-art_hover.svg",
@@ -68,7 +66,6 @@ const projects: HomeProjectCard[] = [
   {
     slug: "langflow-agent-experience",
     title: "Langflow: Agent Experience",
-    date: "Nov 24 – Sep 25",
     tall: true,
     imageSrc: "/assets/work/langflow-agent-experience/agent-art-neutral.svg",
     hoverImageSrc: "/assets/work/langflow-agent-experience/agent-art-hover.svg",
@@ -129,7 +126,6 @@ export default async function Home({ searchParams }: HomePageProps) {
                   <WorkCard
                     slug={project.slug}
                     title={project.title}
-                    date={project.date}
                     tall={project.tall}
                     imageSrc={project.imageSrc}
                     hoverImageSrc={project.hoverImageSrc}
@@ -154,7 +150,6 @@ export default async function Home({ searchParams }: HomePageProps) {
                   <WorkCard
                     slug={project.slug}
                     title={project.title}
-                    date={project.date}
                     tall={project.tall}
                     imageSrc={project.imageSrc}
                     hoverImageSrc={project.hoverImageSrc}

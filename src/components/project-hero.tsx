@@ -91,13 +91,6 @@ export function ProjectHero({
       }}
       className="space-y-0"
     >
-      {/* Project dates */}
-      {meta?.dates ? (
-        <div className="flex justify-center">
-          <span className="text-[14px] text-muted-foreground">{meta.dates}</span>
-        </div>
-      ) : null}
-
       {/* Title */}
       <div className="relative z-10 mx-auto mt-12 max-w-[768px] -mb-16">
         <h1 className="text-center text-[36px] font-medium leading-tight text-foreground md:text-[48px]">

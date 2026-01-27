@@ -68,13 +68,7 @@ Open [http://localhost:3000](http://localhost:3000) to view the site.
 ---
 
 ```
-                    .     .
-                   (\-""-/)
-                   /       \        psst... type "ratmode"
-                  { o   o  }
-                  {   ">   }
-                   \  `-' /
-                    `-..-'
-                   /`     `\
-                  / /     \ \
+        🐀                    🐀
+            psst... type "ratmode"
+        🐀                    🐀
 ```

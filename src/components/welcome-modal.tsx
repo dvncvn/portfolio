@@ -192,7 +192,10 @@ export function WelcomeModal({ visitor, onClose, onStartPresentation }: WelcomeM
         >
           {/* Greeting */}
           <div className={visitor.largeText ? "space-y-6" : "space-y-4"}>
-            <h1 className={`font-medium text-foreground ${visitor.largeText ? "text-[52px] leading-tight" : "text-[28px]"}`}>
+            <h1 
+              className={`font-medium text-foreground ${visitor.largeText ? "text-[52px] leading-tight" : "text-[28px]"}`}
+              style={visitor.useJacquardFont ? { fontFamily: "var(--font-jacquard-24)" } : undefined}
+            >
               {visitor.greeting} 👋
             </h1>
             <p className={`leading-relaxed text-muted-foreground ${visitor.largeText ? "text-[24px]" : "text-[15px]"}`}>

@@ -6,6 +6,7 @@ export type VisitorConfig = {
   emojiRain?: string; // Optional emoji to rain down
   hideAsciiNoise?: boolean; // Hide the ASCII background for this visitor
   largeText?: boolean; // Use larger text for greeting and message
+  useJacquardFont?: boolean; // Use Jacquard font for greeting
 };
 
 // Visitor configurations keyed by URL parameter
@@ -24,6 +25,7 @@ export const visitors: Record<string, VisitorConfig> = {
     emojiRain: "🐀",
     hideAsciiNoise: true,
     largeText: true,
+    useJacquardFont: true,
   },
 };
 

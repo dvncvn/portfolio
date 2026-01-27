@@ -24,7 +24,7 @@ function formatYearsShort(years: string) {
     if (/^now$/i.test(value)) return "Now";
     const m = value.match(/\d{4}/);
     if (!m) return value;
-    return `'${m[0].slice(2)}`;
+    return m[0].slice(2);
   };
 
   return `${toShort(start)} - ${toShort(end)}`;
@@ -35,9 +35,9 @@ export function EmploymentTable({ rows, onViewHistory }: EmploymentTableProps) {
     <div className="w-full max-w-[768px]">
       <table className="w-full table-fixed border-collapse text-[16px]">
         <colgroup>
-          <col />
-          <col className="hidden w-[120px] sm:table-column" />
-          <col className="w-[96px] sm:w-[140px]" />
+          <col className="w-[45%] sm:w-[50%]" />
+          <col className="hidden sm:table-column sm:w-[25%]" />
+          <col className="w-[55%] sm:w-[25%]" />
         </colgroup>
         <tbody>
           {rows.map((row, idx) => (
@@ -45,7 +45,7 @@ export function EmploymentTable({ rows, onViewHistory }: EmploymentTableProps) {
               key={`${row.role}-${row.company}-${row.years}-${idx}`}
               className="border-b border-white/10 last:border-b-0"
             >
-              <td className="py-2 pr-3 align-middle sm:pr-6">
+              <td className="py-2 pr-4 align-middle">
                 <div className="flex min-w-0 items-baseline gap-2 sm:gap-3">
                   <span className="min-w-0 truncate font-medium text-foreground sm:whitespace-nowrap">
                     {row.role}
@@ -58,7 +58,7 @@ export function EmploymentTable({ rows, onViewHistory }: EmploymentTableProps) {
                 </div>
               </td>
 
-              <td className="hidden py-2 pr-6 align-middle sm:table-cell">
+              <td className="hidden py-2 pr-4 align-middle sm:table-cell">
                 <div className="flex items-baseline gap-3">
                   <span className="whitespace-nowrap font-normal text-foreground">
                     {row.company}
@@ -71,7 +71,7 @@ export function EmploymentTable({ rows, onViewHistory }: EmploymentTableProps) {
                 </div>
               </td>
 
-              <td className="py-2 pl-4 align-middle text-left font-mono tabular-nums text-muted-foreground whitespace-nowrap">
+              <td className="py-2 align-middle text-right font-mono tabular-nums text-muted-foreground whitespace-nowrap">
                 <span className="sm:hidden">{formatYearsShort(row.years)}</span>
                 <span className="hidden sm:inline">{row.years.replace(/Now$/, "Now ")}</span>
               </td>

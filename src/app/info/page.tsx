@@ -454,6 +454,8 @@ export default function InfoPage() {
         {/* Left column: intro (unanimated) + table immediately below */}
         <div className="space-y-8 max-w-[768px]">
           <div className="space-y-4">
+            {/* Spacer for visual alignment with home page */}
+            <div className="h-9" aria-hidden="true" />
             <h1 className="text-[20px] font-medium leading-tight text-foreground">
               Hi, I&apos;m Simon
             </h1>

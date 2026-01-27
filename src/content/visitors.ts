@@ -5,6 +5,7 @@ export type VisitorConfig = {
   message: string;
   emojiRain?: string; // Optional emoji to rain down
   hideAsciiNoise?: boolean; // Hide the ASCII background for this visitor
+  largeText?: boolean; // Use larger text for greeting and message
 };
 
 // Visitor configurations keyed by URL parameter
@@ -22,6 +23,7 @@ export const visitors: Record<string, VisitorConfig> = {
     message: "You've unlocked rat mode. Browse the projects like a normal human, or embrace your inner rodent and scurry through presentation mode. The choice is yours, fellow rat.",
     emojiRain: "🐀",
     hideAsciiNoise: true,
+    largeText: true,
   },
 };
 

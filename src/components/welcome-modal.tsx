@@ -147,14 +147,14 @@ export function WelcomeModal({ visitor, onClose, onStartPresentation }: WelcomeM
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: 10, scale: 0.98 }}
           transition={{ duration: 0.35, delay: 0.05, ease: "easeOut" }}
-          className="mx-6 max-w-[480px] space-y-8"
+          className={`mx-6 space-y-8 ${visitor.largeText ? "max-w-[640px]" : "max-w-[480px]"}`}
         >
           {/* Greeting */}
-          <div className="space-y-4">
-            <h1 className="text-[28px] font-medium text-foreground">
+          <div className={visitor.largeText ? "space-y-6" : "space-y-4"}>
+            <h1 className={`font-medium text-foreground ${visitor.largeText ? "text-[48px] leading-tight" : "text-[28px]"}`}>
               {visitor.greeting} 👋
             </h1>
-            <p className="text-[15px] leading-relaxed text-muted-foreground">
+            <p className={`leading-relaxed text-muted-foreground ${visitor.largeText ? "text-[20px]" : "text-[15px]"}`}>
               {visitor.message}
             </p>
           </div>

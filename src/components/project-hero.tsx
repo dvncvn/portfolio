@@ -117,8 +117,8 @@ export function ProjectHero({
           {heroAsset.type === "parallax" && heroAsset.layers ? (
             // Parallax layered hero
             <div className="relative h-full w-full">
-              {/* Dot grid background with vignette - expanded beyond card area */}
-              <div className="pointer-events-none absolute -inset-y-[250px] inset-x-0 overflow-hidden">
+              {/* Dot grid background with vignette - hidden on mobile, expanded beyond card area on desktop */}
+              <div className="pointer-events-none absolute -inset-y-[250px] inset-x-0 hidden overflow-hidden md:block">
                 <DotPattern
                   width={18}
                   height={18}

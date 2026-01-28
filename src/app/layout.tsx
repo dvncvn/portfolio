@@ -30,6 +30,24 @@ export const metadata: Metadata = {
   icons: {
     icon: "/assets/favi.svg",
   },
+  openGraph: {
+    title: "Simon Duncan",
+    description: "Staff product designer portfolio.",
+    images: [
+      {
+        url: "/assets/op-image.png",
+        width: 1200,
+        height: 630,
+        alt: "Simon Duncan - Staff Product Designer",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Simon Duncan",
+    description: "Staff product designer portfolio.",
+    images: ["/assets/op-image.png"],
+  },
 };
 
 export default function RootLayout({

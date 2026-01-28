@@ -302,7 +302,6 @@ function generateSlides(projects: WorkProject[], introText: { name: string; bio:
     type: "closing",
     content: {
       title: "Thank you",
-      body: "I appreciate you taking the time to review my work. If you'd like to connect or discuss opportunities, I'd love to hear from you.",
     },
   });
 
@@ -313,6 +312,106 @@ function SlideNumber({ index, total }: { index: number; total: number }) {
   return (
     <div className="absolute bottom-8 right-8 font-mono text-[12px] tabular-nums text-muted-foreground/40">
       {String(index + 1).padStart(2, "0")}
+    </div>
+  );
+}
+
+function ClosingSlide({ slide }: { slide: Slide }) {
+  const [copied, setCopied] = useState(false);
+  const email = "simonfraserduncan@gmail.com";
+
+  const handleCopyEmail = async () => {
+    try {
+      await navigator.clipboard.writeText(email);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      // Fallback for older browsers
+      const textarea = document.createElement("textarea");
+      textarea.value = email;
+      document.body.appendChild(textarea);
+      textarea.select();
+      document.execCommand("copy");
+      document.body.removeChild(textarea);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  };
+
+  return (
+    <div className="relative flex h-full flex-col justify-center overflow-hidden">
+      {/* ASCII noise background */}
+      <AsciiNoiseBackground
+        className="pointer-events-none absolute inset-0 h-full w-full opacity-100"
+        alpha={0.14}
+        threshold={0.19}
+        exponent={1.25}
+        freq={0.035}
+        speed={0.115}
+        cell={12}
+        fps={30}
+      />
+      {/* Edge fade overlay */}
+      <div
+        className="pointer-events-none absolute inset-0"
+        style={{
+          background: `
+            linear-gradient(to right, rgba(11,10,9,1) 0%, rgba(11,10,9,0) 14%, rgba(11,10,9,0) 86%, rgba(11,10,9,1) 100%),
+            linear-gradient(to bottom, rgba(11,10,9,1) 0%, rgba(11,10,9,0) 14%, rgba(11,10,9,0) 86%, rgba(11,10,9,1) 100%)
+          `,
+        }}
+      />
+      {/* Content */}
+      <div className="relative z-10 flex w-full flex-col items-center justify-center px-6 text-center md:px-12 lg:px-16">
+        <motion.p
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          className="mb-4 text-[14px] text-muted-foreground md:mb-6 md:text-[16px]"
+        >
+          {slide.content?.title}
+        </motion.p>
+        <motion.button
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          onClick={handleCopyEmail}
+          className="group relative cursor-pointer text-[32px] font-medium leading-tight text-foreground transition-all duration-200 hover:text-highlight md:text-[48px] lg:text-[56px] xl:text-[64px]"
+        >
+          <span className={`decoration-highlight/50 underline-offset-8 transition-all duration-200 group-hover:underline ${copied ? "opacity-0" : "opacity-100"}`}>
+            {email}
+          </span>
+          <span
+            className={`absolute inset-0 flex items-center justify-center text-highlight transition-opacity duration-200 ${
+              copied ? "opacity-100" : "opacity-0"
+            }`}
+          >
+            Copied!
+          </span>
+        </motion.button>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.8, duration: 0.4 }}
+          className="mt-10 flex items-center gap-4"
+        >
+          <button
+            onClick={() => window.location.href = "/"}
+            className="inline-flex cursor-pointer items-center gap-2 rounded-md bg-white/[0.06] px-4 py-2 text-[14px] text-muted-foreground transition-all duration-200 ease-out hover:bg-white/[0.1] hover:text-foreground"
+          >
+            Back to Website
+          </button>
+          <button
+            onClick={() => {
+              const event = new KeyboardEvent("keydown", { key: "Home" });
+              window.dispatchEvent(event);
+            }}
+            className="inline-flex cursor-pointer items-center gap-2 rounded-md bg-white/[0.06] px-4 py-2 text-[14px] text-muted-foreground transition-all duration-200 ease-out hover:bg-white/[0.1] hover:text-foreground"
+          >
+            Restart Presentation
+          </button>
+        </motion.div>
+      </div>
     </div>
   );
 }
@@ -800,70 +899,7 @@ function SlideContent({ slide, slideIndex, totalSlides, onLightboxStateChange }:
 
     case "closing":
       return (
-        <div className="relative flex h-full flex-col justify-center overflow-hidden">
-          {/* ASCII noise background */}
-          <AsciiNoiseBackground
-            className="pointer-events-none absolute inset-0 h-full w-full opacity-100"
-            alpha={0.14}
-            threshold={0.19}
-            exponent={1.25}
-            freq={0.035}
-            speed={0.115}
-            cell={12}
-            fps={30}
-          />
-          {/* Edge fade overlay */}
-          <div
-            className="pointer-events-none absolute inset-0"
-            style={{
-              background: `
-                linear-gradient(to right, rgba(11,10,9,1) 0%, rgba(11,10,9,0) 14%, rgba(11,10,9,0) 86%, rgba(11,10,9,1) 100%),
-                linear-gradient(to bottom, rgba(11,10,9,1) 0%, rgba(11,10,9,0) 14%, rgba(11,10,9,0) 86%, rgba(11,10,9,1) 100%)
-              `,
-            }}
-          />
-          {/* Content */}
-          <div className="relative z-10 flex w-full flex-col items-center justify-center px-6 text-center md:px-12 lg:px-16">
-            <motion.h1
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 }}
-              className="text-[40px] font-medium leading-tight text-foreground md:text-[56px] lg:text-[64px] xl:text-[72px]"
-            >
-              {slide.content?.title}
-            </motion.h1>
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-              className="mt-4 max-w-[600px] text-[16px] leading-relaxed text-muted-foreground md:mt-6 md:text-[18px] lg:text-[20px]"
-            >
-              {slide.content?.body}
-            </motion.p>
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.8, duration: 0.4 }}
-              className="mt-10 flex items-center gap-4"
-            >
-              <button
-                onClick={() => window.location.href = "/"}
-                className="inline-flex items-center gap-2 rounded-md bg-white/[0.06] px-4 py-2 text-[14px] text-muted-foreground transition-all duration-200 ease-out hover:bg-white/[0.1] hover:text-foreground"
-              >
-                Back to Website
-              </button>
-              <button
-                onClick={() => {
-                  const event = new KeyboardEvent("keydown", { key: "Home" });
-                  window.dispatchEvent(event);
-                }}
-                className="inline-flex items-center gap-2 rounded-md bg-white/[0.06] px-4 py-2 text-[14px] text-muted-foreground transition-all duration-200 ease-out hover:bg-white/[0.1] hover:text-foreground"
-              >
-                Restart Presentation
-              </button>
-            </motion.div>
-          </div>
-        </div>
+        <ClosingSlide slide={slide} />
       );
 
     default:

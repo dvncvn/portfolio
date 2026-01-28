@@ -35,9 +35,9 @@ export function EmploymentTable({ rows, onViewHistory }: EmploymentTableProps) {
     <div className="w-full max-w-[768px]">
       <table className="w-full table-fixed border-collapse text-[16px]">
         <colgroup>
-          <col className="w-auto sm:w-[50%]" />
-          <col className="hidden sm:table-column sm:w-[25%]" />
-          <col className="w-[100px] sm:w-[25%]" />
+          <col className="w-auto xl:w-[50%]" />
+          <col className="hidden xl:table-column xl:w-[25%]" />
+          <col className="w-[100px] xl:w-[25%]" />
         </colgroup>
         <tbody>
           {rows.map((row, idx) => (
@@ -46,34 +46,34 @@ export function EmploymentTable({ rows, onViewHistory }: EmploymentTableProps) {
               className="border-b border-white/10 last:border-b-0"
             >
               <td className="py-2 pr-4 align-middle">
-                <div className="flex min-w-0 items-baseline gap-2 sm:gap-3">
+                <div className="flex min-w-0 items-baseline gap-2 xl:gap-3">
                   <span className="font-medium text-foreground">
                     {row.role}
                   </span>
                   {row.roleFlag ? (
-                    <span className="hidden whitespace-nowrap text-[#464646] min-[520px]:inline">
+                    <span className="hidden whitespace-nowrap text-[#464646] xl:inline">
                       {row.roleFlag}
                     </span>
                   ) : null}
                 </div>
               </td>
 
-              <td className="hidden py-2 pr-4 align-middle sm:table-cell">
+              <td className="hidden py-2 pr-4 align-middle xl:table-cell">
                 <div className="flex items-baseline gap-3">
                   <span className="whitespace-nowrap font-normal text-foreground">
                     {row.company}
                   </span>
                   {row.companyFlag ? (
-                    <span className="hidden whitespace-nowrap text-[#464646] min-[520px]:inline">
+                    <span className="hidden whitespace-nowrap text-[#464646] xl:inline">
                       {row.companyFlag}
                     </span>
                   ) : null}
                 </div>
               </td>
 
-              <td className="py-2 align-middle text-left sm:text-right font-mono tabular-nums text-muted-foreground whitespace-nowrap">
-                <span className="sm:hidden">{formatYearsShort(row.years)}</span>
-                <span className="hidden sm:inline">{row.years.replace(/Now$/, "Now ")}</span>
+              <td className="py-2 align-middle text-left xl:text-right font-mono tabular-nums text-muted-foreground whitespace-nowrap">
+                <span className="xl:hidden">{formatYearsShort(row.years)}</span>
+                <span className="hidden xl:inline">{row.years.replace(/Now$/, "Now ")}</span>
               </td>
             </tr>
           ))}

@@ -15,7 +15,7 @@ export const metadata: Metadata = {
 type HomeProjectCard = {
   slug: string;
   title: string;
-  date: string;
+  date?: string;
   tall: boolean;
   imageSrc: string;
   hoverImageSrc?: string;

@@ -46,10 +46,10 @@ export function IntroBlock({ animate = true }: { animate?: boolean }) {
               strokeWidth="2"
               strokeLinecap="round"
               strokeLinejoin="round"
-              className="transition-transform duration-200 ease-out group-hover/btn:translate-x-1"
+              className="transition-transform duration-200 ease-out group-hover/btn:translate-x-0.5"
             >
-              <path d="M18 8L22 12L18 16" />
-              <path d="M2 12H22" />
+              <path d="M5 12h14" />
+              <path d="m12 5 7 7-7 7" />
             </svg>
           </Link>
         </div>

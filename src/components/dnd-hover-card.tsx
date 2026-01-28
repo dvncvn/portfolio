@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { createPortal } from "react-dom";
 import { DndCharacterOverlay } from "./dnd-character-overlay";
@@ -11,36 +11,61 @@ type DndHoverCardProps = {
   position?: "above" | "below";
 };
 
+const POPOVER_HEIGHT = 300;
+const POPOVER_WIDTH = 232; // 200px image + 32px padding
+const GAP = 12;
+
 export function DndHoverCard({ children, zIndex = 50, position = "above" }: DndHoverCardProps) {
   const [isHovered, setIsHovered] = useState(false);
   const [overlayOpen, setOverlayOpen] = useState(false);
   const triggerRef = useRef<HTMLSpanElement>(null);
-  const [styles, setStyles] = useState<React.CSSProperties>({});
+  const closeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  useEffect(() => {
-    if (isHovered && triggerRef.current) {
-      const rect = triggerRef.current.getBoundingClientRect();
-      const popoverHeight = 300;
-      const popoverWidth = 232; // 200px image + 32px padding
-      const gap = 12;
-      
-      if (position === "above") {
-        setStyles({
-          position: "fixed",
-          top: rect.top - popoverHeight - gap,
-          left: rect.left + rect.width / 2 - popoverWidth / 2,
-          zIndex,
-        });
-      } else {
-        setStyles({
-          position: "fixed",
-          top: rect.bottom + gap,
-          left: rect.left + rect.width / 2 - popoverWidth / 2,
-          zIndex,
-        });
-      }
+  // Calculate position synchronously from trigger ref
+  const getStyles = useCallback((): React.CSSProperties => {
+    if (!triggerRef.current) return { position: "fixed", opacity: 0 };
+    const rect = triggerRef.current.getBoundingClientRect();
+    
+    if (position === "above") {
+      return {
+        position: "fixed",
+        top: rect.top - POPOVER_HEIGHT - GAP,
+        left: rect.left + rect.width / 2 - POPOVER_WIDTH / 2,
+        zIndex,
+      };
+    } else {
+      return {
+        position: "fixed",
+        top: rect.bottom + GAP,
+        left: rect.left + rect.width / 2 - POPOVER_WIDTH / 2,
+        zIndex,
+      };
     }
-  }, [isHovered, zIndex, position]);
+  }, [position, zIndex]);
+
+  const handleMouseEnter = useCallback(() => {
+    if (closeTimeoutRef.current) {
+      clearTimeout(closeTimeoutRef.current);
+      closeTimeoutRef.current = null;
+    }
+    setIsHovered(true);
+  }, []);
+
+  const handleMouseLeave = useCallback(() => {
+    // Generous delay to allow moving between trigger and popover
+    closeTimeoutRef.current = setTimeout(() => {
+      setIsHovered(false);
+    }, 150);
+  }, []);
+
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (closeTimeoutRef.current) {
+        clearTimeout(closeTimeoutRef.current);
+      }
+    };
+  }, []);
 
   const handleClick = () => {
     setIsHovered(false);
@@ -52,8 +77,8 @@ export function DndHoverCard({ children, zIndex = 50, position = "above" }: DndH
       <span
         ref={triggerRef}
         className="cursor-pointer border-b border-dashed border-muted-foreground/50 transition-colors hover:border-foreground hover:text-foreground"
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
       >
         {children}
       </span>
@@ -66,9 +91,9 @@ export function DndHoverCard({ children, zIndex = 50, position = "above" }: DndH
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, y: position === "above" ? 8 : -8, scale: 0.95 }}
                 transition={{ duration: 0.15, ease: "easeOut" }}
-                style={styles}
-                onMouseEnter={() => setIsHovered(true)}
-                onMouseLeave={() => setIsHovered(false)}
+                style={getStyles()}
+                onMouseEnter={handleMouseEnter}
+                onMouseLeave={handleMouseLeave}
               >
                 <button
                   type="button"
@@ -103,15 +128,23 @@ export function DndHoverCard({ children, zIndex = 50, position = "above" }: DndH
                     </span>
                   </div>
                 </button>
-                {/* Arrow */}
+                {/* Arrow + invisible bridge for easier hover navigation */}
                 {position === "above" ? (
-                  <div className="absolute left-1/2 top-full -translate-x-1/2">
-                    <div className="h-0 w-0 border-l-[6px] border-r-[6px] border-t-[6px] border-l-transparent border-r-transparent border-t-white/10" />
-                  </div>
+                  <>
+                    <div className="absolute left-1/2 top-full -translate-x-1/2">
+                      <div className="h-0 w-0 border-l-[6px] border-r-[6px] border-t-[6px] border-l-transparent border-r-transparent border-t-white/10" />
+                    </div>
+                    {/* Invisible bridge extending down toward trigger */}
+                    <div className="absolute left-1/2 top-full h-[24px] w-[80px] -translate-x-1/2" />
+                  </>
                 ) : (
-                  <div className="absolute bottom-full left-1/2 -translate-x-1/2">
-                    <div className="h-0 w-0 border-l-[6px] border-r-[6px] border-b-[6px] border-l-transparent border-r-transparent border-b-white/10" />
-                  </div>
+                  <>
+                    <div className="absolute bottom-full left-1/2 -translate-x-1/2">
+                      <div className="h-0 w-0 border-l-[6px] border-r-[6px] border-b-[6px] border-l-transparent border-r-transparent border-b-white/10" />
+                    </div>
+                    {/* Invisible bridge extending up toward trigger */}
+                    <div className="absolute bottom-full left-1/2 h-[24px] w-[80px] -translate-x-1/2" />
+                  </>
                 )}
               </motion.div>
             )}

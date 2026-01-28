@@ -147,6 +147,17 @@ function SiteShellContent({ children }: SiteShellProps) {
     console.log("🐀 Rat mode activated!");
   };
 
+  // Listen for direct rat mode toggle from welcome modal
+  useEffect(() => {
+    const handleDirectToggle = (e: CustomEvent<{ active: boolean }>) => {
+      setRatModeActive(e.detail.active);
+      console.log(`🐀 Rat mode ${e.detail.active ? "activated" : "deactivated"} via welcome modal`);
+    };
+
+    window.addEventListener("ratModeToggle", handleDirectToggle as EventListener);
+    return () => window.removeEventListener("ratModeToggle", handleDirectToggle as EventListener);
+  }, []);
+
   // ESC to exit rat mode
   useEffect(() => {
     if (!ratModeActive) return;
@@ -561,14 +572,14 @@ function SiteShellContent({ children }: SiteShellProps) {
       <footer className="mt-20">
         <div className="w-full px-6">
           <div className="mx-auto flex w-full max-w-[1400px] flex-col gap-4 py-8 text-sm text-muted-foreground min-[480px]:flex-row min-[480px]:items-center min-[480px]:justify-between">
-            <span className="group/madison inline-flex items-center gap-2 font-mono text-[#464646] transition-colors duration-300 hover:text-[#5bc4c4]">
+            <span className="group/madison inline-flex cursor-default select-none items-center gap-2 font-mono text-[#464646] transition-colors duration-300 hover:text-[#5bc4c4]">
               {/* Flag - slides in from left on hover */}
               <span className="relative h-[14px] w-0 overflow-hidden transition-all duration-300 ease-out group-hover/madison:w-[21px]">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src="/assets/madison-flag.svg"
                   alt=""
-                  className="absolute left-0 top-0 h-[14px] w-[21px] opacity-0 transition-opacity duration-300 group-hover/madison:opacity-100"
+                  className="absolute left-0 top-0 h-[14px] w-[21px] rounded-[2px] opacity-0 transition-opacity duration-300 group-hover/madison:opacity-100"
                 />
               </span>
               Made in Madison WI
@@ -637,7 +648,24 @@ function SiteShellContent({ children }: SiteShellProps) {
       {ratModeActive && typeof document !== "undefined" &&
         createPortal(
           <>
-            <div className="rat-mode-hint">
+            <div 
+              style={{
+                position: "fixed",
+                bottom: "24px",
+                right: "24px",
+                zIndex: 99999,
+                background: "rgba(0, 0, 0, 0.9)",
+                backdropFilter: "blur(8px)",
+                padding: "12px 20px",
+                borderRadius: "8px",
+                fontFamily: "ui-monospace, SFMono-Regular, monospace",
+                fontSize: "13px",
+                color: "white",
+                border: "1px solid rgba(255, 255, 255, 0.2)",
+                animation: "none",
+                transform: "none",
+              }}
+            >
               🐀 Press ESC to exit rat mode
             </div>
             {/* Cursor-following rat */}

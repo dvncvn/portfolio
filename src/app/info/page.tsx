@@ -468,7 +468,7 @@ export default function InfoPage() {
           <BlurFade delay={0}>
             <div className="relative">
               {/* Activity indicator pointing at current position */}
-              <div className="absolute -left-10 top-[10px] hidden lg:block">
+              <div className="absolute -left-10 top-[10px] hidden xl:block">
                 <ActivityIndicator />
               </div>
               <EmploymentTable rows={workHistory} onViewHistory={openResume} />

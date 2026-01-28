@@ -201,7 +201,7 @@ export function GithubStarsChart({
               href="https://github.com/langflow-ai/langflow"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex flex-col items-end cursor-pointer"
+              className="relative flex flex-col items-end cursor-pointer"
               onMouseEnter={() => setIsHovered(true)}
               onMouseLeave={() => setIsHovered(false)}
             >
@@ -219,7 +219,7 @@ export function GithubStarsChart({
               <AnimatePresence>
                 {isHovered && (
                   <motion.span
-                    className="text-[12px] text-muted-foreground flex items-center gap-1"
+                    className="absolute top-full right-0 mt-1 text-[12px] text-muted-foreground flex items-center gap-1"
                     initial={{ opacity: 0, y: -4 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -4 }}

@@ -115,23 +115,39 @@ type WelcomeModalProps = {
   onStartPresentation: () => void;
 };
 
-// Rat mode checkbox labels
+// Rat mode checkbox labels - index 4 is the troll checkbox that resets everything
 const RAT_CHECKBOXES = [
   "I understand what I'm getting into",
   "I accept the consequences",
   "I am prepared for chaos",
   "I promise not to blame Simon",
+  "Wait... I'm not actually a rat",  // TROLL - resets all
+  "I have notified my next of kin",
+  "I acknowledge this was my idea",
   "I am definitely a rat",
 ];
+const TROLL_CHECKBOX_INDEX = 4;
+
+// Index that triggers burst reveal of multiple checkboxes
+const BURST_TRIGGER_INDEX = 2;
+const BURST_REVEAL_COUNT = 3; // How many extra checkboxes appear at once
 
 export function WelcomeModal({ visitor, onClose, onStartPresentation }: WelcomeModalProps) {
-  const [ratChecks, setRatChecks] = useState<boolean[]>([false, false, false, false, false]);
+  const [ratChecks, setRatChecks] = useState<boolean[]>([false, false, false, false, false, false, false, false]);
   const [ratModeEnabled, setRatModeEnabled] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [burstTriggered, setBurstTriggered] = useState(false);
   
   const isRatPack = visitor.id === "ratpack";
-  const visibleCheckboxes = ratChecks.filter((_, i) => i === 0 || ratChecks[i - 1]).length;
-  const allChecked = ratChecks.every(Boolean);
+  
+  // Calculate visible checkboxes - with burst effect
+  const baseVisible = ratChecks.filter((_, i) => i === 0 || ratChecks[i - 1]).length;
+  const visibleCheckboxes = burstTriggered 
+    ? Math.max(baseVisible, BURST_TRIGGER_INDEX + 1 + BURST_REVEAL_COUNT)
+    : baseVisible;
+  
+  // All checked = all non-troll checkboxes are checked (troll checkbox is always skipped)
+  const allChecked = ratChecks.every((checked, i) => i === TROLL_CHECKBOX_INDEX || checked);
 
   // Mount state for portal
   useEffect(() => {
@@ -155,28 +171,31 @@ export function WelcomeModal({ visitor, onClose, onStartPresentation }: WelcomeM
     return () => window.removeEventListener("keydown", handleEscape);
   }, [onClose]);
 
-  // Enable rat mode when all boxes checked
-  useEffect(() => {
-    if (allChecked && !ratModeEnabled) {
-      setRatModeEnabled(true);
-      // Trigger rat mode by simulating the key sequence
-      const event = new KeyboardEvent("keydown", { key: "r" });
-      window.dispatchEvent(event);
-      ["a", "t", "m", "o", "d", "e"].forEach((key, i) => {
-        setTimeout(() => {
-          window.dispatchEvent(new KeyboardEvent("keydown", { key }));
-        }, (i + 1) * 50);
-      });
-    }
-  }, [allChecked, ratModeEnabled]);
 
   const handleRatCheck = (index: number) => {
+    // Troll checkbox - reset everything!
+    if (index === TROLL_CHECKBOX_INDEX) {
+      setRatChecks(new Array(RAT_CHECKBOXES.length).fill(false));
+      setBurstTriggered(false);
+      return;
+    }
+    
     const newChecks = [...ratChecks];
     newChecks[index] = !newChecks[index];
+    
+    // Trigger burst reveal when checking the trigger checkbox
+    if (index === BURST_TRIGGER_INDEX && newChecks[index]) {
+      setBurstTriggered(true);
+    }
+    
     // If unchecking, uncheck all after it too
     if (!newChecks[index]) {
       for (let i = index + 1; i < newChecks.length; i++) {
         newChecks[i] = false;
+      }
+      // Reset burst if unchecking at or before trigger
+      if (index <= BURST_TRIGGER_INDEX) {
+        setBurstTriggered(false);
       }
     }
     setRatChecks(newChecks);
@@ -264,12 +283,12 @@ export function WelcomeModal({ visitor, onClose, onStartPresentation }: WelcomeM
           <div className="flex flex-col gap-3 sm:flex-row">
             <button
               onClick={handleBrowse}
-              className="group/btn inline-flex cursor-pointer items-center justify-center gap-2 rounded-md bg-white/[0.08] px-5 py-3 text-[14px] font-medium text-foreground transition-all duration-200 ease-out hover:bg-white/[0.12]"
+              className={`group/btn inline-flex cursor-pointer items-center justify-center gap-2 rounded-md bg-[#121212] text-muted-foreground transition-all duration-200 ease-out hover:bg-[#1a1a1a] hover:text-foreground ${visitor.largeText ? "px-6 py-4 text-[18px]" : "px-5 py-3 text-[14px]"}`}
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                width="18"
-                height="18"
+                width={visitor.largeText ? "22" : "18"}
+                height={visitor.largeText ? "22" : "18"}
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
@@ -282,75 +301,139 @@ export function WelcomeModal({ visitor, onClose, onStartPresentation }: WelcomeM
                 <rect x="14" y="14" width="7" height="7" />
                 <rect x="3" y="14" width="7" height="7" />
               </svg>
-              <span>Browse Projects</span>
+              <span>View Projects</span>
             </button>
             <button
               onClick={handlePresentation}
-              className="group/btn inline-flex cursor-pointer items-center justify-center gap-2 rounded-md border border-white/[0.1] px-5 py-3 text-[14px] text-muted-foreground transition-all duration-200 ease-out hover:border-white/[0.2] hover:text-foreground"
+              className={`group/btn inline-flex cursor-pointer items-center justify-center gap-2 rounded-md bg-[#121212] text-muted-foreground transition-all duration-200 ease-out hover:bg-[#1a1a1a] hover:text-[#01F8A5] ${visitor.largeText ? "px-6 py-4 text-[18px]" : "px-5 py-3 text-[14px]"}`}
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                width="18"
-                height="18"
+                width={visitor.largeText ? "22" : "18"}
+                height={visitor.largeText ? "22" : "18"}
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
                 strokeWidth="2"
                 strokeLinecap="round"
                 strokeLinejoin="round"
+                className="transition-all duration-200 group-hover/btn:stroke-[#01F8A5]"
               >
-                <polygon points="5 3 19 12 5 21 5 3" />
+                <path d="M5 5a2 2 0 0 1 3.008-1.728l11.997 6.998a2 2 0 0 1 .003 3.458l-12 7A2 2 0 0 1 5 19z"/>
               </svg>
-              <span>Presentation Mode</span>
+              <span>Open Presentation</span>
             </button>
           </div>
 
-          {/* Rat mode checkboxes - only for ratpack visitor */}
+          {/* ESC hint */}
+          <p className={`text-muted-foreground/50 ${visitor.largeText ? "text-[14px]" : "text-[12px]"}`}>
+            Press <kbd className="rounded border border-white/10 bg-white/5 px-1.5 py-0.5 font-mono text-[10px]">ESC</kbd> to browse freely
+          </p>
+
+          {/* Rat mode checkboxes / control panel - only for ratpack visitor */}
           {isRatPack && (
             <div className="space-y-3 rounded-lg border border-white/10 bg-white/[0.02] p-4">
-              <p className="font-mono text-[13px] text-muted-foreground">
-                Or... enable <RainbowText>Rat Mode</RainbowText> now:
-              </p>
-              <div className="space-y-2">
-                {RAT_CHECKBOXES.slice(0, Math.min(visibleCheckboxes + 1, RAT_CHECKBOXES.length)).map((label, i) => (
-                  <motion.label
-                    key={i}
-                    initial={{ opacity: 0, x: -10 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.2, delay: i === visibleCheckboxes ? 0.15 : 0 }}
-                    className="flex cursor-pointer items-center gap-3 font-mono text-[14px]"
+              <AnimatePresence mode="wait">
+                {allChecked ? (
+                  ratModeEnabled ? (
+                    /* Rat Mode Active - show disable button */
+                    <motion.div
+                      key="control-panel-active"
+                      initial={{ opacity: 0, scale: 0.95 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.95 }}
+                      transition={{ duration: 0.2 }}
+                      className="space-y-4"
+                    >
+                      <div className="flex items-center gap-4">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src="/assets/rat.png" alt="Rat" className="h-12 w-12" />
+                        <div>
+                          <p className="font-mono text-[14px] font-medium text-[#01F8A5]">
+                            Rat Mode Active
+                          </p>
+                          <p className="font-mono text-[12px] text-muted-foreground">
+                            A rat now follows your cursor everywhere
+                          </p>
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => {
+                          setRatChecks(new Array(RAT_CHECKBOXES.length).fill(false));
+                          setBurstTriggered(false);
+                          setRatModeEnabled(false);
+                          window.dispatchEvent(new CustomEvent("ratModeToggle", { detail: { active: false } }));
+                        }}
+                        className="w-full cursor-pointer rounded-lg bg-white/15 px-5 py-2.5 font-mono text-[13px] text-muted-foreground transition-all duration-200 hover:bg-white/10 hover:text-foreground"
+                      >
+                        Flee 🏃
+                      </button>
+                    </motion.div>
+                  ) : (
+                    /* All checked but not enabled yet - show enable button */
+                    <motion.div
+                      key="control-panel-ready"
+                      initial={{ opacity: 0, scale: 0.95 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.95 }}
+                      transition={{ duration: 0.2 }}
+                      className="space-y-4"
+                    >
+                      <p className="font-mono text-[14px] text-muted-foreground">
+                        Ready to unleash chaos?
+                      </p>
+                      <button
+                        onClick={() => {
+                          setRatModeEnabled(true);
+                          window.dispatchEvent(new CustomEvent("ratModeToggle", { detail: { active: true } }));
+                        }}
+                        className="w-full cursor-pointer rounded-lg bg-white/15 px-5 py-2.5 font-mono text-[13px] text-foreground transition-all duration-200 hover:bg-white/25"
+                      >
+                        Enter 🐀
+                      </button>
+                    </motion.div>
+                  )
+                ) : (
+                  /* Checkbox sequence */
+                  <motion.div
+                    key="checkboxes"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.15 }}
                   >
-                    <input
-                      type="checkbox"
-                      checked={ratChecks[i]}
-                      onChange={() => handleRatCheck(i)}
-                      className="h-4 w-4 cursor-pointer rounded border-white/20 bg-white/5 accent-yellow-400"
-                    />
-                    <span className={ratChecks[i] ? "text-foreground" : "text-muted-foreground"}>
-                      {label}
-                    </span>
-                    {i === RAT_CHECKBOXES.length - 1 && ratChecks[i] && (
-                      <span className="ml-2">🐀</span>
-                    )}
-                  </motion.label>
-                ))}
-              </div>
-              {allChecked && (
-                <motion.p
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  className="mt-3 font-mono text-[12px] text-yellow-400"
-                >
-                  🎉 Rat Mode activated! Close this screen to experience chaos.
-                </motion.p>
-              )}
+                    <p className="mb-3 font-mono text-[13px] text-muted-foreground">
+                      Or... enable <RainbowText>Rat Mode</RainbowText> now:
+                    </p>
+                    <div className="space-y-2">
+                      {RAT_CHECKBOXES.slice(0, Math.min(visibleCheckboxes + 1, RAT_CHECKBOXES.length)).map((label, i) => (
+                        <motion.label
+                          key={i}
+                          initial={{ opacity: 0, x: -10 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ duration: 0.2, delay: i === visibleCheckboxes ? 0.15 : 0 }}
+                          className="flex cursor-pointer items-center gap-3 font-mono text-[14px]"
+                        >
+                          <input
+                            type="checkbox"
+                            checked={ratChecks[i]}
+                            onChange={() => handleRatCheck(i)}
+                            className="h-4 w-4 cursor-pointer rounded border-white/20 bg-white/5 accent-[#01F8A5]"
+                          />
+                          <span className={ratChecks[i] ? "text-foreground" : "text-muted-foreground"}>
+                            {label}
+                          </span>
+                          {i === RAT_CHECKBOXES.length - 1 && ratChecks[i] && (
+                            <span className="ml-2">🐀</span>
+                          )}
+                        </motion.label>
+                      ))}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
           )}
-
-          {/* Subtle hint */}
-          <p className="text-[12px] text-muted-foreground/60">
-            Press Escape to browse freely
-          </p>
         </motion.div>
       </motion.div>
     </AnimatePresence>,

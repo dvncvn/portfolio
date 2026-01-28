@@ -35,6 +35,7 @@ const navItems: PaletteItem[] = [
   { type: "nav", label: "Play", href: "/play" },
   { type: "nav", label: "Info", href: "/info" },
   { type: "separator", label: "Actions" },
+  { type: "action", label: "Open Presentation", action: "openPresentation" },
   { type: "action", label: "View Resume", action: "openResume" },
   { type: "action", label: "Copy Email", action: "copyEmail" },
 ];
@@ -71,7 +72,10 @@ export function CommandPalette({ isOpen, onClose, currentPath = "/" }: CommandPa
         router.push(item.href);
         onClose();
       } else if (item.type === "action") {
-        if (item.action === "openResume") {
+        if (item.action === "openPresentation") {
+          router.push("/?presentation=true");
+          onClose();
+        } else if (item.action === "openResume") {
           openResume();
           onClose();
         } else if (item.action === "copyEmail") {

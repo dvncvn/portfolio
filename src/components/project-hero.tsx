@@ -161,11 +161,12 @@ export function ProjectHero({
       ) : null}
 
       {/* Summary + metadata */}
-      <div className="relative z-10 mx-auto mt-0 w-full max-w-[768px]">
-        <div className="grid gap-8 md:gap-10 md:grid-cols-[minmax(0,1fr)_270px] md:items-start">
+      <div className="relative z-10 mx-auto mt-0 w-full max-w-[768px] py-10 md:py-16">
+        <div className="space-y-12 md:space-y-14">
+          {/* Summary content */}
           <div className="space-y-6">
-            <h2 className="text-[20px] font-medium text-foreground">Summary</h2>
-            <div className="space-y-5 text-[16px] leading-relaxed text-muted-foreground">
+            <h2 className="text-[24px] font-medium text-foreground md:text-[28px]">Summary</h2>
+            <div className="space-y-6 text-[18px] leading-[1.7] text-muted-foreground md:text-[20px]">
               {summary
                 .split(/\n\s*\n/g)
                 .map((p) => p.trim())
@@ -176,27 +177,26 @@ export function ProjectHero({
             </div>
           </div>
 
+          {/* Metadata row */}
           {meta ? (
-            <dl className="grid gap-y-6 text-[16px]">
+            <dl className="flex flex-wrap gap-x-10 gap-y-4 text-[15px] md:gap-x-14">
               {meta.company ? (
-                <div className="grid grid-cols-[80px_1fr] gap-2">
+                <div className="flex flex-col gap-1">
                   <dt className="text-muted-foreground/60">Company</dt>
                   <dd className="text-foreground">{meta.company}</dd>
                 </div>
               ) : null}
               {meta.role ? (
-                <div className="grid grid-cols-[80px_1fr] gap-2">
+                <div className="flex flex-col gap-1">
                   <dt className="text-muted-foreground/60">Role</dt>
                   <dd className="text-foreground">{meta.role}</dd>
                 </div>
               ) : null}
               {meta.team && meta.team.length > 0 ? (
-                <div className="grid grid-cols-[80px_1fr] gap-2">
+                <div className="flex flex-col gap-1">
                   <dt className="text-muted-foreground/60">Team</dt>
-                  <dd className="space-y-1 text-foreground">
-                    {meta.team.map((t) => (
-                      <div key={t}>{t}</div>
-                    ))}
+                  <dd className="text-foreground">
+                    {meta.team.join(", ")}
                   </dd>
                 </div>
               ) : null}

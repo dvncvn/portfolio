@@ -91,31 +91,53 @@ export function AsciiNoiseBackground({
 
     let raf = 0;
     let lastFrame = 0;
+    let currentWidth = 0;
+    let currentHeight = 0;
+
+    const setFont = () => {
+      ctx.textBaseline = "top";
+      ctx.font = `${fontSize}px ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace`;
+    };
 
     const resize = () => {
+      const rect = canvas.getBoundingClientRect();
+      const { width, height } = rect;
+      
+      // Guard against zero dimensions
+      if (width <= 0 || height <= 0) return;
+      
       const dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
-      const { width, height } = canvas.getBoundingClientRect();
       canvas.width = Math.floor(width * dpr);
       canvas.height = Math.floor(height * dpr);
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      
+      // Store current dimensions for draw function
+      currentWidth = width;
+      currentHeight = height;
+      
+      // Re-set font after resize (canvas resize resets context state)
+      setFont();
     };
 
+    // Initial resize + observe container for size changes (handles animations, etc.)
     resize();
+    const resizeObserver = new ResizeObserver(() => {
+      resize();
+    });
+    resizeObserver.observe(canvas);
     window.addEventListener("resize", resize);
 
-    ctx.textBaseline = "top";
-    ctx.font = `${fontSize}px ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace`;
-
     const draw = (tMs: number) => {
+      // Use stored dimensions to avoid getBoundingClientRect during draw
+      if (currentWidth <= 0 || currentHeight <= 0) return;
+      
       const t = tMs / 1000;
 
-      const { width, height } = canvas.getBoundingClientRect();
-      ctx.clearRect(0, 0, width, height);
-
+      ctx.clearRect(0, 0, currentWidth, currentHeight);
       ctx.fillStyle = `rgba(255,255,255,${alpha})`;
 
-      const cols = Math.ceil(width / cell) + 1;
-      const rows = Math.ceil(height / cell) + 1;
+      const cols = Math.ceil(currentWidth / cell) + 1;
+      const rows = Math.ceil(currentHeight / cell) + 1;
 
       const z = t * speed;
       for (let y = 0; y < rows; y++) {
@@ -154,11 +176,12 @@ export function AsciiNoiseBackground({
 
     raf = requestAnimationFrame(loop);
     return () => {
+      resizeObserver.disconnect();
       window.removeEventListener("resize", resize);
       cancelAnimationFrame(raf);
     };
   }, [alpha, threshold, exponent, freq, speed, cell, fontSize, fps]);
 
-  return <canvas ref={canvasRef} className={className} aria-hidden="true" />;
+  return <canvas ref={canvasRef} className={`h-full w-full ${className ?? ""}`} aria-hidden="true" />;
 }
 

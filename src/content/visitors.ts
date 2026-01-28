@@ -27,6 +27,13 @@ export const visitors: Record<string, VisitorConfig> = {
     largeText: true,
     useJacquardFont: true,
   },
+  warmwanderer: {
+    id: "warmwanderer",
+    name: "Sarah",
+    greeting: "Hi Sarah",
+    message: "Thank you for all your support and for being the light of my life. Without you, none of this work would be possible. Everything I build is better because you're by my side.",
+    emojiRain: "💖",
+  },
 };
 
 export function getVisitor(id: string | undefined): VisitorConfig | null {

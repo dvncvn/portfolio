@@ -29,6 +29,8 @@ export function CompareView({
   const containerRef = useRef<HTMLDivElement>(null);
   const rafRef = useRef<number | null>(null);
   const [containerWidth, setContainerWidth] = useState(0);
+  const [actualAspectRatio, setActualAspectRatio] = useState<string | null>(null);
+  
   const clip = useMemo(() => {
     if (!containerWidth) return "50%";
     const rightPx = Math.max(0, containerWidth * (1 - value));
@@ -49,6 +51,12 @@ export function CompareView({
     });
     observer.observe(node);
     return () => observer.disconnect();
+  }, []);
+  
+  const handleImageLoad = useCallback((e: React.SyntheticEvent<HTMLImageElement>) => {
+    const img = e.currentTarget;
+    // Use the image's natural aspect ratio for the container
+    setActualAspectRatio(`${img.naturalWidth}/${img.naturalHeight}`);
   }, []);
 
   const updateFromClientX = useCallback((clientX: number) => {
@@ -117,7 +125,7 @@ export function CompareView({
           <div
             ref={containerRef}
             className="relative w-full"
-            style={{ aspectRatio: `${width}/${height}` }}
+            style={{ aspectRatio: actualAspectRatio || `${width}/${height}` }}
             onPointerDown={handlePointerDown}
           >
           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -126,6 +134,7 @@ export function CompareView({
             alt={beforeAlt}
             className="absolute inset-0 h-full w-full select-none object-cover"
             draggable={false}
+            onLoad={handleImageLoad}
           />
 
           <div

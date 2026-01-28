@@ -31,7 +31,7 @@ export const metadata: Metadata = {
     icon: "/assets/favi.svg",
   },
   openGraph: {
-    title: "Simon Duncan",
+    title: "Simon Duncan | Product Design",
     description: "Staff product designer portfolio.",
     images: [
       {
@@ -44,7 +44,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Simon Duncan",
+    title: "Simon Duncan | Product Design",
     description: "Staff product designer portfolio.",
     images: ["/assets/op-image.png"],
   },

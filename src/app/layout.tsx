@@ -29,6 +29,7 @@ export const metadata: Metadata = {
   description: "Staff product designer portfolio.",
   icons: {
     icon: "/assets/favi.svg",
+    apple: "/assets/favi.svg",
   },
   openGraph: {
     title: "Simon Duncan | Product Design",

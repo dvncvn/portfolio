@@ -26,7 +26,7 @@ type SvgAccentConfig = {
 type WorkCardProps = {
   slug: string;
   title: string;
-  date: string;
+  date?: string;
   tall?: boolean;
   imageSrc?: string;
   hoverImageSrc?: string;

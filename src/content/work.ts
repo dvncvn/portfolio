@@ -32,4 +32,3 @@ export async function getNextProject(
   // Use explicitly defined next project from the JSON
   return currentProject.nextProject ?? null;
 }
-

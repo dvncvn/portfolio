@@ -194,8 +194,13 @@ export function PlayLightbox({ item, onClose }: PlayLightboxProps) {
           <div className="flex flex-col gap-4">
             <h2 className="text-lg font-medium text-foreground">{item.title}</h2>
             <p className="text-sm leading-relaxed text-muted-foreground">
-              {item.summary ?? item.description}
+              {item.description}
             </p>
+            {item.summary && item.summary !== item.description && (
+              <p className="text-sm leading-relaxed text-muted-foreground/80">
+                {item.summary}
+              </p>
+            )}
             {item.href && (
               <a
                 href={item.href}

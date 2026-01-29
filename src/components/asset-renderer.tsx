@@ -110,12 +110,33 @@ function getAssetLightboxSrc(asset: WorkProjectAsset) {
 
 function useGalleryLightbox(assets: WorkProjectAsset[]) {
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
+  const historyPushedRef = useRef(false);
+
+  // Handle browser back button
+  useEffect(() => {
+    if (activeIndex === null) return;
+
+    const onPopState = () => {
+      // Browser back was pressed, close the lightbox
+      historyPushedRef.current = false;
+      setActiveIndex(null);
+    };
+
+    window.addEventListener("popstate", onPopState);
+    return () => window.removeEventListener("popstate", onPopState);
+  }, [activeIndex]);
 
   useEffect(() => {
     if (activeIndex === null) return;
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
-        setActiveIndex(null);
+        // Go back in history instead of just closing
+        if (historyPushedRef.current) {
+          historyPushedRef.current = false;
+          window.history.back();
+        } else {
+          setActiveIndex(null);
+        }
       }
       if (event.key === "ArrowRight") {
         setActiveIndex((prev) => {
@@ -134,10 +155,27 @@ function useGalleryLightbox(assets: WorkProjectAsset[]) {
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [activeIndex, assets.length]);
 
+  const openAt = (index: number) => {
+    // Push a history state so back button closes the lightbox
+    window.history.pushState({ lightbox: true }, "");
+    historyPushedRef.current = true;
+    setActiveIndex(index);
+  };
+
+  const close = () => {
+    // Go back in history to close
+    if (historyPushedRef.current) {
+      historyPushedRef.current = false;
+      window.history.back();
+    } else {
+      setActiveIndex(null);
+    }
+  };
+
   return {
     activeIndex,
-    openAt: (index: number) => setActiveIndex(index),
-    close: () => setActiveIndex(null),
+    openAt,
+    close,
     next: () =>
       setActiveIndex((prev) => {
         if (prev === null) return prev;

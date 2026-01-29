@@ -557,6 +557,52 @@ function SiteShellContent({ children }: SiteShellProps) {
                   </Link>
                 </motion.div>
               ))}
+              
+              {/* Elsewhere section */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 10 }}
+                transition={{ duration: 0.3, delay: navLinks.length * 0.05 }}
+                className="flex flex-col items-center gap-8 pt-8"
+              >
+                <span className="text-[14px] font-medium uppercase tracking-wider text-muted-foreground/50">
+                  Elsewhere
+                </span>
+                {footerLinks.map((link, idx) => (
+                  <motion.div
+                    key={link.label}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 10 }}
+                    transition={{ duration: 0.3, delay: (navLinks.length + 1 + idx) * 0.05 }}
+                  >
+                    <Link
+                      href={link.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="text-[32px] font-medium text-muted-foreground transition-colors hover:text-foreground"
+                    >
+                      {link.label}
+                    </Link>
+                  </motion.div>
+                ))}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 10 }}
+                  transition={{ duration: 0.3, delay: (navLinks.length + 1 + footerLinks.length) * 0.05 }}
+                >
+                  <a
+                    href={`mailto:${EMAIL}`}
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="text-[32px] font-medium text-muted-foreground transition-colors hover:text-foreground"
+                  >
+                    Email
+                  </a>
+                </motion.div>
+              </motion.div>
             </nav>
           </motion.div>
         )}
@@ -571,7 +617,7 @@ function SiteShellContent({ children }: SiteShellProps) {
 
       <footer className="mt-20">
         <div className="w-full px-6">
-          <div className="mx-auto flex w-full max-w-[1400px] flex-col gap-4 py-8 text-sm text-muted-foreground min-[480px]:flex-row min-[480px]:items-center min-[480px]:justify-between">
+          <div className="mx-auto flex w-full max-w-[1400px] items-center justify-between gap-4 py-8 text-sm text-muted-foreground">
             <span className="group/madison inline-flex cursor-default select-none items-center gap-2 font-mono text-[#464646] transition-colors duration-300 hover:text-[#5bc4c4]">
               {/* Flag - slides in from left on hover */}
               <span className="relative h-[14px] w-0 overflow-hidden transition-all duration-300 ease-out group-hover/madison:w-[21px]">
@@ -584,7 +630,7 @@ function SiteShellContent({ children }: SiteShellProps) {
               </span>
               Made in Madison WI
             </span>
-            <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
+            <div className="hidden items-center gap-x-6 min-[480px]:flex">
               {footerLinks.map((link) => (
                 <Link
                   key={link.label}
@@ -596,28 +642,23 @@ function SiteShellContent({ children }: SiteShellProps) {
                   {link.label}
                 </Link>
               ))}
-              {/* Email - copy on desktop, mailto on mobile */}
+              {/* Email - copy on desktop */}
               <a
                 href={`mailto:${EMAIL}`}
                 onClick={(e) => {
-                  // Check if device supports hover (desktop)
-                  const isDesktop = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
-                  if (isDesktop) {
-                    e.preventDefault();
-                    navigator.clipboard.writeText(EMAIL);
-                    setEmailCopied(true);
-                    setTimeout(() => setEmailCopied(false), 2000);
-                  }
-                  // On mobile, let the default mailto behavior happen
+                  e.preventDefault();
+                  navigator.clipboard.writeText(EMAIL);
+                  setEmailCopied(true);
+                  setTimeout(() => setEmailCopied(false), 2000);
                 }}
-                className="transition-colors hover:text-foreground"
+                className="cursor-pointer transition-colors hover:text-foreground"
               >
                 {emailCopied ? "Copied" : "Email"}
               </a>
-              {/* Command Palette Trigger - hidden on very small screens */}
+              {/* Command Palette Trigger */}
               <button
                 onClick={() => setCommandPaletteOpen(true)}
-                className={`hidden h-7 w-7 cursor-pointer items-center justify-center rounded-lg border border-white/[0.06] bg-white/[0.02] font-mono text-[13px] text-white/20 transition-all hover:border-white/10 hover:bg-white/[0.04] hover:text-white/40 sm:flex ${
+                className={`h-7 w-7 cursor-pointer items-center justify-center rounded-lg border border-white/[0.06] bg-white/[0.02] font-mono text-[13px] text-white/20 transition-all hover:border-white/10 hover:bg-white/[0.04] hover:text-white/40 flex ${
                   commandPaletteOpen || isResumeOpen ? "invisible" : ""
                 }`}
                 aria-label="Open navigator (press /)"

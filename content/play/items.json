@@ -1,5 +1,20 @@
 [
   {
+    "slug": "snowfall",
+    "title": "Snowfall",
+    "description": "Generative audiovisual instrument: falling snow on screen drives sound. A homage to the norns script “fall.”",
+    "summary": "You can tweak density, flake size, wind, scale/mood, and dither; there’s also a 16-step drum sequencer with generative fills, stutter, and tone controls. Built with Vite, Canvas 2D, and Web Audio API (no libraries).",
+    "thumbnail": "/assets/play/snowfall/thumb.png",
+    "assets": [
+      { "type": "image", "src": "/assets/play/snowfall/lightbox-1.png", "alt": "Snowfall generative instrument" }
+    ],
+    "tool": "Vite, Canvas 2D, Web Audio API",
+    "year": "2026",
+    "href": "https://github.com/dvncvn/snowfall",
+    "ctaLabel": "View Repo",
+    "tags": ["Code"]
+  },
+  {
     "slug": "terra",
     "title": "Terra",
     "description": "Three.js terrain generator with ASCII effects and audio reactivity.",

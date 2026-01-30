@@ -22,13 +22,14 @@ export function DndCharacterOverlay({ isOpen, onClose }: DndCharacterOverlayProp
     };
   }, [isOpen]);
 
-  // Close on escape
+  // Close on escape - stopImmediatePropagation prevents presentation mode from also closing
   useEffect(() => {
     if (!isOpen) return;
 
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
         e.preventDefault();
+        e.stopImmediatePropagation();
         onClose();
       }
     };

@@ -1,13 +1,17 @@
 "use client";
 
-import { createContext, useContext, useState, useCallback, useEffect, useRef } from "react";
+import { createContext, useContext, useState, useCallback } from "react";
 import { usePathname } from "next/navigation";
 
 type PageContentContextValue = {
   /** The current page's content as markdown */
   markdown: string | null;
-  /** The current page's title for display */
-  pageTitle: string | null;
+  /** The pathname this content belongs to */
+  contentPathname: string | null;
+  /** Current pathname for comparison */
+  currentPathname: string;
+  /** Whether content is ready (matches current path) */
+  isContentReady: boolean;
   /** Set the page content (call this from page components) */
   setPageContent: (markdown: string, title?: string) => void;
   /** Copy the current page content to clipboard */
@@ -27,24 +31,17 @@ const PageContentContext = createContext<PageContentContextValue | null>(null);
 export function PageContentProvider({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const [markdown, setMarkdown] = useState<string | null>(null);
-  const [pageTitle, setPageTitle] = useState<string | null>(null);
+  const [contentPathname, setContentPathname] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   const [isViewerOpen, setIsViewerOpen] = useState(false);
-  const prevPathnameRef = useRef<string | null>(null);
 
-  // Clear content only when pathname actually changes (not on initial mount)
-  useEffect(() => {
-    if (prevPathnameRef.current !== null && prevPathnameRef.current !== pathname) {
-      setMarkdown(null);
-      setPageTitle(null);
-    }
-    prevPathnameRef.current = pathname;
-  }, [pathname]);
+  // Content is ready if we have markdown and it's for the current path
+  const isContentReady = markdown !== null && contentPathname === pathname;
 
-  const setPageContent = useCallback((content: string, title?: string) => {
+  const setPageContent = useCallback((content: string) => {
     setMarkdown(content);
-    if (title) setPageTitle(title);
-  }, []);
+    setContentPathname(pathname);
+  }, [pathname]);
 
   const copyToClipboard = useCallback(async () => {
     if (!markdown) return false;
@@ -58,9 +55,10 @@ export function PageContentProvider({ children }: { children: React.ReactNode })
     }
   }, [markdown]);
 
+  // Always allow opening - viewer will show loading if content not ready
   const openViewer = useCallback(() => {
-    if (markdown) setIsViewerOpen(true);
-  }, [markdown]);
+    setIsViewerOpen(true);
+  }, []);
 
   const closeViewer = useCallback(() => {
     setIsViewerOpen(false);
@@ -69,8 +67,10 @@ export function PageContentProvider({ children }: { children: React.ReactNode })
   return (
     <PageContentContext.Provider
       value={{
-        markdown,
-        pageTitle,
+        markdown: isContentReady ? markdown : null,
+        contentPathname,
+        currentPathname: pathname,
+        isContentReady,
         setPageContent,
         copyToClipboard,
         copied,

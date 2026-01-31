@@ -13,7 +13,7 @@ export default async function PlayPage() {
   const markdown = playPageToMarkdown(items);
 
   return (
-    <PageContentRegistrar markdown={markdown} title="Play">
+    <PageContentRegistrar markdown={markdown}>
       <div className="py-20">
         <PlayGrid items={items} />
       </div>

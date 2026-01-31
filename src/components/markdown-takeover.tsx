@@ -21,8 +21,14 @@ const navLinks: NavLink[] = [
   { label: "Info", href: "/info" },
 ];
 
-// Patterns to match in markdown content and their corresponding routes
-const linkPatterns: { pattern: RegExp; href: string }[] = [
+// Patterns to match in markdown content and their corresponding routes/links
+type LinkPattern = {
+  pattern: RegExp;
+  href: string;
+  external?: boolean; // If true, opens in new tab
+};
+
+const linkPatterns: LinkPattern[] = [
   // Work projects
   { pattern: /Langflow:\s*Platform\s*Redesign/gi, href: "/work/langflow-platform-redesign" },
   { pattern: /Langflow:\s*Agent\s*Experience/gi, href: "/work/langflow-agent-experience" },
@@ -33,6 +39,11 @@ const linkPatterns: { pattern: RegExp; href: string }[] = [
   { pattern: /\bTerra\b/g, href: "/play" },
   { pattern: /A surprising gust of air/gi, href: "/play" },
   { pattern: /Of what was/gi, href: "/play" },
+  // External links - contact & social
+  { pattern: /simonfraserduncan@gmail\.com/g, href: "mailto:simonfraserduncan@gmail.com", external: true },
+  { pattern: /simonduncan\.co/g, href: "https://simonduncan.co", external: true },
+  { pattern: /linkedin\.com\/in\/simonfraserduncan/g, href: "https://linkedin.com/in/simonfraserduncan", external: true },
+  { pattern: /github\.com\/dvncvn/g, href: "https://github.com/dvncvn", external: true },
 ];
 
 type MarkdownTakeoverProps = {
@@ -83,15 +94,31 @@ export function MarkdownTakeover({ isOpen, onClose, markdown }: MarkdownTakeover
         // Reset the pattern's lastIndex since we used test()
         linkPattern.pattern.lastIndex = 0;
         
-        parts.push(
-          <button
-            key={`link-${keyIndex++}`}
-            onClick={() => handleNavigate(linkPattern.href)}
-            className="cursor-pointer text-[#01F8A5] underline decoration-[#01F8A5]/30 underline-offset-2 transition-colors hover:decoration-[#01F8A5]/60"
-          >
-            {matchedText}
-          </button>
-        );
+        if (linkPattern.external) {
+          // External link - open in new tab
+          parts.push(
+            <a
+              key={`link-${keyIndex++}`}
+              href={linkPattern.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="cursor-pointer text-[#01F8A5] underline decoration-[#01F8A5]/30 underline-offset-2 transition-colors hover:decoration-[#01F8A5]/60"
+            >
+              {matchedText}
+            </a>
+          );
+        } else {
+          // Internal link - navigate within app
+          parts.push(
+            <button
+              key={`link-${keyIndex++}`}
+              onClick={() => handleNavigate(linkPattern.href)}
+              className="cursor-pointer text-[#01F8A5] underline decoration-[#01F8A5]/30 underline-offset-2 transition-colors hover:decoration-[#01F8A5]/60"
+            >
+              {matchedText}
+            </button>
+          );
+        }
       } else {
         parts.push(matchedText);
       }

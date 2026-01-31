@@ -56,7 +56,7 @@ const EMAIL = "simonfraserduncan@gmail.com";
 export function CommandPalette({ isOpen, onClose, currentPath = "/" }: CommandPaletteProps) {
   const router = useRouter();
   const { openResume } = useResume();
-  const { markdown, openViewer } = usePageContent();
+  const { openViewer } = usePageContent();
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [copiedEmail, setCopiedEmail] = useState(false);
   const listRef = useRef<HTMLDivElement>(null);
@@ -89,14 +89,12 @@ export function CommandPalette({ isOpen, onClose, currentPath = "/" }: CommandPa
           }, 1500);
           return; // Don't close
         } else if (item.action === "viewMarkdown") {
-          if (markdown) {
-            openViewer();
-            onClose();
-          }
+          openViewer();
+          onClose();
         }
       }
     },
-    [router, onClose, openResume, markdown, openViewer]
+    [router, onClose, openResume, openViewer]
   );
 
   // Reset selection when opened
@@ -230,8 +228,6 @@ export function CommandPalette({ isOpen, onClose, currentPath = "/" }: CommandPa
                             ? "text-foreground"
                             : item.indent
                             ? "text-muted-foreground/70"
-                            : item.type === "action" && item.action === "viewMarkdown" && !markdown
-                            ? "text-muted-foreground/40"
                             : "text-muted-foreground"
                         }`}
                       >

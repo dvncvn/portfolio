@@ -54,10 +54,22 @@ function describeAssets(assets: WorkProjectAsset[]): string[] {
   return descriptions;
 }
 
+// All work projects for navigation
+const ALL_PROJECTS = [
+  { slug: "langflow-platform-redesign", title: "Langflow: Platform Redesign" },
+  { slug: "langflow-agent-experience", title: "Langflow: Agent Experience" },
+  { slug: "context-forge", title: "Context Forge" },
+  { slug: "astra-db", title: "Astra DB" },
+];
+
+type ProjectNavigation = {
+  nextProject?: { slug: string; title: string } | null;
+};
+
 /**
  * Convert a work project to markdown format
  */
-export function workProjectToMarkdown(project: WorkProject): string {
+export function workProjectToMarkdown(project: WorkProject, navigation?: ProjectNavigation): string {
   const lines: string[] = [];
 
   // Add site context
@@ -156,6 +168,30 @@ export function workProjectToMarkdown(project: WorkProject): string {
       }
     }
   }
+
+  // Navigation section
+  lines.push("---");
+  lines.push("");
+  lines.push("## More Work");
+  lines.push("");
+
+  // Next project link
+  if (navigation?.nextProject) {
+    lines.push(`**Next:** ${navigation.nextProject.title}`);
+    lines.push("");
+  }
+
+  // All projects
+  lines.push("**All Projects:**");
+  for (const proj of ALL_PROJECTS) {
+    const isCurrent = proj.slug === project.slug;
+    if (isCurrent) {
+      lines.push(`- ${proj.title} *(current)*`);
+    } else {
+      lines.push(`- ${proj.title}`);
+    }
+  }
+  lines.push("");
 
   return lines.join("\n").trim();
 }

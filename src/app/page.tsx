@@ -109,7 +109,7 @@ export default async function Home({ searchParams }: HomePageProps) {
   const markdown = homePageToMarkdown(markdownProjects);
 
   return (
-    <PageContentRegistrar markdown={markdown} title="Work">
+    <PageContentRegistrar markdown={markdown}>
       <HomePageClient visitor={visitor}>
       <div className="py-20">
         {/* Hero section */}

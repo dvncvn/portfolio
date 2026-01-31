@@ -453,7 +453,7 @@ export default function InfoPage() {
   const [asciiColor, setAsciiColor] = useState<EffectColor>(null);
 
   return (
-    <PageContentRegistrar markdown={INFO_MARKDOWN} title="Info">
+    <PageContentRegistrar markdown={INFO_MARKDOWN}>
       <div className="py-20">
       {/* 2-column layout: content takes more space, image is smaller */}
       <section className="grid gap-10 lg:grid-cols-[1fr_440px] lg:gap-24">

@@ -55,10 +55,10 @@ export default async function WorkProjectPage({
 
   // Generate markdown for the copy feature
   const projectWithEnrichedSections = { ...project, sections };
-  const markdown = workProjectToMarkdown(projectWithEnrichedSections);
+  const markdown = workProjectToMarkdown(projectWithEnrichedSections, { nextProject });
 
   return (
-    <PageContentRegistrar markdown={markdown} title={project.title}>
+    <PageContentRegistrar markdown={markdown}>
       <div className="py-20">
         <div className="space-y-24">
           <ProjectHero

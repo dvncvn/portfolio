@@ -5,7 +5,7 @@ import { EmploymentTable, type EmploymentRow } from "@/components/employment-tab
 import { BlurFade } from "@/components/ui/blur-fade";
 import { motion, AnimatePresence } from "framer-motion";
 import { useResume } from "@/contexts/resume-context";
-import { usePageContent } from "@/contexts/page-content-context";
+import { PageContentRegistrar } from "@/components/page-content-registrar";
 import { infoPageToMarkdown } from "@/lib/markdown";
 import { DndHoverCard } from "@/components/dnd-hover-card";
 
@@ -438,9 +438,11 @@ const workHistory: EmploymentRow[] = [
   },
 ];
 
+// Generate markdown once at module level since it's static
+const INFO_MARKDOWN = infoPageToMarkdown();
+
 export default function InfoPage() {
   const { openResume } = useResume();
-  const { setPageContent } = usePageContent();
   const [imageEffect, setImageEffect] = useState<ImageEffect>("normal");
   const [showControls, setShowControls] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
@@ -450,13 +452,9 @@ export default function InfoPage() {
   const [asciiSize, setAsciiSize] = useState(12);
   const [asciiColor, setAsciiColor] = useState<EffectColor>(null);
 
-  // Register page content for markdown view
-  useEffect(() => {
-    setPageContent(infoPageToMarkdown(), "Info");
-  }, [setPageContent]);
-
   return (
-    <div className="py-20">
+    <PageContentRegistrar markdown={INFO_MARKDOWN} title="Info">
+      <div className="py-20">
       {/* 2-column layout: content takes more space, image is smaller */}
       <section className="grid gap-10 lg:grid-cols-[1fr_440px] lg:gap-24">
         {/* Left column: intro (unanimated) + table immediately below */}
@@ -795,5 +793,6 @@ export default function InfoPage() {
         </BlurFade>
       </section>
     </div>
+    </PageContentRegistrar>
   );
 }

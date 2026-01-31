@@ -1,8 +1,39 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter, usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { createPortal } from "react-dom";
+
+type NavLink = {
+  label: string;
+  href: string;
+  indent?: boolean;
+};
+
+const navLinks: NavLink[] = [
+  { label: "Work", href: "/" },
+  { label: "Langflow: Platform Redesign", href: "/work/langflow-platform-redesign", indent: true },
+  { label: "Langflow: Agent Experience", href: "/work/langflow-agent-experience", indent: true },
+  { label: "Context Forge", href: "/work/context-forge", indent: true },
+  { label: "Astra DB", href: "/work/astra-db", indent: true },
+  { label: "Play", href: "/play" },
+  { label: "Info", href: "/info" },
+];
+
+// Patterns to match in markdown content and their corresponding routes
+const linkPatterns: { pattern: RegExp; href: string }[] = [
+  // Work projects
+  { pattern: /Langflow:\s*Platform\s*Redesign/gi, href: "/work/langflow-platform-redesign" },
+  { pattern: /Langflow:\s*Agent\s*Experience/gi, href: "/work/langflow-agent-experience" },
+  { pattern: /Context\s*Forge(?::\s*Reimagined)?/gi, href: "/work/context-forge" },
+  { pattern: /Astra(?:\s*DB)?(?::\s*AI-First\s*Database\s*Design)?/gi, href: "/work/astra-db" },
+  // Play projects (all link to /play)
+  { pattern: /\bSnowfall\b/g, href: "/play" },
+  { pattern: /\bTerra\b/g, href: "/play" },
+  { pattern: /A surprising gust of air/gi, href: "/play" },
+  { pattern: /Of what was/gi, href: "/play" },
+];
 
 type MarkdownTakeoverProps = {
   isOpen: boolean;
@@ -11,7 +42,70 @@ type MarkdownTakeoverProps = {
 };
 
 export function MarkdownTakeover({ isOpen, onClose, markdown }: MarkdownTakeoverProps) {
+  const router = useRouter();
+  const pathname = usePathname();
   const [copied, setCopied] = useState(false);
+
+  const isActive = (href: string) => {
+    if (href === "/") {
+      return pathname === "/";
+    }
+    return pathname === href || pathname.startsWith(href + "/");
+  };
+
+  const handleNavigate = (href: string) => {
+    router.push(href);
+    // Don't close - stay in markdown mode
+  };
+
+  // Render markdown with clickable links for known patterns
+  const renderMarkdownWithLinks = (text: string) => {
+    // Build a combined pattern that matches any of our link patterns
+    const allPatterns = linkPatterns.map(p => `(${p.pattern.source})`).join("|");
+    const combinedRegex = new RegExp(allPatterns, "gi");
+    
+    const parts: React.ReactNode[] = [];
+    let lastIndex = 0;
+    let match;
+    let keyIndex = 0;
+
+    while ((match = combinedRegex.exec(text)) !== null) {
+      // Add text before the match
+      if (match.index > lastIndex) {
+        parts.push(text.slice(lastIndex, match.index));
+      }
+
+      // Find which pattern matched
+      const matchedText = match[0];
+      const linkPattern = linkPatterns.find(p => p.pattern.test(matchedText));
+      
+      if (linkPattern) {
+        // Reset the pattern's lastIndex since we used test()
+        linkPattern.pattern.lastIndex = 0;
+        
+        parts.push(
+          <button
+            key={`link-${keyIndex++}`}
+            onClick={() => handleNavigate(linkPattern.href)}
+            className="cursor-pointer text-[#01F8A5] underline decoration-[#01F8A5]/30 underline-offset-2 transition-colors hover:decoration-[#01F8A5]/60"
+          >
+            {matchedText}
+          </button>
+        );
+      } else {
+        parts.push(matchedText);
+      }
+
+      lastIndex = match.index + matchedText.length;
+    }
+
+    // Add remaining text
+    if (lastIndex < text.length) {
+      parts.push(text.slice(lastIndex));
+    }
+
+    return parts.length > 0 ? parts : text;
+  };
 
   const handleCopy = async () => {
     if (!markdown) return;
@@ -129,17 +223,37 @@ export function MarkdownTakeover({ isOpen, onClose, markdown }: MarkdownTakeover
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.25, delay: 0.05 }}
-            className="h-full overflow-y-auto px-6 pb-24 pt-12 scrollbar-none"
+            className="h-full overflow-y-auto px-6 pb-24 pt-6 scrollbar-none"
           >
             <div className="mx-auto max-w-[900px]">
+              {/* Navigation */}
+              <nav className="mb-8 flex flex-wrap items-center gap-x-1 gap-y-1 border-b border-white/[0.06] pb-4">
+                {navLinks.map((link) => (
+                  <button
+                    key={link.href}
+                    onClick={() => handleNavigate(link.href)}
+                    className={`rounded-md px-2.5 py-1 font-mono text-[12px] transition-colors ${
+                      link.indent ? "ml-1" : ""
+                    } ${
+                      isActive(link.href)
+                        ? "bg-white/[0.08] text-foreground"
+                        : "text-muted-foreground hover:bg-white/[0.04] hover:text-foreground"
+                    }`}
+                  >
+                    {link.label}
+                  </button>
+                ))}
+              </nav>
+
+              {/* Markdown content */}
               {markdown ? (
                 <pre className="whitespace-pre-wrap break-words font-mono text-[13px] leading-[1.7] text-foreground/80">
-                  {markdown}
+                  {renderMarkdownWithLinks(markdown)}
                 </pre>
               ) : (
                 <div className="flex h-[60vh] items-center justify-center">
                   <p className="text-[14px] text-muted-foreground/50">
-                    No content available for this page
+                    Loading content...
                   </p>
                 </div>
               )}

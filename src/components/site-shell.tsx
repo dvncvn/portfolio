@@ -9,7 +9,9 @@ import { HyperText } from "@/components/ui/hyper-text";
 import { CommandPalette } from "@/components/command-palette";
 import { RatModeDialog } from "@/components/rat-mode-dialog";
 import { ResumeProvider, useResume } from "@/contexts/resume-context";
+import { PageContentProvider, usePageContent } from "@/contexts/page-content-context";
 import { ResumeTakeover } from "@/components/resume-takeover";
+import { MarkdownTakeover } from "@/components/markdown-takeover";
 
 type SiteShellProps = {
   children: React.ReactNode;
@@ -70,6 +72,7 @@ function SiteShellContent({ children }: SiteShellProps) {
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const keySequenceRef = useRef("");
   const { isOpen: isResumeOpen, closeResume, resumeData } = useResume();
+  const { isViewerOpen: isMarkdownOpen, closeViewer: closeMarkdown, markdown } = usePageContent();
 
   // Close mobile menu on route change
   useEffect(() => {
@@ -740,6 +743,13 @@ function SiteShellContent({ children }: SiteShellProps) {
         onClose={closeResume}
         data={resumeData}
       />
+
+      {/* Markdown Viewer */}
+      <MarkdownTakeover
+        isOpen={isMarkdownOpen}
+        onClose={closeMarkdown}
+        markdown={markdown}
+      />
     </div>
   );
 }
@@ -747,7 +757,9 @@ function SiteShellContent({ children }: SiteShellProps) {
 export function SiteShell({ children }: SiteShellProps) {
   return (
     <ResumeProvider>
-      <SiteShellContent>{children}</SiteShellContent>
+      <PageContentProvider>
+        <SiteShellContent>{children}</SiteShellContent>
+      </PageContentProvider>
     </ResumeProvider>
   );
 }

@@ -5,8 +5,10 @@ import { WorkCard } from "@/components/work-card";
 import { BlurFade } from "@/components/ui/blur-fade";
 import { WorkSectionHeader } from "@/components/work-section-header";
 import { HomePageClient } from "@/components/home-page-client";
+import { PageContentRegistrar } from "@/components/page-content-registrar";
 import { getWorkProject } from "@/content/work";
 import { getVisitor } from "@/content/visitors";
+import { homePageToMarkdown } from "@/lib/markdown";
 
 export const metadata: Metadata = {
   title: "Work | Simon Duncan",
@@ -96,8 +98,19 @@ export default async function Home({ searchParams }: HomePageProps) {
   );
   const validProjects = fullProjects.filter((p): p is NonNullable<typeof p> => p !== null);
 
+  // Generate markdown for the copy feature
+  const markdownProjects = validProjects.map((p) => ({
+    slug: p.slug,
+    title: p.title,
+    shortScope: p.shortScope,
+    summary: p.summary,
+    meta: p.meta,
+  }));
+  const markdown = homePageToMarkdown(markdownProjects);
+
   return (
-    <HomePageClient visitor={visitor}>
+    <PageContentRegistrar markdown={markdown} title="Work">
+      <HomePageClient visitor={visitor}>
       <div className="py-20">
         {/* Hero section */}
         <section className="grid gap-16 lg:gap-24">
@@ -166,6 +179,7 @@ export default async function Home({ searchParams }: HomePageProps) {
           </div>
         </section>
       </div>
-    </HomePageClient>
+      </HomePageClient>
+    </PageContentRegistrar>
   );
 }

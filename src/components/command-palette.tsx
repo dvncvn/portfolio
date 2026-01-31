@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { useResume } from "@/contexts/resume-context";
+import { usePageContent } from "@/contexts/page-content-context";
 
 type NavItem = {
   type: "nav";
@@ -38,6 +39,7 @@ const navItems: PaletteItem[] = [
   { type: "action", label: "Open Presentation", action: "openPresentation" },
   { type: "action", label: "View Resume", action: "openResume" },
   { type: "action", label: "Copy Email", action: "copyEmail" },
+  { type: "action", label: "View as Markdown", action: "viewMarkdown" },
 ];
 
 // Get selectable items only (not separators)
@@ -54,6 +56,7 @@ const EMAIL = "simonfraserduncan@gmail.com";
 export function CommandPalette({ isOpen, onClose, currentPath = "/" }: CommandPaletteProps) {
   const router = useRouter();
   const { openResume } = useResume();
+  const { markdown, openViewer } = usePageContent();
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [copiedEmail, setCopiedEmail] = useState(false);
   const listRef = useRef<HTMLDivElement>(null);
@@ -85,10 +88,15 @@ export function CommandPalette({ isOpen, onClose, currentPath = "/" }: CommandPa
             setCopiedEmail(false);
           }, 1500);
           return; // Don't close
+        } else if (item.action === "viewMarkdown") {
+          if (markdown) {
+            openViewer();
+            onClose();
+          }
         }
       }
     },
-    [router, onClose, openResume]
+    [router, onClose, openResume, markdown, openViewer]
   );
 
   // Reset selection when opened
@@ -222,6 +230,8 @@ export function CommandPalette({ isOpen, onClose, currentPath = "/" }: CommandPa
                             ? "text-foreground"
                             : item.indent
                             ? "text-muted-foreground/70"
+                            : item.type === "action" && item.action === "viewMarkdown" && !markdown
+                            ? "text-muted-foreground/40"
                             : "text-muted-foreground"
                         }`}
                       >

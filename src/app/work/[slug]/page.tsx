@@ -4,7 +4,9 @@ import { getWorkProject, getWorkProjectSlugs, getNextProject } from "@/content/w
 import { ProjectHero } from "@/components/project-hero";
 import { SectionBlock } from "@/components/section-block";
 import { ProjectNavigator } from "@/components/project-navigator";
+import { PageContentRegistrar } from "@/components/page-content-registrar";
 import { getGithubStars } from "@/lib/github";
+import { workProjectToMarkdown } from "@/lib/markdown";
 import type { WorkProjectSection } from "@/content/types";
 
 export const metadata: Metadata = {
@@ -51,25 +53,31 @@ export default async function WorkProjectPage({
   const sections = await enrichSectionsWithGithubStars(project.sections);
   const nextProject = await getNextProject(slug);
 
+  // Generate markdown for the copy feature
+  const projectWithEnrichedSections = { ...project, sections };
+  const markdown = workProjectToMarkdown(projectWithEnrichedSections);
+
   return (
-    <div className="py-20">
-      <div className="space-y-24">
-        <ProjectHero
-          title={project.title}
-          heroAsset={project.heroAsset}
-          summary={project.summary}
-          meta={project.meta}
-        />
+    <PageContentRegistrar markdown={markdown} title={project.title}>
+      <div className="py-20">
+        <div className="space-y-24">
+          <ProjectHero
+            title={project.title}
+            heroAsset={project.heroAsset}
+            summary={project.summary}
+            meta={project.meta}
+          />
 
-        <div className="space-y-[88px]">
-          {sections.map((section, idx) => (
-            <SectionBlock key={`${section.heading}-${idx}`} section={section} index={idx} />
-          ))}
+          <div className="space-y-[88px]">
+            {sections.map((section, idx) => (
+              <SectionBlock key={`${section.heading}-${idx}`} section={section} index={idx} />
+            ))}
+          </div>
+
+          <ProjectNavigator nextProject={nextProject ?? undefined} />
         </div>
-
-        <ProjectNavigator nextProject={nextProject ?? undefined} />
       </div>
-    </div>
+    </PageContentRegistrar>
   );
 }
 

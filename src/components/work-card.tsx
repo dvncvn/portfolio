@@ -36,6 +36,8 @@ type WorkCardProps = {
   svgPadding?: string;
   vignette?: boolean;
   dotGrid?: boolean;
+  /** Mark as above-the-fold for eager loading + high fetch priority */
+  priority?: boolean;
 };
 
 export function WorkCard({
@@ -50,6 +52,7 @@ export function WorkCard({
   svgPadding,
   vignette,
   dotGrid,
+  priority = false,
 }: WorkCardProps) {
   const cardRef = useRef<HTMLAnchorElement>(null);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
@@ -196,7 +199,9 @@ export function WorkCard({
                           ? (svgPadding ?? "p-8 sm:p-10 md:p-12")
                           : "p-6 sm:p-8",
                       ].join(" ")}
-                      loading="lazy"
+                      loading={priority ? "eager" : "lazy"}
+                      fetchPriority={priority ? "high" : undefined}
+                      decoding="async"
                       draggable={false}
                     />
                     {/* Mobile hover art */}
@@ -214,6 +219,8 @@ export function WorkCard({
                             ? (svgPadding ?? "p-8 sm:p-10 md:p-12")
                             : "p-6 sm:p-8",
                         ].join(" ")}
+                        loading="lazy"
+                        decoding="async"
                         draggable={false}
                       />
                     ) : null}
@@ -232,7 +239,9 @@ export function WorkCard({
                       ? (svgPadding ?? "p-8 sm:p-10 md:p-12")
                       : "p-6 sm:p-8",
                   ].join(" ")}
-                  loading="lazy"
+                  loading={priority ? "eager" : "lazy"}
+                  fetchPriority={priority ? "high" : undefined}
+                  decoding="async"
                   draggable={false}
                 />
 
@@ -252,6 +261,8 @@ export function WorkCard({
                         ? (svgPadding ?? "p-8 sm:p-10 md:p-12")
                         : "p-6 sm:p-8",
                     ].join(" ")}
+                    loading="lazy"
+                    decoding="async"
                     draggable={false}
                   />
                 ) : null}

@@ -1,17 +1,32 @@
 "use client";
 
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { motion, useMotionValueEvent, useScroll, AnimatePresence } from "framer-motion";
 import { HyperText } from "@/components/ui/hyper-text";
-import { CommandPalette } from "@/components/command-palette";
-import { RatModeDialog } from "@/components/rat-mode-dialog";
 import { ResumeProvider, useResume } from "@/contexts/resume-context";
 import { PageContentProvider, usePageContent } from "@/contexts/page-content-context";
-import { ResumeTakeover } from "@/components/resume-takeover";
-import { MarkdownTakeover } from "@/components/markdown-takeover";
+
+// Lazy-load overlay components – these are never visible on first paint
+const CommandPalette = dynamic(
+  () => import("@/components/command-palette").then((m) => ({ default: m.CommandPalette })),
+  { ssr: false }
+);
+const RatModeDialog = dynamic(
+  () => import("@/components/rat-mode-dialog").then((m) => ({ default: m.RatModeDialog })),
+  { ssr: false }
+);
+const ResumeTakeover = dynamic(
+  () => import("@/components/resume-takeover").then((m) => ({ default: m.ResumeTakeover })),
+  { ssr: false }
+);
+const MarkdownTakeover = dynamic(
+  () => import("@/components/markdown-takeover").then((m) => ({ default: m.MarkdownTakeover })),
+  { ssr: false }
+);
 
 type SiteShellProps = {
   children: React.ReactNode;
@@ -73,6 +88,34 @@ function SiteShellContent({ children }: SiteShellProps) {
   const keySequenceRef = useRef("");
   const { isOpen: isResumeOpen, closeResume, resumeData } = useResume();
   const { isViewerOpen: isMarkdownOpen, closeViewer: closeMarkdown, markdown } = usePageContent();
+
+  // Track which overlay chunks have been loaded (load on first trigger, keep mounted for exit animations)
+  const [overlayLoaded, setOverlayLoaded] = useState({
+    commandPalette: false,
+    ratModeDialog: false,
+    resume: false,
+    markdown: false,
+  });
+
+  useEffect(() => {
+    if (commandPaletteOpen && !overlayLoaded.commandPalette)
+      setOverlayLoaded((prev) => ({ ...prev, commandPalette: true }));
+  }, [commandPaletteOpen, overlayLoaded.commandPalette]);
+
+  useEffect(() => {
+    if (ratModeDialogOpen && !overlayLoaded.ratModeDialog)
+      setOverlayLoaded((prev) => ({ ...prev, ratModeDialog: true }));
+  }, [ratModeDialogOpen, overlayLoaded.ratModeDialog]);
+
+  useEffect(() => {
+    if (isResumeOpen && !overlayLoaded.resume)
+      setOverlayLoaded((prev) => ({ ...prev, resume: true }));
+  }, [isResumeOpen, overlayLoaded.resume]);
+
+  useEffect(() => {
+    if (isMarkdownOpen && !overlayLoaded.markdown)
+      setOverlayLoaded((prev) => ({ ...prev, markdown: true }));
+  }, [isMarkdownOpen, overlayLoaded.markdown]);
 
   // Close mobile menu on route change
   useEffect(() => {
@@ -674,19 +717,23 @@ function SiteShellContent({ children }: SiteShellProps) {
         </div>
       </footer>
 
-      {/* Command Palette */}
-      <CommandPalette
-        isOpen={commandPaletteOpen}
-        onClose={() => setCommandPaletteOpen(false)}
-        currentPath={pathname}
-      />
+      {/* Command Palette (chunk loads on first open) */}
+      {overlayLoaded.commandPalette && (
+        <CommandPalette
+          isOpen={commandPaletteOpen}
+          onClose={() => setCommandPaletteOpen(false)}
+          currentPath={pathname}
+        />
+      )}
 
-      {/* Rat Mode Dialog */}
-      <RatModeDialog
-        isOpen={ratModeDialogOpen}
-        onClose={() => setRatModeDialogOpen(false)}
-        onConfirm={handleRatModeConfirm}
-      />
+      {/* Rat Mode Dialog (chunk loads on first trigger) */}
+      {overlayLoaded.ratModeDialog && (
+        <RatModeDialog
+          isOpen={ratModeDialogOpen}
+          onClose={() => setRatModeDialogOpen(false)}
+          onConfirm={handleRatModeConfirm}
+        />
+      )}
 
       {/* Rat Mode Exit Hint - rendered via portal to escape transformed parents */}
       {ratModeActive && typeof document !== "undefined" &&
@@ -737,19 +784,23 @@ function SiteShellContent({ children }: SiteShellProps) {
         )
       }
 
-      {/* Resume Takeover */}
-      <ResumeTakeover
-        isOpen={isResumeOpen}
-        onClose={closeResume}
-        data={resumeData}
-      />
+      {/* Resume Takeover (chunk loads on first open) */}
+      {overlayLoaded.resume && (
+        <ResumeTakeover
+          isOpen={isResumeOpen}
+          onClose={closeResume}
+          data={resumeData}
+        />
+      )}
 
-      {/* Markdown Viewer */}
-      <MarkdownTakeover
-        isOpen={isMarkdownOpen}
-        onClose={closeMarkdown}
-        markdown={markdown}
-      />
+      {/* Markdown Viewer (chunk loads on first open) */}
+      {overlayLoaded.markdown && (
+        <MarkdownTakeover
+          isOpen={isMarkdownOpen}
+          onClose={closeMarkdown}
+          markdown={markdown}
+        />
+      )}
     </div>
   );
 }

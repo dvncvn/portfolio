@@ -1,10 +1,16 @@
 "use client";
 
 import { useState, useCallback, useEffect } from "react";
+import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { WelcomeModal } from "@/components/welcome-modal";
 import type { VisitorConfig } from "@/content/visitors";
+
+// Lazy-load WelcomeModal – only shown for ?visitor= URLs
+const WelcomeModal = dynamic(
+  () => import("@/components/welcome-modal").then((m) => ({ default: m.WelcomeModal })),
+  { ssr: false }
+);
 
 type HomePageClientProps = {
   visitor: VisitorConfig | null;

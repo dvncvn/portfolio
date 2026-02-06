@@ -1,9 +1,15 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import dynamic from "next/dynamic";
 import { useSearchParams, useRouter } from "next/navigation";
-import { PresentationMode } from "@/components/presentation-mode";
 import type { WorkProject } from "@/content/types";
+
+// Lazy-load PresentationMode – it's ~1000 lines and pulls in many heavy deps
+const PresentationMode = dynamic(
+  () => import("@/components/presentation-mode").then((m) => ({ default: m.PresentationMode })),
+  { ssr: false }
+);
 
 type WorkSectionHeaderProps = {
   projects: WorkProject[];

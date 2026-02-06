@@ -148,6 +148,7 @@ export default async function Home({ searchParams }: HomePageProps) {
                     svgPadding={project.svgPadding}
                     vignette={project.vignette}
                     dotGrid={project.dotGrid}
+                    priority
                   />
                 </BlurFade>
               ))}
@@ -172,6 +173,7 @@ export default async function Home({ searchParams }: HomePageProps) {
                     svgPadding={project.svgPadding}
                     vignette={project.vignette}
                     dotGrid={project.dotGrid}
+                    priority
                   />
                 </BlurFade>
               ))}

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Jacquard_24 } from "next/font/google";
+import { GeistPixelSquare } from "geist/font/pixel";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Analytics } from "@vercel/analytics/next";
 import { SiteShell } from "@/components/site-shell";
@@ -59,7 +60,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} ${jacquard24.variable}`}
+      className={`${geistSans.variable} ${geistMono.variable} ${jacquard24.variable} ${GeistPixelSquare.variable}`}
     >
       <body className="antialiased">
         <SiteShell>{children}</SiteShell>

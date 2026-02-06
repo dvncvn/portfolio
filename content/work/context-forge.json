@@ -31,27 +31,6 @@
     {
       "heading": "",
       "caption": "",
-      "layout": "compare",
-      "assets": [
-        {
-          "type": "image",
-          "src": "/assets/work/context-forge/before.png",
-          "alt": "Before",
-          "width": 0,
-          "height": 0
-        },
-        {
-          "type": "image",
-          "src": "/assets/work/context-forge/after.png",
-          "alt": "After",
-          "width": 0,
-          "height": 0
-        }
-      ]
-    },
-    {
-      "heading": "",
-      "caption": "",
       "layout": "bento",
       "maxWidth": 1400,
       "assets": [

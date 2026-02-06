@@ -42,14 +42,14 @@
         {
           "type": "image",
           "src": "/assets/work/langflow-agent-experience/before-canvas.png",
-          "alt": "Before",
+          "alt": "Before: Everything was a component on the canvas. This flat hierarchy encouraged flexibility but became crowded as flows grew complex. It was difficult to distinguish the agent from its tools.",
           "width": 1152,
           "height": 864
         },
         {
           "type": "image",
           "src": "/assets/work/langflow-agent-experience/after-canvas.png",
-          "alt": "After",
+          "alt": "After: The agent is now a first-class citizen with tools, data, and model directly associated. This provides an at-a-glance view of capabilities and clears the canvas for multi-agent workflows.",
           "width": 1152,
           "height": 864
         }
@@ -64,13 +64,13 @@
           "type": "image",
           "src": "/assets/work/langflow-agent-experience/bento-assets/thumb/card-1-fg.png",
           "fullSrc": "/assets/work/langflow-agent-experience/bento-assets/full/full-1.png",
-          "alt": "TODO: Asset description"
+          "alt": "Agentic building in Langflow combines natural language prompting with the visual canvas. Prompt your desired agentic flow and get a visual representation of it."
         },
         {
           "type": "image",
           "src": "/assets/work/langflow-agent-experience/bento-assets/thumb/card-2-fg.png",
           "fullSrc": "/assets/work/langflow-agent-experience/bento-assets/full/full-2.png",
-          "alt": "TODO: Asset description"
+          "alt": "Rather than restricting prompting to a chat interface or copilot sidebar, Langflow lets you generate components and next steps directly on the canvas."
         }
       ]
     },

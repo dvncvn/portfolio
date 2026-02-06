@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { createPortal } from "react-dom";
@@ -45,6 +45,81 @@ const linkPatterns: LinkPattern[] = [
   { pattern: /linkedin\.com\/in\/simonfraserduncan/g, href: "https://linkedin.com/in/simonfraserduncan", external: true },
   { pattern: /github\.com\/dvncvn/g, href: "https://github.com/dvncvn", external: true },
 ];
+
+function FallingPixels() {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const animRef = useRef<number>(0);
+
+  const init = useCallback(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    const dpr = window.devicePixelRatio || 1;
+    const resize = () => {
+      canvas.width = window.innerWidth * dpr;
+      canvas.height = window.innerHeight * dpr;
+      canvas.style.width = `${window.innerWidth}px`;
+      canvas.style.height = `${window.innerHeight}px`;
+      ctx.scale(dpr, dpr);
+    };
+    resize();
+    window.addEventListener("resize", resize);
+
+    const PIXEL_SIZE = 3;
+    const COUNT = 40;
+    const pixels = Array.from({ length: COUNT }, () => ({
+      x: Math.random() * window.innerWidth,
+      y: Math.random() * window.innerHeight,
+      speed: 0.15 + Math.random() * 0.35,
+      opacity: 0.04 + Math.random() * 0.08,
+    }));
+
+    const draw = () => {
+      const w = window.innerWidth;
+      const h = window.innerHeight;
+      ctx.clearRect(0, 0, w, h);
+
+      for (const p of pixels) {
+        p.y += p.speed;
+        if (p.y > h + PIXEL_SIZE) {
+          p.y = -PIXEL_SIZE;
+          p.x = Math.random() * w;
+        }
+        ctx.fillStyle = `rgba(255, 255, 255, ${p.opacity})`;
+        ctx.fillRect(
+          Math.round(p.x / PIXEL_SIZE) * PIXEL_SIZE,
+          Math.round(p.y / PIXEL_SIZE) * PIXEL_SIZE,
+          PIXEL_SIZE,
+          PIXEL_SIZE
+        );
+      }
+
+      animRef.current = requestAnimationFrame(draw);
+    };
+
+    animRef.current = requestAnimationFrame(draw);
+
+    return () => {
+      window.removeEventListener("resize", resize);
+      cancelAnimationFrame(animRef.current);
+    };
+  }, []);
+
+  useEffect(() => {
+    const cleanup = init();
+    return cleanup;
+  }, [init]);
+
+  return (
+    <canvas
+      ref={canvasRef}
+      className="pointer-events-none fixed inset-0"
+      aria-hidden="true"
+    />
+  );
+}
 
 type MarkdownTakeoverProps = {
   isOpen: boolean;
@@ -175,7 +250,11 @@ export function MarkdownTakeover({ isOpen, onClose, markdown }: MarkdownTakeover
           exit={{ opacity: 0 }}
           transition={{ duration: 0.2 }}
           className="fixed inset-0 z-50 bg-[#0a0a0a]"
+          style={{ fontFamily: "var(--font-geist-pixel-square), monospace" }}
         >
+          {/* Decorative falling pixels */}
+          <FallingPixels />
+
           {/* Close button - fixed to top right */}
           <button
             onClick={onClose}
@@ -259,7 +338,7 @@ export function MarkdownTakeover({ isOpen, onClose, markdown }: MarkdownTakeover
                   <button
                     key={link.href}
                     onClick={() => handleNavigate(link.href)}
-                    className={`rounded-md px-2.5 py-1 font-mono text-[12px] transition-colors ${
+                    className={`rounded-md px-2.5 py-1 text-[12px] transition-colors ${
                       link.indent ? "ml-1" : ""
                     } ${
                       isActive(link.href)
@@ -274,7 +353,7 @@ export function MarkdownTakeover({ isOpen, onClose, markdown }: MarkdownTakeover
 
               {/* Markdown content */}
               {markdown ? (
-                <pre className="whitespace-pre-wrap break-words font-mono text-[13px] leading-[1.7] text-foreground/80">
+                <pre className="whitespace-pre-wrap break-words text-[17px] leading-[1.7] text-foreground/80" style={{ fontFamily: "var(--font-geist-pixel-square), monospace" }}>
                   {renderMarkdownWithLinks(markdown)}
                 </pre>
               ) : (

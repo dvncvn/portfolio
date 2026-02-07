@@ -242,7 +242,7 @@ Product strategy, problem framing, information architecture, interaction design,
 ## Tools
 
 - Figma, prototyping, design systems tooling
-- Cursor, Warp, hands-on coding and rapid iteration
+- Cursor, Warp, Claude Code, v0, and other agentic coding tools for hands-on, rapid iteration
 - Midjourney and image tooling for concept exploration
 - Prompting, agent-assisted workflows, and AI-enabled prototyping
 

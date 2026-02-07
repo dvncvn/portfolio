@@ -13,7 +13,7 @@ type ResumeContextValue = {
 
 const resumeData: ResumeData = {
   name: "Simon Duncan",
-  title: "Staff Product Designer",
+  title: "Product Designer",
   location: "Madison, WI (Remote)",
   portfolio: "simonduncan.co",
   email: "simonfraserduncan@gmail.com",
@@ -123,7 +123,7 @@ const resumeData: ResumeData = {
   skills: "Product strategy, problem framing, information architecture, interaction design, UI design, design systems, prototyping, discovery, qualitative research, quantitative analysis, experimentation and A/B testing, metrics definition, stakeholder management, team leadership, basic front-end development",
   tools: [
     "Figma, prototyping, design systems tooling",
-    "Cursor, Warp, hands-on coding and rapid iteration",
+    "Cursor, Warp, Claude Code, v0, and other agentic coding tools for hands-on, rapid iteration",
     "Midjourney and image tooling for concept exploration and production assets",
     "Prompting, agent-assisted workflows, and AI-enabled prototyping to accelerate exploration and delivery",
   ],

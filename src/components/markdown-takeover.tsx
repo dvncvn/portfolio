@@ -250,7 +250,6 @@ export function MarkdownTakeover({ isOpen, onClose, markdown }: MarkdownTakeover
           exit={{ opacity: 0 }}
           transition={{ duration: 0.2 }}
           className="fixed inset-0 z-50 bg-[#0a0a0a]"
-          style={{ fontFamily: "var(--font-geist-pixel-square), monospace" }}
         >
           {/* Decorative falling pixels */}
           <FallingPixels />
@@ -333,12 +332,12 @@ export function MarkdownTakeover({ isOpen, onClose, markdown }: MarkdownTakeover
           >
             <div className="mx-auto max-w-[900px]">
               {/* Navigation */}
-              <nav className="mb-8 flex flex-wrap items-center gap-x-1 gap-y-1 border-b border-white/[0.06] pb-4">
+              <nav className="mb-8 flex flex-wrap items-center gap-x-1 gap-y-1 pb-4">
                 {navLinks.map((link) => (
                   <button
                     key={link.href}
                     onClick={() => handleNavigate(link.href)}
-                    className={`rounded-md px-2.5 py-1 text-[12px] transition-colors ${
+                    className={`rounded-md px-2.5 py-1 font-mono text-[12px] transition-colors ${
                       link.indent ? "ml-1" : ""
                     } ${
                       isActive(link.href)
@@ -353,9 +352,33 @@ export function MarkdownTakeover({ isOpen, onClose, markdown }: MarkdownTakeover
 
               {/* Markdown content */}
               {markdown ? (
-                <pre className="whitespace-pre-wrap break-words text-[17px] leading-[1.7] text-foreground/80" style={{ fontFamily: "var(--font-geist-pixel-square), monospace" }}>
-                  {renderMarkdownWithLinks(markdown)}
-                </pre>
+                <div className="mx-auto max-w-[600px]">
+                  {/* Top frame */}
+                  <div className="mb-4 flex select-none font-mono text-[13px] text-white/[0.08]">
+                    <span>┌</span>
+                    <span className="flex-1 overflow-hidden">{"─".repeat(200)}</span>
+                    <span>┐</span>
+                  </div>
+
+                  <pre className="whitespace-pre-wrap break-words font-mono text-[13px] leading-[1.7] text-foreground/80">
+                    {markdown.split("\n").map((line, i) => {
+                      const isHeading = /^#{1,3}\s/.test(line);
+                      return (
+                        <span key={i} className={isHeading ? "text-foreground font-medium" : undefined}>
+                          {renderMarkdownWithLinks(line)}
+                          {"\n"}
+                        </span>
+                      );
+                    })}
+                  </pre>
+
+                  {/* Bottom frame */}
+                  <div className="mt-4 flex select-none font-mono text-[13px] text-white/[0.08]">
+                    <span>└</span>
+                    <span className="flex-1 overflow-hidden">{"─".repeat(200)}</span>
+                    <span>┘</span>
+                  </div>
+                </div>
               ) : (
                 <div className="flex h-[60vh] items-center justify-center">
                   <p className="text-[14px] text-muted-foreground/50">

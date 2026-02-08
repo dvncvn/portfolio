@@ -27,12 +27,15 @@ export type ResumeData = {
   phone?: string;
   summary: string;
   sections: ResumeSection[];
+  /** Compact one-liner entries for earlier roles */
+  moreExperience?: string[];
   education?: {
     degree: string;
     school: string;
     honors?: string;
+    years?: string;
   };
-  skills?: string;
+  skills?: string[];
   tools?: string[];
 };
 
@@ -84,10 +87,21 @@ function formatResumeAsText(data: ResumeData): string {
     lines.push("");
   }
   
+  // More Experience
+  if (data.moreExperience && data.moreExperience.length > 0) {
+    lines.push("MORE EXPERIENCE");
+    for (const entry of data.moreExperience) {
+      lines.push(entry);
+    }
+    lines.push("");
+  }
+
   // Skills
-  if (data.skills) {
+  if (data.skills && data.skills.length > 0) {
     lines.push("SKILLS");
-    lines.push(data.skills);
+    for (const skill of data.skills) {
+      lines.push(`- ${skill}`);
+    }
     lines.push("");
   }
   
@@ -210,32 +224,28 @@ export function ResumeTakeover({ isOpen, onClose, data }: ResumeTakeoverProps) {
                 </>
               )}
             </button>
-            <div className="group relative">
-              <button
-                disabled
-                className="inline-flex cursor-not-allowed items-center gap-2 rounded-md bg-[#141414] px-4 py-2 text-[14px] text-muted-foreground/50"
+            <a
+              href="/assets/simonduncan-resume.pdf"
+              download
+              className="inline-flex items-center gap-2 rounded-md bg-[#1a1a1a] px-4 py-2 text-[14px] text-muted-foreground transition-all duration-200 ease-out hover:bg-[#252525] hover:text-foreground"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
               >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                  <polyline points="7 10 12 15 17 10" />
-                  <line x1="12" y1="15" x2="12" y2="3" />
-                </svg>
-                <span>Download PDF</span>
-              </button>
-              <div className="pointer-events-none absolute bottom-full left-1/2 mb-2 -translate-x-1/2 whitespace-nowrap rounded-md bg-black/90 px-2 py-1 text-[12px] text-white opacity-0 transition-opacity group-hover:opacity-100">
-                PDF coming soon
-              </div>
-            </div>
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                <polyline points="7 10 12 15 17 10" />
+                <line x1="12" y1="15" x2="12" y2="3" />
+              </svg>
+              <span>Download PDF</span>
+            </a>
           </div>
 
           {/* Content */}
@@ -275,7 +285,7 @@ export function ResumeTakeover({ isOpen, onClose, data }: ResumeTakeoverProps) {
                             <div className="flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between">
                               <div>
                                 <h4 className="text-[16px] font-medium text-foreground">
-                                  {entry.company}, {entry.role}
+                                  {entry.company} — {entry.role}
                                 </h4>
                                 {entry.location && (
                                   <p className="text-[14px] text-muted-foreground">
@@ -293,16 +303,34 @@ export function ResumeTakeover({ isOpen, onClose, data }: ResumeTakeoverProps) {
                               </span>
                             </div>
                             {entry.bullets && entry.bullets.length > 0 && (
-                              <p className="mt-3 text-[14px] leading-relaxed text-muted-foreground">
-                                {entry.bullets.join(". ")}
-                                {entry.bullets[entry.bullets.length - 1]?.endsWith(".") ? "" : "."}
-                              </p>
+                              <ul className="mt-3 space-y-1.5 text-[14px] leading-relaxed text-muted-foreground">
+                                {entry.bullets.map((bullet, bIdx) => (
+                                  <li key={bIdx} className="flex gap-2">
+                                    <span className="mt-[7px] h-1 w-1 flex-shrink-0 rounded-full bg-muted-foreground/40" />
+                                    <span>{bullet}</span>
+                                  </li>
+                                ))}
+                              </ul>
                             )}
                           </div>
                         ))}
                       </div>
                     </div>
                   ))}
+
+                  {/* More Experience */}
+                  {data.moreExperience && data.moreExperience.length > 0 && (
+                    <div className="space-y-4">
+                      <h3 className="text-[14px] font-medium uppercase tracking-wider text-muted-foreground">
+                        More Experience
+                      </h3>
+                      <ul className="space-y-1.5 text-[14px] text-muted-foreground">
+                        {data.moreExperience.map((entry, idx) => (
+                          <li key={idx}>{entry}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
                 </div>
 
                 {/* Right column: Summary, Education, Skills, Tools */}
@@ -329,19 +357,24 @@ export function ResumeTakeover({ isOpen, onClose, data }: ResumeTakeoverProps) {
                         {data.education.honors && (
                           <p className="text-muted-foreground">{data.education.honors}</p>
                         )}
+                        {data.education.years && (
+                          <p className="text-muted-foreground">{data.education.years}</p>
+                        )}
                       </div>
                     </div>
                   )}
 
                   {/* Skills */}
-                  {data.skills && (
+                  {data.skills && data.skills.length > 0 && (
                     <div className="space-y-2">
                       <h3 className="text-[12px] font-medium uppercase tracking-wider text-muted-foreground">
                         Skills
                       </h3>
-                      <p className="leading-relaxed text-muted-foreground">
-                        {data.skills}
-                      </p>
+                      <ul className="space-y-1 text-muted-foreground">
+                        {data.skills.map((skill, idx) => (
+                          <li key={idx}>{skill}</li>
+                        ))}
+                      </ul>
                     </div>
                   )}
 

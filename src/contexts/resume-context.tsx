@@ -13,119 +13,79 @@ type ResumeContextValue = {
 
 const resumeData: ResumeData = {
   name: "Simon Duncan",
-  title: "Product Designer",
+  title: "Full-Stack Product Design",
   location: "Madison, WI (Remote)",
   portfolio: "simonduncan.co",
   email: "simonfraserduncan@gmail.com",
   phone: "612 704 0593",
-  summary: "Focused on developer tools and AI products. Strong product intuition, high judgment in ambiguity, and end-to-end execution from framing to shipped UI. Close engineering partner, often prototyping in code.",
+  summary: "Mission-oriented designer building AI-native developer experiences. High-velocity IC who pairs closely with engineering and sweats interaction details. Experienced team leader who can set direction and execute.",
   sections: [
     {
-      title: "Experience",
+      title: "Selected Experience",
       entries: [
         {
-          company: "IBM (via DataStax acquisition)",
+          company: "IBM (via DataStax Acquisition)",
           role: "Staff Product Designer",
           location: "Madison, WI (Remote)",
           years: "Dec 2020 – Present",
-          progression: "Senior Product Designer → Design Manager → Staff Product Designer",
+          progression: "Promoted: Sr Product Designer → Design Manager → Staff Product Designer",
           bullets: [
-            "Design lead for Langflow, an open-source visual GenAI agent builder. Helped scale adoption from 14k to 140k+ GitHub stars by improving onboarding, templates, and the core developer experience",
-            "Led product design for Astra DB, contributing to growth from 0 to $70M+ ARR",
-            "Managed a team of 4 designers during DataStax's pivot to an AI-first company, maintaining momentum through organizational change",
-            "Defined cloud experience success metrics with product and engineering leadership to tie UX investment to measurable outcomes",
-            "Contributed to securing $115M Series E funding through product narrative, experience storytelling, and customer-ready demos",
-            "Recipient of the prestigious Ellis Award for outstanding business impact",
+            "Design lead for Langflow (OSS agent builder): improved onboarding, templates, and core UX; grew from 14k → 145k+ GitHub stars",
+            "Led 0→1 product design for Astra DB; shipped end-to-end cloud vector database experiences across key workflows and platform UX; contributed to growth from $0 → $70M+ ARR",
+            "Built and scaled interaction patterns + design systems to improve consistency and shipping velocity across teams",
+            "Defined cloud experience success metrics with product and engineering leadership; tied UX work to measurable outcomes",
+            "Ellis Award recipient (only Design IC) for outstanding business impact",
           ],
         },
         {
           company: "New Relic",
           role: "Senior Product Designer",
-          location: "Portland, OR",
+          location: "Portland, OR (Remote)",
           years: "2020",
           bullets: [
-            "Redesigned the New Relic One admin portal, simplifying key platform administration workflows and improving usability for enterprise teams",
+            "Redesigned the New Relic One admin portal, simplifying key platform administration workflows for enterprise teams",
           ],
         },
         {
           company: "Scott Logic",
           role: "Lead Product Designer",
-          location: "Edinburgh, United Kingdom",
+          location: "Edinburgh, UK",
           years: "2019 – 2020",
           bullets: [
             "Led FinTech engagements across retail and institutional products, partnering with engineering to ship end-to-end improvements",
-            "Co-led a 10-person design team, supporting hiring and mentoring",
-            "Built and ran the graduate design program, including recruiting, onboarding, and coaching",
-          ],
-        },
-        {
-          company: "Branch",
-          role: "Product Designer",
-          location: "Minneapolis, MN (Remote)",
-          years: "2020",
-          bullets: [
-            "Established foundational user research practices during COVID-era volatility, capturing customer anxieties and translating insights into product decisions",
-          ],
-        },
-        {
-          company: "Trek Bicycle",
-          role: "Product Designer",
-          location: "Madison, WI",
-          years: "2018",
-          bullets: [
-            "Led UX research, experimentation, and analytics for Trekbikes.com, including A/B testing and funnel analysis to drive iterative improvements",
-          ],
-        },
-        {
-          company: "Cloudability",
-          role: "Product Designer",
-          location: "Boulder, CO",
-          years: "2017",
-          bullets: [
-            "Led design for automation and container-related experiences, with emphasis on operational clarity and data visualization",
-          ],
-        },
-        {
-          company: "IHS Markit",
-          role: "Product Designer",
-          location: "Boulder, CO",
-          years: "2015 – 2017",
-          bullets: [
-            "Led product design engagements with FinTech teams across discovery, interaction design, and shipped UI",
-          ],
-        },
-        {
-          company: "Scott Logic",
-          role: "UX Designer",
-          location: "Edinburgh, United Kingdom",
-          years: "2013 – 2015",
-          bullets: [
-            "Delivered product design for FinTech clients, from discovery through execution",
-          ],
-        },
-        {
-          company: "Great Wolf Lodge",
-          role: "Content Manager",
-          location: "Madison, WI",
-          years: "2012 – 2013",
-          bullets: [
-            "Owned A/B testing and site optimization for a high-traffic, revenue-critical site",
+            "Co-led a 10-person design team, supporting hiring and mentoring; built and ran the graduate design program",
           ],
         },
       ],
     },
   ],
+  moreExperience: [
+    "Branch — Product Designer (2020) • Minneapolis, MN",
+    "Trek — Product Designer (2018) • Madison, WI",
+    "Cloudability — Product Designer (2017–2018) • Boulder, CO",
+    "IHS Markit — UX Designer (2015–2017) • Boulder, CO",
+    "Scott Logic — UX Designer (2013–2015) • Edinburgh, UK",
+    "Great Wolf Lodge — Content Manager (2012–2013) • Madison, WI",
+  ],
   education: {
     degree: "BA, Music and Technology",
-    school: "University of East Anglia, Norwich, England",
+    school: "University of East Anglia",
     honors: "First Class Honours",
+    years: "2009–2012",
   },
-  skills: "Product strategy, problem framing, information architecture, interaction design, UI design, design systems, prototyping, discovery, qualitative research, quantitative analysis, experimentation and A/B testing, metrics definition, stakeholder management, team leadership, basic front-end development",
+  skills: [
+    "Early-stage product definition; from ambiguity to shipped",
+    "Developer tools UX (DX, onboarding, workflow design)",
+    "AI-native product design; Agent/RAG/LLM UX",
+    "Interaction design + information architecture",
+    "Prototyping in code",
+    "Metrics, experimentation, and success criteria",
+    "Cross-functional leadership; PM/Eng/Exec alignment",
+    "High-craft UI",
+  ],
   tools: [
-    "Figma, prototyping, design systems tooling",
-    "Cursor, Warp, Claude Code, v0, and other agentic coding tools for hands-on, rapid iteration",
-    "Midjourney and image tooling for concept exploration and production assets",
-    "Prompting, agent-assisted workflows, and AI-enabled prototyping to accelerate exploration and delivery",
+    "Figma + Figma MCP for high-fi mocks and concepts",
+    "Cursor / Claude Code / v0 for agentic building",
   ],
 };
 
@@ -144,7 +104,7 @@ export function ResumeProvider({ children }: { children: React.ReactNode }) {
         openResume,
         closeResume,
         resumeData,
-        resumeUrl: "/assets/resume.pdf",
+        resumeUrl: "/assets/simonduncan-resume.pdf",
       }}
     >
       {children}

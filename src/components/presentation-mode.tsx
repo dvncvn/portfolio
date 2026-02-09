@@ -969,6 +969,8 @@ export function PresentationMode({ isOpen, onClose, projects, introText }: Prese
           goToPrevSlide();
           break;
         case "Home":
+        case "r":
+        case "R":
           if (isLightboxOpen) return;
           e.preventDefault();
           setCurrentSlide(0);

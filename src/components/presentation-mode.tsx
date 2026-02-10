@@ -362,38 +362,40 @@ function ClosingSlide({ slide }: { slide: Slide }) {
         }}
       />
       {/* Content */}
-      <div className="relative z-10 flex w-full flex-col items-center justify-center px-6 text-center md:px-12 lg:px-16">
-        <motion.p
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          className="mb-4 text-[14px] text-muted-foreground md:mb-6 md:text-[16px]"
-        >
-          {slide.content?.title}
-        </motion.p>
-        <motion.button
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          onClick={handleCopyEmail}
-          className="group relative cursor-pointer text-[32px] font-medium leading-tight text-foreground transition-all duration-200 hover:text-highlight md:text-[48px] lg:text-[56px] xl:text-[64px]"
-        >
-          <span className={`decoration-highlight/50 underline-offset-8 transition-all duration-200 group-hover:underline ${copied ? "opacity-0" : "opacity-100"}`}>
-            {email}
-          </span>
-          <span
-            className={`absolute inset-0 flex items-center justify-center text-highlight transition-opacity duration-200 ${
-              copied ? "opacity-100" : "opacity-0"
-            }`}
+      <div className="relative z-10 flex h-full w-full items-center justify-center px-6 text-center md:px-12 lg:px-16">
+        <div className="flex flex-col items-center">
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            className="mb-4 text-[14px] text-muted-foreground md:mb-6 md:text-[16px]"
           >
-            Copied!
-          </span>
-        </motion.button>
+            {slide.content?.title}
+          </motion.p>
+          <motion.button
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            onClick={handleCopyEmail}
+            className="group relative cursor-pointer text-[32px] font-medium leading-tight text-foreground transition-all duration-200 hover:text-highlight md:text-[48px] lg:text-[56px] xl:text-[64px]"
+          >
+            <span className={`decoration-highlight/50 underline-offset-8 transition-all duration-200 group-hover:underline ${copied ? "opacity-0" : "opacity-100"}`}>
+              {email}
+            </span>
+            <span
+              className={`absolute inset-0 flex items-center justify-center text-highlight transition-opacity duration-200 ${
+                copied ? "opacity-100" : "opacity-0"
+              }`}
+            >
+              Copied!
+            </span>
+          </motion.button>
+        </div>
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.8, duration: 0.4 }}
-          className="mt-10 flex items-center gap-4"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.8, duration: 0.35 }}
+          className="absolute bottom-12 left-1/2 flex -translate-x-1/2 items-center gap-4"
         >
           <button
             onClick={() => window.location.href = "/"}

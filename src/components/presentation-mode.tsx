@@ -338,6 +338,8 @@ function ClosingSlide({ slide }: { slide: Slide }) {
     }
   };
 
+  const fadeIn = { type: "tween" as const, duration: 0.35, ease: [0.22, 1, 0.36, 1] };
+
   return (
     <div className="relative flex h-full flex-col justify-center overflow-hidden">
       {/* ASCII noise background */}
@@ -361,21 +363,21 @@ function ClosingSlide({ slide }: { slide: Slide }) {
           `,
         }}
       />
-      {/* Content */}
+      {/* Content - opacity only so it doesn't fight the slide's x transition */}
       <div className="relative z-10 flex h-full w-full items-center justify-center px-6 text-center md:px-12 lg:px-16">
         <div className="flex flex-col items-center">
           <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.08, ...fadeIn }}
             className="mb-4 text-[14px] text-muted-foreground md:mb-6 md:text-[16px]"
           >
             {slide.content?.title}
           </motion.p>
           <motion.button
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.2, ...fadeIn }}
             onClick={handleCopyEmail}
             className="group relative cursor-pointer text-[32px] font-medium leading-tight text-foreground transition-all duration-200 hover:text-highlight md:text-[48px] lg:text-[56px] xl:text-[64px]"
           >
@@ -390,29 +392,29 @@ function ClosingSlide({ slide }: { slide: Slide }) {
               Copied!
             </span>
           </motion.button>
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.5, duration: 0.3 }}
+            className="mt-6 flex items-center gap-4"
+          >
+            <button
+              onClick={() => window.location.href = "/"}
+              className="inline-flex cursor-pointer items-center gap-2 rounded-md bg-white/[0.06] px-4 py-2 text-[14px] text-muted-foreground transition-all duration-200 ease-out hover:bg-white/[0.1] hover:text-foreground"
+            >
+              Back to Website
+            </button>
+            <button
+              onClick={() => {
+                const event = new KeyboardEvent("keydown", { key: "Home" });
+                window.dispatchEvent(event);
+              }}
+              className="inline-flex cursor-pointer items-center gap-2 rounded-md bg-white/[0.06] px-4 py-2 text-[14px] text-muted-foreground transition-all duration-200 ease-out hover:bg-white/[0.1] hover:text-foreground"
+            >
+              Restart Presentation
+            </button>
+          </motion.div>
         </div>
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.8, duration: 0.35 }}
-          className="absolute bottom-12 left-1/2 flex -translate-x-1/2 items-center gap-4"
-        >
-          <button
-            onClick={() => window.location.href = "/"}
-            className="inline-flex cursor-pointer items-center gap-2 rounded-md bg-white/[0.06] px-4 py-2 text-[14px] text-muted-foreground transition-all duration-200 ease-out hover:bg-white/[0.1] hover:text-foreground"
-          >
-            Back to Website
-          </button>
-          <button
-            onClick={() => {
-              const event = new KeyboardEvent("keydown", { key: "Home" });
-              window.dispatchEvent(event);
-            }}
-            className="inline-flex cursor-pointer items-center gap-2 rounded-md bg-white/[0.06] px-4 py-2 text-[14px] text-muted-foreground transition-all duration-200 ease-out hover:bg-white/[0.1] hover:text-foreground"
-          >
-            Restart Presentation
-          </button>
-        </motion.div>
       </div>
     </div>
   );

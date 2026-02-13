@@ -338,7 +338,7 @@ function ClosingSlide({ slide }: { slide: Slide }) {
     }
   };
 
-  const fadeIn = { type: "tween" as const, duration: 0.35, ease: [0.22, 1, 0.36, 1] };
+  const fadeIn = { type: "tween" as const, duration: 0.35, ease: [0.22, 1, 0.36, 1] as const };
 
   return (
     <div className="relative flex h-full flex-col justify-center overflow-hidden">

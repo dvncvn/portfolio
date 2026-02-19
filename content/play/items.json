@@ -1,5 +1,23 @@
 [
   {
+    "slug": "bitfield",
+    "title": "Bitfield",
+    "description": "A celebration of Geist's new Pixel type variant. Glitchy art meets lofi aesthetic.",
+    "summary": "Generative pixel-grid experience driven by Geist Pixel. Adjust seed, resolution, scale, subdivision, density, noise, warp, and timing. Built as an interactive exploration of the typeface.",
+    "thumbnail": "/assets/play/bitfield/thumb.png",
+    "assets": [
+      { "type": "image", "src": "/assets/play/bitfield/lightbox-1.png", "alt": "Bitfield generative pixel grid" },
+      { "type": "image", "src": "/assets/play/bitfield/lightbox-2.png", "alt": "Bitfield glitch aesthetic" },
+      { "type": "image", "src": "/assets/play/bitfield/lightbox-3.png", "alt": "Bitfield Geist Pixel" },
+      { "type": "image", "src": "/assets/play/bitfield/lightbox-4.png", "alt": "Bitfield lofi visual" }
+    ],
+    "tool": "Vercel",
+    "year": "2026",
+    "href": "https://mg-psi-one.vercel.app/?seed=0&speed=1&grid=184&scale=4.6&subdiv=2&density=0.5&noise=0.5&warp=0&period=8",
+    "ctaLabel": "Open app",
+    "tags": ["Code"]
+  },
+  {
     "slug": "snowfall",
     "title": "Snowfall",
     "description": "Generative audiovisual instrument: falling snow on screen drives sound. A homage to the norns script “fall.”",

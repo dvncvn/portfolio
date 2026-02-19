@@ -215,7 +215,7 @@ export function PlayLightbox({ item, onClose }: PlayLightboxProps) {
           </div>
 
           {/* Right column: Metadata */}
-          <dl className="grid gap-y-1 text-sm">
+          <dl className="flex flex-col gap-4 text-sm leading-tight [&_dt]:m-0 [&_dd]:m-0">
             {item.tool && (
               <div className="grid grid-cols-[1fr_1fr] gap-3">
                 <dt className="text-muted-foreground">Tool</dt>

@@ -35,6 +35,7 @@ const linkPatterns: LinkPattern[] = [
   { pattern: /Context\s*Forge(?::\s*Reimagined)?/gi, href: "/work/context-forge" },
   { pattern: /Astra(?:\s*DB)?(?::\s*AI-First\s*Database\s*Design)?/gi, href: "/work/astra-db" },
   // Play projects (all link to /play)
+  { pattern: /\bBitfield\b/g, href: "/play" },
   { pattern: /\bSnowfall\b/g, href: "/play" },
   { pattern: /\bTerra\b/g, href: "/play" },
   { pattern: /A surprising gust of air/gi, href: "/play" },
@@ -144,64 +145,76 @@ export function MarkdownTakeover({ isOpen, onClose, markdown }: MarkdownTakeover
     // Don't close - stay in markdown mode
   };
 
-  // Render markdown with clickable links for known patterns
+  // Regex for standard markdown links [text](url)
+  const mdLinkRegex = /\[([^\]]*)\]\((https?:\/\/[^)\s]+|mailto:[^)\s]+)\)/g;
+
+  // Render markdown with clickable links: known patterns + standard [text](url) links
   const renderMarkdownWithLinks = (text: string) => {
-    // Build a combined pattern that matches any of our link patterns
+    type Span = { start: number; end: number; type: "mdlink"; text: string; url: string } | { start: number; end: number; type: "pattern"; pattern: LinkPattern; matchedText: string };
+    const spans: Span[] = [];
+
+    // Collect markdown link spans
+    let mdMatch;
+    mdLinkRegex.lastIndex = 0;
+    while ((mdMatch = mdLinkRegex.exec(text)) !== null) {
+      spans.push({ start: mdMatch.index, end: mdMatch.index + mdMatch[0].length, type: "mdlink", text: mdMatch[1], url: mdMatch[2] });
+    }
+
+    // Collect pattern match spans
     const allPatterns = linkPatterns.map(p => `(${p.pattern.source})`).join("|");
     const combinedRegex = new RegExp(allPatterns, "gi");
-    
+    let patternMatch;
+    while ((patternMatch = combinedRegex.exec(text)) !== null) {
+      const matchedText = patternMatch[0];
+      const linkPattern = linkPatterns.find(p => p.pattern.test(matchedText));
+      if (linkPattern) {
+        linkPattern.pattern.lastIndex = 0;
+        spans.push({ start: patternMatch.index, end: patternMatch.index + matchedText.length, type: "pattern", pattern: linkPattern, matchedText });
+      }
+    }
+
+    // Sort by start, then drop overlaps (keep first)
+    spans.sort((a, b) => a.start - b.start);
+    const nonOverlapping: Span[] = [];
+    for (const s of spans) {
+      if (nonOverlapping.length === 0 || s.start >= nonOverlapping[nonOverlapping.length - 1].end) {
+        nonOverlapping.push(s);
+      }
+    }
+
     const parts: React.ReactNode[] = [];
     let lastIndex = 0;
-    let match;
     let keyIndex = 0;
+    const linkClass = "cursor-pointer text-[#01F8A5] underline decoration-[#01F8A5]/30 underline-offset-2 transition-colors hover:decoration-[#01F8A5]/60";
 
-    while ((match = combinedRegex.exec(text)) !== null) {
-      // Add text before the match
-      if (match.index > lastIndex) {
-        parts.push(text.slice(lastIndex, match.index));
+    for (const span of nonOverlapping) {
+      if (span.start > lastIndex) {
+        parts.push(text.slice(lastIndex, span.start));
       }
-
-      // Find which pattern matched
-      const matchedText = match[0];
-      const linkPattern = linkPatterns.find(p => p.pattern.test(matchedText));
-      
-      if (linkPattern) {
-        // Reset the pattern's lastIndex since we used test()
-        linkPattern.pattern.lastIndex = 0;
-        
-        if (linkPattern.external) {
-          // External link - open in new tab
+      if (span.type === "mdlink") {
+        parts.push(
+          <a key={`link-${keyIndex++}`} href={span.url} target="_blank" rel="noopener noreferrer" className={linkClass}>
+            {span.text || span.url}
+          </a>
+        );
+      } else {
+        const { pattern, matchedText } = span;
+        if (pattern.external) {
           parts.push(
-            <a
-              key={`link-${keyIndex++}`}
-              href={linkPattern.href}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="cursor-pointer text-[#01F8A5] underline decoration-[#01F8A5]/30 underline-offset-2 transition-colors hover:decoration-[#01F8A5]/60"
-            >
+            <a key={`link-${keyIndex++}`} href={pattern.href} target="_blank" rel="noopener noreferrer" className={linkClass}>
               {matchedText}
             </a>
           );
         } else {
-          // Internal link - navigate within app
           parts.push(
-            <button
-              key={`link-${keyIndex++}`}
-              onClick={() => handleNavigate(linkPattern.href)}
-              className="cursor-pointer text-[#01F8A5] underline decoration-[#01F8A5]/30 underline-offset-2 transition-colors hover:decoration-[#01F8A5]/60"
-            >
+            <button key={`link-${keyIndex++}`} onClick={() => handleNavigate(pattern.href)} className={linkClass}>
               {matchedText}
             </button>
           );
         }
-      } else {
-        parts.push(matchedText);
       }
-
-      lastIndex = match.index + matchedText.length;
+      lastIndex = span.end;
     }
-
-    // Add remaining text
     if (lastIndex < text.length) {
       parts.push(text.slice(lastIndex));
     }

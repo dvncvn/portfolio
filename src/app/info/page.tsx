@@ -434,7 +434,7 @@ const workHistory: EmploymentRow[] = [
     company: "DataStax",
     roleFlag: null,
     companyFlag: null,
-    years: "2023 – 2024",
+    years: "2020 – 2023",
   },
 ];
 

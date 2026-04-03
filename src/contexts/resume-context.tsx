@@ -18,16 +18,34 @@ const resumeData: ResumeData = {
   portfolio: "simonduncan.co",
   email: "simonfraserduncan@gmail.com",
   phone: "612 704 0593",
-  summary: "Mission-oriented designer building AI-native developer experiences. High-velocity IC who pairs closely with engineering and sweats interaction details. Experienced team leader who can set direction and execute.",
+  summary: "Mission-oriented designer building agentic product experiences. High-velocity IC who pairs closely with engineering and sweats interaction details. Experienced team leader who can set direction and execute.",
   sections: [
     {
       title: "Selected Experience",
       entries: [
         {
+          company: "AlphaSense",
+          role: "Staff Product Designer",
+          location: "Madison, WI (Remote)",
+          years: "2026 – Present",
+          bullets: [
+            "Staff product design for agentic experiences across the product suite",
+          ],
+        },
+        {
           company: "IBM (via DataStax Acquisition)",
           role: "Staff Product Designer",
           location: "Madison, WI (Remote)",
-          years: "Dec 2020 – Present",
+          years: "2025 – 2026",
+          bullets: [
+            "Continued design leadership for Langflow and IBM AI/developer platform experiences following the DataStax acquisition",
+          ],
+        },
+        {
+          company: "DataStax",
+          role: "Staff Product Designer",
+          location: "Madison, WI (Remote)",
+          years: "Dec 2020 – 2025",
           progression: "Promoted: Sr Product Designer → Design Manager → Staff Product Designer",
           bullets: [
             "Design lead for Langflow (OSS agent builder): improved onboarding, templates, and core UX; grew from 14k → 145k+ GitHub stars",

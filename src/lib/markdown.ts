@@ -3,8 +3,8 @@ import type { WorkProject, WorkProjectAsset, PlayItem } from "@/content/types";
 // Site-level context that gets prepended to each page
 const SITE_CONTEXT = `---
 **Source:** Simon Duncan's Portfolio (simonduncan.co)
-**Author:** Simon Duncan – Staff Product Designer at IBM
-**Focus:** AI platforms, developer tools, and complex systems design
+**Author:** Simon Duncan – Staff Product Designer at AlphaSense
+**Focus:** Agentic product experiences, AI platforms, developer tools, and complex systems design
 **Contact:** simonfraserduncan@gmail.com
 ---
 
@@ -206,16 +206,16 @@ export function infoPageToMarkdown(): string {
 
 ## Introduction
 
-I'm a Staff Product Designer working on AI and developer platforms at IBM. I turn complex systems into clear, usable, and durable products. I'm experienced across OSS, startups, and enterprise.
+I'm a Staff Product Designer working on agentic experiences at AlphaSense. I turn complex systems into clear, usable, and durable products. I'm experienced across OSS, startups, and enterprise.
 
 ## Current Role
 
-**Position:** Staff Product Designer at IBM (via DataStax acquisition)  
+**Position:** Staff Product Designer at AlphaSense  
 **Location:** Madison, WI (Remote)  
-**Tenure:** December 2020 – Present
+**Tenure:** 2026 – Present
 
 ### Career Progression
-- Senior Product Designer → Design Manager → Staff Product Designer
+- Senior Product Designer → Design Manager → Staff Product Designer (DataStax; continued at IBM post-acquisition, 2025–2026)
 
 ## Key Accomplishments
 
@@ -365,7 +365,7 @@ export function homePageToMarkdown(projects: HomePageProject[]): string {
 
   lines.push("# Simon Duncan – Staff Product Designer");
   lines.push("");
-  lines.push("Staff Product Designer focused on AI and developer platforms at IBM. I turn complex systems into clear, usable, and durable products. Experienced across OSS, startups, and enterprise.");
+  lines.push("Staff Product Designer focused on agentic experiences at AlphaSense. I turn complex systems into clear, usable, and durable products. Experienced across OSS, startups, and enterprise.");
   lines.push("");
 
   lines.push("## Selected Work");

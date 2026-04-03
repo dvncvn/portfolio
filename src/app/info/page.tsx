@@ -410,10 +410,17 @@ function ActivityIndicator() {
 const workHistory: EmploymentRow[] = [
   {
     role: "Staff Product Designer",
+    roleFlag: null,
+    company: "AlphaSense",
+    companyFlag: null,
+    years: "2026 – Now",
+  },
+  {
+    role: "Staff Product Designer",
     roleFlag: "Acquired",
     company: "IBM",
     companyFlag: null,
-    years: "2025 – Now",
+    years: "2025 – 2026",
   },
   {
     role: "Staff Product Designer",
@@ -466,7 +473,7 @@ export default function InfoPage() {
               Hi, I&apos;m Simon
             </h1>
             <p className="text-base leading-relaxed text-muted-foreground lg:max-w-[768px]">
-              I&apos;m a Staff Product Designer working on AI and developer platforms at IBM. I turn complex systems into clear, usable, and durable products. I&apos;m experienced across OSS, startups, and enterprise.
+              I&apos;m a Staff Product Designer working on agentic experiences at AlphaSense. I turn complex systems into clear, usable, and durable products. I&apos;m experienced across OSS, startups, and enterprise.
             </p>
           </div>
 

@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Jacquard_24 } from "next/font/google";
-import { GeistPixelSquare } from "geist/font/pixel";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Analytics } from "@vercel/analytics/next";
 import { SiteShell } from "@/components/site-shell";
@@ -23,6 +22,8 @@ const jacquard24 = Jacquard_24({
   subsets: ["latin"],
   display: "swap",
   weight: "400",
+  /** Decorative font (easter eggs, D&D card) — defer so Geist can paint first */
+  preload: false,
 });
 
 export const metadata: Metadata = {
@@ -60,7 +61,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} ${jacquard24.variable} ${GeistPixelSquare.variable}`}
+      className={`${geistSans.variable} ${geistMono.variable} ${jacquard24.variable}`}
     >
       <body className="antialiased">
         <SiteShell>{children}</SiteShell>

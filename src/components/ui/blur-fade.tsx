@@ -62,7 +62,8 @@ export function BlurFade({
     <AnimatePresence>
       <motion.div
         ref={ref}
-        initial="hidden"
+        // When not using scroll-triggered reveal, skip hidden initial frame (helps FCP/LCP).
+        initial={inView ? "hidden" : false}
         animate={isInView ? "visible" : "hidden"}
         exit="hidden"
         variants={combinedVariants}

@@ -236,9 +236,16 @@ export function CommandPalette({ isOpen, onClose, currentPath = "/" }: CommandPa
                           : item.label}
                       </span>
                       {isCurrent && (
-                        <span className="font-mono text-[10px] text-[#01F8A5]/60 uppercase tracking-wider">
-                          here
-                        </span>
+                        <motion.span
+                          aria-label="Current page"
+                          className="inline-block h-1.5 w-1.5 rounded-full bg-[#01F8A5]"
+                          animate={{ opacity: [1, 0.25, 1] }}
+                          transition={{
+                            duration: 1.8,
+                            repeat: Infinity,
+                            ease: "easeInOut",
+                          }}
+                        />
                       )}
                     </span>
                     <span

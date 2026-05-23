@@ -248,15 +248,26 @@ export function CommandPalette({ isOpen, onClose, currentPath = "/" }: CommandPa
                         />
                       )}
                     </span>
-                    <span
-                      className={`font-mono text-[11px] transition-all ${
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="14"
+                      height="14"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      aria-hidden="true"
+                      className={`transition-all duration-200 ease-out ${
                         isSelected
-                          ? "text-[#01F8A5] opacity-100"
-                          : "opacity-0"
+                          ? "translate-x-0 text-[#01F8A5] opacity-100"
+                          : "-translate-x-1 opacity-0"
                       }`}
                     >
-                      →
-                    </span>
+                      <path d="M5 12h14" />
+                      <path d="m12 5 7 7-7 7" />
+                    </svg>
                   </button>
                 );
               })}

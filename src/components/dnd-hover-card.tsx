@@ -98,7 +98,7 @@ export function DndHoverCard({ children, zIndex = 50, position = "above" }: DndH
                 <button
                   type="button"
                   onClick={handleClick}
-                  className="group block cursor-pointer overflow-hidden rounded-xl border border-white/10 bg-[#151413]/95 p-4 shadow-2xl backdrop-blur-xl transition-all duration-200 hover:border-white/30 hover:scale-[1.02] hover:shadow-[0_0_30px_rgba(255,255,255,0.1)]"
+                  className="dnd-card group relative block cursor-pointer overflow-hidden rounded-xl border border-white/10 bg-[#151413]/95 p-4 shadow-2xl backdrop-blur-xl"
                 >
                   {/* Character art */}
                   <div className="relative h-[200px] w-[200px] overflow-hidden rounded-lg bg-[#1a1918]">
@@ -106,11 +106,11 @@ export function DndHoverCard({ children, zIndex = 50, position = "above" }: DndH
                     <img
                       src="/assets/dnd-character.png"
                       alt="Perrin Burrowfen"
-                      className="h-full w-full object-cover transition-transform duration-200 group-hover:scale-105"
+                      className="h-full w-full object-cover"
                     />
                     {/* Hover overlay */}
                     <div className="absolute inset-0 flex items-center justify-center bg-black/0 transition-colors duration-200 group-hover:bg-black/40">
-                      <span className="font-mono text-[10px] uppercase tracking-widest text-white opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+                      <span className="-translate-y-1.5 font-mono text-[10px] uppercase tracking-widest text-white opacity-0 transition-all duration-200 ease-out group-hover:translate-y-0 group-hover:opacity-100">
                         View character info
                       </span>
                     </div>
@@ -128,23 +128,11 @@ export function DndHoverCard({ children, zIndex = 50, position = "above" }: DndH
                     </span>
                   </div>
                 </button>
-                {/* Arrow + invisible bridge for easier hover navigation */}
+                {/* Invisible bridge for easier hover navigation */}
                 {position === "above" ? (
-                  <>
-                    <div className="absolute left-1/2 top-full -translate-x-1/2">
-                      <div className="h-0 w-0 border-l-[6px] border-r-[6px] border-t-[6px] border-l-transparent border-r-transparent border-t-white/10" />
-                    </div>
-                    {/* Invisible bridge extending down toward trigger */}
-                    <div className="absolute left-1/2 top-full h-[24px] w-[80px] -translate-x-1/2" />
-                  </>
+                  <div className="absolute left-1/2 top-full h-[24px] w-[80px] -translate-x-1/2" />
                 ) : (
-                  <>
-                    <div className="absolute bottom-full left-1/2 -translate-x-1/2">
-                      <div className="h-0 w-0 border-l-[6px] border-r-[6px] border-b-[6px] border-l-transparent border-r-transparent border-b-white/10" />
-                    </div>
-                    {/* Invisible bridge extending up toward trigger */}
-                    <div className="absolute bottom-full left-1/2 h-[24px] w-[80px] -translate-x-1/2" />
-                  </>
+                  <div className="absolute bottom-full left-1/2 h-[24px] w-[80px] -translate-x-1/2" />
                 )}
               </motion.div>
             )}

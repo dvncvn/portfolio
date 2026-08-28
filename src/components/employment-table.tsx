@@ -35,9 +35,9 @@ export function EmploymentTable({ rows, onViewHistory }: EmploymentTableProps) {
     <div className="w-full max-w-[768px]">
       <table className="w-full table-fixed border-collapse text-[16px]">
         <colgroup>
-          <col className="w-auto xl:w-[50%]" />
-          <col className="hidden xl:table-column xl:w-[25%]" />
-          <col className="w-[100px] xl:w-[25%]" />
+          <col className="w-auto md:w-[50%]" />
+          <col className="hidden md:table-column md:w-[25%]" />
+          <col className="w-[100px] md:w-[25%]" />
         </colgroup>
         <tbody>
           {rows.map((row, idx) => (
@@ -56,9 +56,12 @@ export function EmploymentTable({ rows, onViewHistory }: EmploymentTableProps) {
                     </span>
                   ) : null}
                 </div>
+                <div className="mt-0.5 font-normal text-muted-foreground md:hidden">
+                  {row.company}
+                </div>
               </td>
 
-              <td className="hidden py-2 pr-4 align-middle xl:table-cell">
+              <td className="hidden py-2 pr-4 align-middle md:table-cell">
                 <div className="flex items-baseline gap-3">
                   <span className="whitespace-nowrap font-normal text-foreground">
                     {row.company}

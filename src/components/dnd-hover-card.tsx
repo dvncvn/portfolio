@@ -124,7 +124,7 @@ export function DndHoverCard({ children, zIndex = 50, position = "above" }: DndH
                       Perrin Burrowfen
                     </span>
                     <span className="mt-1 block font-mono text-[11px] text-muted-foreground">
-                      Level 3 Twilight Cleric
+                      Level 7 Twilight Cleric
                     </span>
                   </div>
                 </button>

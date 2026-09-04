@@ -34,7 +34,7 @@ export async function HomeWorkSection() {
       <section className="work-section mt-32">
         <WorkSectionHeader projects={validProjects} />
 
-        <div className="work-grid flex flex-row gap-8 max-[900px]:flex-col max-[900px]:gap-6">
+        <div className="work-grid flex flex-row gap-6 max-[900px]:flex-col">
           <div className="flex flex-1 flex-col gap-6 max-[900px]:flex-none">
             {[HOME_WORK_CARDS[0], HOME_WORK_CARDS[1]].map((project) => (
               <BlurFade
@@ -95,7 +95,7 @@ export function HomeWorkSectionFallback() {
       <div className="mb-8 flex items-baseline justify-between">
         <h2 className="text-[14px] font-medium uppercase tracking-wide text-[#7D7D7D]">Work</h2>
       </div>
-      <div className="work-grid flex flex-row gap-8 max-[900px]:flex-col max-[900px]:gap-6">
+      <div className="work-grid flex flex-row gap-6 max-[900px]:flex-col">
         <div className="flex flex-1 flex-col gap-6 max-[900px]:flex-none">
           <div className="aspect-[4/5] w-full animate-pulse rounded-[8px] bg-white/[0.06] max-[900px]:aspect-auto max-[900px]:min-h-[280px]" />
           <div className="aspect-[4/3] w-full animate-pulse rounded-[8px] bg-white/[0.06] max-[900px]:aspect-auto max-[900px]:min-h-[220px]" />

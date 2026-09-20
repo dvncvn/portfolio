@@ -1,77 +1,43 @@
-```
- :::::::: ::::::::::: ::::    ::::   ::::::::  ::::    :::      :::::::::  :::     ::: ::::    :::  ::::::::  :::     ::: ::::    ::: 
-:+:    :+:    :+:     +:+:+: :+:+:+ :+:    :+: :+:+:   :+:      :+:    :+: :+:     :+: :+:+:   :+: :+:    :+: :+:     :+: :+:+:   :+: 
-+:+           +:+     +:+ +:+:+ +:+ +:+    +:+ :+:+:+  +:+      +:+    +:+ +:+     +:+ :+:+:+  +:+ +:+        +:+     +:+ :+:+:+  +:+ 
-+#++:++#++    +#+     +#+  +:+  +#+ +#+    +:+ +#+ +:+ +#+      +#+    +:+ +#+     +:+ +#+ +:+ +#+ +#+        +#+     +:+ +#+ +:+ +#+ 
-       +#+    +#+     +#+       +#+ +#+    +#+ +#+  +#+#+#      +#+    +#+  +#+   +#+  +#+  +#+#+# +#+         +#+   +#+  +#+  +#+#+# 
-#+#    #+#    #+#     #+#       #+# #+#    #+# #+#   #+#+#      #+#    #+#   #+#+#+#   #+#   #+#+# #+#    #+#   #+#+#+#   #+#   #+#+# 
- ######## ########### ###       ###  ########  ###    ####      #########      ###     ###    ####  ########      ###     ###    #### 
-```
+# Simon Duncan
 
-# Simon Duncan Portfolio
+Product design portfolio. [simonduncan.co ↗](https://simonduncan.co)
 
-Personal portfolio website showcasing product design work.
+Next.js 16 · React 19 · TypeScript · Tailwind CSS 4 · Framer Motion
 
-## Tech Stack
+---
 
-- **Framework**: Next.js 16 (App Router) with React 19
-- **Styling**: Tailwind CSS v4
-- **Animation**: Framer Motion
-- **Analytics**: Vercel Analytics & Speed Insights
-- **Fonts**: Geist Sans, Geist Mono, Jacquard 24
+### Pages
 
-## Pages
+| Route | Content |
+| :--- | :--- |
+| `/` | Selected work |
+| `/work/[slug]` | Case studies |
+| `/play` | Side projects |
+| `/info` | About and résumé |
 
-- **/** – Work showcase with animated project cards
-- **/work/[slug]** – Individual project case studies
-- **/play** – Creative/side projects gallery with lightbox
-- **/info** – About page with interactive profile image effects
+### Development
 
-## Features
-
-- **Command Palette** – Press `/` to open quick navigation
-- **Resume Modal** – View full work history and download resume
-- **Image Effects** – Dither, pixelate, and ASCII rendering on info page
-- **Presentation Mode** – Project slideshow for work section
-- **Dark Theme** – System-aware with smooth transitions
-- **Responsive** – Mobile-first design
-
-## Project Structure
-
-```
-src/
-├── app/              # Next.js pages and layouts
-├── components/       # React components
-│   └── ui/           # Reusable UI primitives
-├── content/          # Content loaders (work.ts, play.ts)
-├── contexts/         # React context providers
-└── lib/              # Utilities
-content/
-├── work/             # Project JSON files
-└── play/             # Play items JSON
-public/assets/        # Images, SVGs, project assets
-```
-
-## Getting Started
-
-```bash
+```sh
 npm install
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) to view the site.
+[localhost:3000](http://localhost:3000)
 
-## Scripts
+| Command | |
+| :--- | :--- |
+| `npm run build` | Production build |
+| `npm run start` | Production server |
+| `npm run lint` | ESLint |
 
-- `npm run dev` – Start development server
-- `npm run build` – Build for production
-- `npm run start` – Start production server
-- `npm run lint` – Run ESLint
+### Structure
 
----
-
-```
-        🐀                    🐀
-         psst... type "ratmode"
-        🐀                    🐀
+```text
+src/app/          Pages and layouts
+src/components/   Components
+src/content/      Content loaders
+src/contexts/     Shared state
+src/lib/          Utilities
+content/          Work and play JSON
+public/assets/    Images and media
 ```

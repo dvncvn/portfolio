@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { bindSvgHighlight } from "@/lib/accents";
 
 type InlineSvgProps = {
   /** Public-path URL, e.g. `/assets/work/foo/art.svg` */
@@ -18,6 +19,8 @@ type InlineSvgProps = {
   accentColor?: string;
   /** Transition duration in ms for accent color changes */
   accentTransitionMs?: number;
+  /** Remap baked electric-green hexes to the live `--highlight` token */
+  bindHighlight?: boolean;
 };
 
 export function InlineSvg({
@@ -26,10 +29,17 @@ export function InlineSvg({
   transform,
   accentColor,
   accentTransitionMs = 500,
+  bindHighlight = false,
 }: InlineSvgProps) {
   const [svg, setSvg] = useState<string | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-  const stableTransform = useMemo(() => transform, [transform]);
+  const stableTransform = useMemo(() => {
+    if (!bindHighlight && !transform) return undefined;
+    return (raw: string) => {
+      const next = transform ? transform(raw) : raw;
+      return bindHighlight ? bindSvgHighlight(next) : next;
+    };
+  }, [bindHighlight, transform]);
 
   useEffect(() => {
     let cancelled = false;

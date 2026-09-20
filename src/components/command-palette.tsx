@@ -5,6 +5,14 @@ import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { useResume } from "@/contexts/resume-context";
 import { usePageContent } from "@/contexts/page-content-context";
+import { useAccent } from "@/contexts/accent-context";
+import { ACCENT_IDS, ACCENTS, type AccentId } from "@/lib/accents";
+
+type PaletteAction =
+  | "openPresentation"
+  | "openResume"
+  | "copyEmail"
+  | "viewMarkdown";
 
 type NavItem = {
   type: "nav";
@@ -16,7 +24,7 @@ type NavItem = {
 type ActionItem = {
   type: "action";
   label: string;
-  action: string;
+  action: PaletteAction;
   indent?: boolean;
 };
 
@@ -24,6 +32,8 @@ type SeparatorItem = {
   type: "separator";
   label: string;
 };
+
+type AccentItem = { type: "accent"; accent: AccentId };
 
 type PaletteItem = NavItem | ActionItem | SeparatorItem;
 
@@ -43,7 +53,11 @@ const navItems: PaletteItem[] = [
 ];
 
 // Get selectable items only (not separators)
-const selectableItems = navItems.filter((item): item is NavItem | ActionItem => item.type !== "separator");
+const accentItems: AccentItem[] = ACCENT_IDS.map((accent) => ({ type: "accent", accent }));
+const selectableItems = [
+  ...navItems.filter((item): item is NavItem | ActionItem => item.type !== "separator"),
+  ...accentItems,
+];
 
 type CommandPaletteProps = {
   isOpen: boolean;
@@ -57,6 +71,7 @@ export function CommandPalette({ isOpen, onClose, currentPath = "/" }: CommandPa
   const router = useRouter();
   const { openResume } = useResume();
   const { openViewer } = usePageContent();
+  const { accent, setAccent } = useAccent();
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [copiedEmail, setCopiedEmail] = useState(false);
   const listRef = useRef<HTMLDivElement>(null);
@@ -70,31 +85,41 @@ export function CommandPalette({ isOpen, onClose, currentPath = "/" }: CommandPa
   };
 
   const handleSelect = useCallback(
-    async (item: NavItem | ActionItem) => {
-      if (item.type === "nav") {
+    async (item: NavItem | ActionItem | AccentItem) => {
+      if (item.type === "accent") {
+        setAccent(item.accent);
+      } else if (item.type === "nav") {
         router.push(item.href);
         onClose();
       } else if (item.type === "action") {
-        if (item.action === "openPresentation") {
-          router.push("/?presentation=true");
-          onClose();
-        } else if (item.action === "openResume") {
-          openResume();
-          onClose();
-        } else if (item.action === "copyEmail") {
-          await navigator.clipboard.writeText(EMAIL);
-          setCopiedEmail(true);
-          setTimeout(() => {
-            setCopiedEmail(false);
-          }, 1500);
-          return; // Don't close
-        } else if (item.action === "viewMarkdown") {
-          openViewer();
-          onClose();
+        switch (item.action) {
+          case "openPresentation":
+            router.push("/?presentation=true");
+            onClose();
+            break;
+          case "openResume":
+            openResume();
+            onClose();
+            break;
+          case "copyEmail":
+            await navigator.clipboard.writeText(EMAIL);
+            setCopiedEmail(true);
+            setTimeout(() => {
+              setCopiedEmail(false);
+            }, 1500);
+            break;
+          case "viewMarkdown":
+            openViewer();
+            onClose();
+            break;
+          default: {
+            const _exhaustive: never = item.action;
+            return _exhaustive;
+          }
         }
       }
     },
-    [router, onClose, openResume, openViewer]
+    [router, onClose, openResume, openViewer, setAccent]
   );
 
   // Reset selection when opened
@@ -162,6 +187,7 @@ export function CommandPalette({ isOpen, onClose, currentPath = "/" }: CommandPa
 
           {/* Palette */}
           <motion.div
+            ref={listRef}
             initial={{ opacity: 0, y: 10, scale: 0.98 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 10, scale: 0.98 }}
@@ -182,8 +208,8 @@ export function CommandPalette({ isOpen, onClose, currentPath = "/" }: CommandPa
             </div>
 
             {/* List */}
-            <div ref={listRef} className="py-2">
-              {navItems.map((item, idx) => {
+            <div className="py-2">
+              {navItems.map((item) => {
                 if (item.type === "separator") {
                   return (
                     <div
@@ -223,7 +249,7 @@ export function CommandPalette({ isOpen, onClose, currentPath = "/" }: CommandPa
                       <span
                         className={`text-[13px] transition-colors ${
                           isCurrent
-                            ? "text-[#01F8A5]"
+                            ? "text-highlight"
                             : isSelected
                             ? "text-foreground"
                             : item.indent
@@ -238,7 +264,7 @@ export function CommandPalette({ isOpen, onClose, currentPath = "/" }: CommandPa
                       {isCurrent && (
                         <motion.span
                           aria-label="Current page"
-                          className="inline-block h-1.5 w-1.5 rounded-full bg-[#01F8A5]"
+                          className="inline-block h-1.5 w-1.5 rounded-full bg-highlight"
                           animate={{ opacity: [1, 0.25, 1] }}
                           transition={{
                             duration: 1.8,
@@ -261,7 +287,7 @@ export function CommandPalette({ isOpen, onClose, currentPath = "/" }: CommandPa
                       aria-hidden="true"
                       className={`transition-all duration-200 ease-out ${
                         isSelected
-                          ? "translate-x-0 text-[#01F8A5] opacity-100"
+                          ? "translate-x-0 text-highlight opacity-100"
                           : "-translate-x-1 opacity-0"
                       }`}
                     >
@@ -273,22 +299,32 @@ export function CommandPalette({ isOpen, onClose, currentPath = "/" }: CommandPa
               })}
             </div>
 
-            {/* Footer hint */}
-            <div className="flex items-center gap-4 border-t border-white/5 px-4 py-2.5">
-              <div className="flex items-center gap-1.5">
-                <kbd className="rounded border border-white/10 bg-white/5 px-1 py-0.5 font-mono text-[10px] text-muted-foreground">
-                  ↑
-                </kbd>
-                <kbd className="rounded border border-white/10 bg-white/5 px-1 py-0.5 font-mono text-[10px] text-muted-foreground">
-                  ↓
-                </kbd>
-                <span className="font-mono text-[10px] text-[#5a5a5a]">navigate</span>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <kbd className="rounded border border-white/10 bg-white/5 px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground">
-                  ↵
-                </kbd>
-                <span className="font-mono text-[10px] text-[#5a5a5a]">go</span>
+            <div className="border-t border-white/5 px-3 py-1.5" role="group" aria-label="Accent color">
+              <div className="flex items-center gap-0.5">
+                {accentItems.map((item) => {
+                  const color = ACCENTS[item.accent];
+                  const selectableIdx = selectableItems.indexOf(item);
+                  const active = accent === item.accent;
+                  const highlighted = selectedIndex === selectableIdx;
+                  return (
+                    <button
+                      key={item.accent}
+                      type="button"
+                      data-selectable-index={selectableIdx}
+                      aria-label={color.label}
+                      aria-pressed={active}
+                      onClick={() => handleSelect(item)}
+                      onMouseEnter={() => setSelectedIndex(selectableIdx)}
+                      className={`flex h-8 w-8 items-center justify-center rounded-full transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/70 ${highlighted ? "bg-white/[0.06]" : "hover:bg-white/[0.04]"}`}
+                    >
+                      <span
+                        className={`h-3.5 w-3.5 rounded-full ${active ? "ring-1 ring-white/60 ring-offset-[3px] ring-offset-[#151413]" : ""}`}
+                        style={{ backgroundColor: color.hex }}
+                        aria-hidden="true"
+                      />
+                    </button>
+                  );
+                })}
               </div>
             </div>
           </motion.div>

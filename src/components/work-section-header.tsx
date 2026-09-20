@@ -52,7 +52,7 @@ export function WorkSectionHeader({ projects }: WorkSectionHeaderProps) {
         </h2>
         <button
           onClick={openPresentation}
-          className="group inline-flex cursor-pointer items-center gap-2 rounded-md bg-[#121212] px-3 py-1.5 text-[13px] text-muted-foreground transition-all duration-200 hover:bg-[#1a1a1a] hover:text-[#01F8A5]"
+          className="group inline-flex cursor-pointer items-center gap-2 rounded-md bg-[#121212] px-3 py-1.5 text-[13px] text-muted-foreground transition-all duration-200 hover:bg-[#1a1a1a] hover:text-highlight"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -64,7 +64,7 @@ export function WorkSectionHeader({ projects }: WorkSectionHeaderProps) {
             strokeWidth="2"
             strokeLinecap="round"
             strokeLinejoin="round"
-            className="transition-all duration-200 group-hover:scale-110 group-hover:stroke-[#01F8A5]"
+            className="transition-all duration-200 group-hover:scale-110 group-hover:stroke-highlight"
           >
             <path d="M5 5a2 2 0 0 1 3.008-1.728l11.997 6.998a2 2 0 0 1 .003 3.458l-12 7A2 2 0 0 1 5 19z"/>
           </svg>

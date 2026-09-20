@@ -9,6 +9,7 @@ import { motion, useMotionValueEvent, useScroll, AnimatePresence } from "framer-
 import { HyperText } from "@/components/ui/hyper-text";
 import { ResumeProvider, useResume } from "@/contexts/resume-context";
 import { PageContentProvider, usePageContent } from "@/contexts/page-content-context";
+import { AccentProvider } from "@/contexts/accent-context";
 
 // Lazy-load overlay components – these are never visible on first paint
 const CommandPalette = dynamic(
@@ -807,10 +808,12 @@ function SiteShellContent({ children }: SiteShellProps) {
 
 export function SiteShell({ children }: SiteShellProps) {
   return (
-    <ResumeProvider>
-      <PageContentProvider>
-        <SiteShellContent>{children}</SiteShellContent>
-      </PageContentProvider>
-    </ResumeProvider>
+    <AccentProvider>
+      <ResumeProvider>
+        <PageContentProvider>
+          <SiteShellContent>{children}</SiteShellContent>
+        </PageContentProvider>
+      </ResumeProvider>
+    </AccentProvider>
   );
 }

@@ -23,6 +23,44 @@ type SvgAccentConfig = {
   transitionMs?: number; // default: 520
 };
 
+function WorkCardArt({
+  src,
+  className,
+  alt,
+  priority = false,
+  decorative = false,
+}: {
+  src: string;
+  className: string;
+  alt?: string;
+  priority?: boolean;
+  decorative?: boolean;
+}) {
+  if (src.endsWith(".svg")) {
+    return (
+      <InlineSvg
+        src={src}
+        bindHighlight
+        className={`${className} [&>svg]:block [&>svg]:h-full [&>svg]:w-full`}
+      />
+    );
+  }
+
+  return (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src={src}
+      alt={decorative ? "" : alt}
+      aria-hidden={decorative ? true : undefined}
+      className={className}
+      loading={priority ? "eager" : "lazy"}
+      fetchPriority={priority ? "high" : undefined}
+      decoding="async"
+      draggable={false}
+    />
+  );
+}
+
 type WorkCardProps = {
   slug: string;
   title: string;
@@ -57,6 +95,7 @@ export function WorkCard({
   const cardRef = useRef<HTMLAnchorElement>(null);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [isHovered, setIsHovered] = useState(false);
+  const mobileHoverSrc = mobileHoverImageSrc ?? hoverImageSrc;
 
   const handleMouseMove = useCallback(
     (e: React.MouseEvent<HTMLAnchorElement>) => {
@@ -177,6 +216,7 @@ export function WorkCard({
             {imageSrc && imageSrc.endsWith(".svg") && svgAccent ? (
               <InlineSvg
                 src={imageSrc}
+                bindHighlight
                 className={[
                   `h-full w-full opacity-[0.92] ${svgPadding ?? "p-8 sm:p-10 md:p-12"}`,
                   // Ensure the inlined <svg> fills the box and stays centered.
@@ -189,49 +229,38 @@ export function WorkCard({
                 {/* Mobile-specific art (if provided) - visible when grid is single column (< 900px) */}
                 {mobileImageSrc ? (
                   <>
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
+                    <WorkCardArt
                       src={mobileImageSrc}
                       alt={title}
+                      priority={priority}
                       className={[
                         "absolute inset-0 h-full w-full object-contain opacity-[0.92] min-[900px]:hidden",
                         mobileImageSrc.endsWith(".svg")
                           ? (svgPadding ?? "p-8 sm:p-10 md:p-12")
                           : "p-6 sm:p-8",
                       ].join(" ")}
-                      loading={priority ? "eager" : "lazy"}
-                      fetchPriority={priority ? "high" : undefined}
-                      decoding="async"
-                      draggable={false}
                     />
-                    {/* Mobile hover art */}
-                    {(mobileHoverImageSrc || hoverImageSrc) ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
-                        src={mobileHoverImageSrc || hoverImageSrc}
-                        alt=""
-                        aria-hidden="true"
+                    {mobileHoverSrc ? (
+                      <WorkCardArt
+                        src={mobileHoverSrc}
+                        decorative
                         className={[
                           "absolute inset-0 h-full w-full object-contain min-[900px]:hidden",
                           "transition-opacity duration-500 ease-out",
                           isHovered ? "opacity-100" : "opacity-0",
-                          (mobileHoverImageSrc || hoverImageSrc || "").endsWith(".svg")
+                          mobileHoverSrc.endsWith(".svg")
                             ? (svgPadding ?? "p-8 sm:p-10 md:p-12")
                             : "p-6 sm:p-8",
                         ].join(" ")}
-                        loading="lazy"
-                        decoding="async"
-                        draggable={false}
                       />
                     ) : null}
                   </>
                 ) : null}
 
-                {/* Desktop art - hidden when grid is single column if mobile version exists */}
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
+                <WorkCardArt
                   src={imageSrc}
                   alt={title}
+                  priority={priority}
                   className={[
                     "absolute inset-0 h-full w-full object-contain opacity-[0.92]",
                     mobileImageSrc ? "hidden min-[900px]:block" : "",
@@ -239,19 +268,12 @@ export function WorkCard({
                       ? (svgPadding ?? "p-8 sm:p-10 md:p-12")
                       : "p-6 sm:p-8",
                   ].join(" ")}
-                  loading={priority ? "eager" : "lazy"}
-                  fetchPriority={priority ? "high" : undefined}
-                  decoding="async"
-                  draggable={false}
                 />
 
-                {/* Desktop hover art - hidden when grid is single column if mobile version exists */}
                 {hoverImageSrc ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
+                  <WorkCardArt
                     src={hoverImageSrc}
-                    alt=""
-                    aria-hidden="true"
+                    decorative
                     className={[
                       "absolute inset-0 h-full w-full object-contain",
                       "transition-opacity duration-500 ease-out",
@@ -261,9 +283,6 @@ export function WorkCard({
                         ? (svgPadding ?? "p-8 sm:p-10 md:p-12")
                         : "p-6 sm:p-8",
                     ].join(" ")}
-                    loading="lazy"
-                    decoding="async"
-                    draggable={false}
                   />
                 ) : null}
 

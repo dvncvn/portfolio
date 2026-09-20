@@ -305,7 +305,7 @@ export function WelcomeModal({ visitor, onClose, onStartPresentation }: WelcomeM
             </button>
             <button
               onClick={handlePresentation}
-              className={`group/btn inline-flex cursor-pointer items-center justify-center gap-2 rounded-md bg-[#121212] text-muted-foreground transition-all duration-200 ease-out hover:bg-[#1a1a1a] hover:text-[#01F8A5] ${visitor.largeText ? "px-6 py-4 text-[18px]" : "px-5 py-3 text-[14px]"}`}
+              className={`group/btn inline-flex cursor-pointer items-center justify-center gap-2 rounded-md bg-[#121212] text-muted-foreground transition-all duration-200 ease-out hover:bg-[#1a1a1a] hover:text-highlight ${visitor.largeText ? "px-6 py-4 text-[18px]" : "px-5 py-3 text-[14px]"}`}
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -317,7 +317,7 @@ export function WelcomeModal({ visitor, onClose, onStartPresentation }: WelcomeM
                 strokeWidth="2"
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                className="transition-all duration-200 group-hover/btn:stroke-[#01F8A5]"
+                className="transition-all duration-200 group-hover/btn:stroke-highlight"
               >
                 <path d="M5 5a2 2 0 0 1 3.008-1.728l11.997 6.998a2 2 0 0 1 .003 3.458l-12 7A2 2 0 0 1 5 19z"/>
               </svg>
@@ -349,7 +349,7 @@ export function WelcomeModal({ visitor, onClose, onStartPresentation }: WelcomeM
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img src="/assets/rat.png" alt="Rat" className="h-12 w-12" />
                         <div>
-                          <p className="font-mono text-[14px] font-medium text-[#01F8A5]">
+                          <p className="font-mono text-[14px] font-medium text-highlight">
                             Rat Mode Active
                           </p>
                           <p className="font-mono text-[12px] text-muted-foreground">
@@ -418,7 +418,7 @@ export function WelcomeModal({ visitor, onClose, onStartPresentation }: WelcomeM
                             type="checkbox"
                             checked={ratChecks[i]}
                             onChange={() => handleRatCheck(i)}
-                            className="h-4 w-4 cursor-pointer rounded border-white/20 bg-white/5 accent-[#01F8A5]"
+                            className="h-4 w-4 cursor-pointer rounded border-white/20 bg-white/5 accent-highlight"
                           />
                           <span className={ratChecks[i] ? "text-foreground" : "text-muted-foreground"}>
                             {label}

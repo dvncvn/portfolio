@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import { Geist, Geist_Mono, Jacquard_24 } from "next/font/google";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Analytics } from "@vercel/analytics/next";
 import { SiteShell } from "@/components/site-shell";
+import { ACCENT_BOOTSTRAP_SCRIPT } from "@/lib/accents";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -64,6 +66,9 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} ${jacquard24.variable}`}
     >
       <body className="antialiased">
+        <Script id="accent-bootstrap" strategy="beforeInteractive">
+          {ACCENT_BOOTSTRAP_SCRIPT}
+        </Script>
         <SiteShell>{children}</SiteShell>
         <SpeedInsights />
         <Analytics />

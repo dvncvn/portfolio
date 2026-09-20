@@ -5,6 +5,7 @@ import { useRef } from "react";
 import { WorkProjectAsset, ParallaxLayer } from "@/content/types";
 import { DotPattern } from "@/components/ui/dot-pattern";
 import { BlurFade } from "@/components/ui/blur-fade";
+import { InlineSvg } from "@/components/inline-svg";
 import type { WorkProjectMeta } from "@/content/types";
 
 type ProjectHeroProps = {
@@ -13,6 +14,21 @@ type ProjectHeroProps = {
   summary: string;
   meta?: WorkProjectMeta;
 };
+
+// Inline SVG artwork so fills, strokes, and gradient stops inherit the site accent.
+function HeroArt({ src, alt = "", priority = false }: { src: string; alt?: string; priority?: boolean }) {
+  if (src.endsWith(".svg")) {
+    return (
+      <div className="h-full w-full" role={alt ? "img" : undefined} aria-label={alt || undefined} aria-hidden={alt ? undefined : true}>
+        <InlineSvg src={src} bindHighlight className="h-full w-full [&>svg]:block [&>svg]:h-full [&>svg]:w-full" />
+      </div>
+    );
+  }
+  return (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img src={src} alt={alt} className="h-full w-full object-contain" draggable={false} loading={priority ? "eager" : "lazy"} fetchPriority={priority ? "high" : "auto"} />
+  );
+}
 
 // Parallax layer component to use hooks properly
 function ParallaxLayerImage({
@@ -47,19 +63,15 @@ function ParallaxLayerImage({
   );
 
   return (
-    // eslint-disable-next-line @next/next/no-img-element
-    <motion.img
-      src={layer.src}
-      alt=""
+    <motion.div
       className="absolute inset-0 h-full w-full origin-center object-contain select-none pointer-events-none scale-[0.32] md:scale-[0.45]"
-      draggable={false}
-      loading={index === 0 ? "eager" : "lazy"}
-      fetchPriority={index === 0 ? "high" : "auto"}
       style={{
         x: shouldReduceMotion ? offsetX : layerParallaxX,
         y: shouldReduceMotion ? offsetY : layerParallaxY,
       }}
-    />
+    >
+      <HeroArt src={layer.src} priority={index === 0} />
+    </motion.div>
   );
 }
 
@@ -144,18 +156,14 @@ export function ProjectHero({
             </div>
           ) : (
             // Standard single image hero
-            // eslint-disable-next-line @next/next/no-img-element
-            <motion.img
-              src={heroAsset.src}
-              alt={heroAsset.alt ?? ""}
+            <motion.div
               className={`h-full w-full origin-center object-contain select-none pointer-events-none ${
                 hasHeroVignette ? "scale-[1.15]" : "scale-[0.8] md:scale-[0.95]"
               }`}
-              draggable={false}
-              loading="eager"
-              fetchPriority="high"
               style={{ y: shouldReduceMotion ? 0 : heroParallaxY }}
-            />
+            >
+              <HeroArt src={heroAsset.src} alt={heroAsset.alt} priority />
+            </motion.div>
           )}
         </div>
       ) : null}

@@ -185,7 +185,7 @@ export function MarkdownTakeover({ isOpen, onClose, markdown }: MarkdownTakeover
     const parts: React.ReactNode[] = [];
     let lastIndex = 0;
     let keyIndex = 0;
-    const linkClass = "cursor-pointer text-[#01F8A5] underline decoration-[#01F8A5]/30 underline-offset-2 transition-colors hover:decoration-[#01F8A5]/60";
+    const linkClass = "cursor-pointer text-highlight underline decoration-highlight/30 underline-offset-2 transition-colors hover:decoration-highlight/60";
 
     for (const span of nonOverlapping) {
       if (span.start > lastIndex) {
@@ -308,7 +308,7 @@ export function MarkdownTakeover({ isOpen, onClose, markdown }: MarkdownTakeover
                     strokeWidth="2"
                     strokeLinecap="round"
                     strokeLinejoin="round"
-                    className="text-[#01F8A5]"
+                    className="text-highlight"
                   >
                     <polyline points="20 6 9 17 4 12" />
                   </svg>

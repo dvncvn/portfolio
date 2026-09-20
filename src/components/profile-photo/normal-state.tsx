@@ -22,7 +22,7 @@ export function NormalState() {
         </defs>
         <rect width="100%" height="100%" fill={`url(#${patternId})`} />
       </svg>
-      <p>A little less normal?</p>
+      <p>&quot;Normal&quot;</p>
     </div>
   );
 }

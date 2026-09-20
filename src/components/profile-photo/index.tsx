@@ -6,34 +6,11 @@ import { EffectImage } from "./effect-image";
 import styles from "./controls.module.css";
 import { NormalState } from "./normal-state";
 import { DitherPicker } from "./dither-picker";
+import { InkPicker } from "./ink-picker";
 import { TiltPhoto } from "./tilt-photo";
-import { BLAZE_ORANGE, DEFAULT_SETTINGS, type EffectSettings, type ImageEffect, type EffectColor } from "@/lib/photo-effects";
-
-// Generate a random vibrant color
-function getRandomColor(): EffectColor {
-  const hue = Math.random() * 360;
-  const saturation = 70 + Math.random() * 30; // 70-100%
-  const lightness = 50 + Math.random() * 20; // 50-70%
-  
-  // Convert HSL to RGB
-  const c = (1 - Math.abs(2 * lightness / 100 - 1)) * saturation / 100;
-  const x = c * (1 - Math.abs((hue / 60) % 2 - 1));
-  const m = lightness / 100 - c / 2;
-  
-  let r = 0, g = 0, b = 0;
-  if (hue < 60) { r = c; g = x; b = 0; }
-  else if (hue < 120) { r = x; g = c; b = 0; }
-  else if (hue < 180) { r = 0; g = c; b = x; }
-  else if (hue < 240) { r = 0; g = x; b = c; }
-  else if (hue < 300) { r = x; g = 0; b = c; }
-  else { r = c; g = 0; b = x; }
-  
-  return {
-    r: Math.round((r + m) * 255),
-    g: Math.round((g + m) * 255),
-    b: Math.round((b + m) * 255),
-  };
-}
+import { useSharedPhoto } from "./use-shared-photo";
+import type { PhotoRecipe } from "@/lib/shared-photo";
+import { ASCII_MAX_SIZE, ASCII_SETS, BLAZE_ORANGE, DEFAULT_SETTINGS, type AsciiSet, type EffectSettings, type ImageEffect } from "@/lib/photo-effects";
 
 function EffectButton({
   label,
@@ -71,7 +48,13 @@ export function ProfilePhoto() {
     cancelAnimationFrame(rippleFrame.current);
     rippleAnimation.current?.cancel();
   }, []);
-  const [imageEffect, setImageEffect] = useState<ImageEffect>("normal");
+  const shared = useSharedPhoto();
+  const { effect: imageEffect, settings, colors } = shared.recipe;
+  const setImageEffect = (effect: ImageEffect) => shared.changeRecipe((current) => ({ ...current, effect }));
+  const setSettings = (update: (current: PhotoRecipe["settings"]) => PhotoRecipe["settings"]) =>
+    shared.changeRecipe((current) => ({ ...current, settings: update(current.settings) }));
+  const setColors = (update: (current: PhotoRecipe["colors"]) => PhotoRecipe["colors"]) =>
+    shared.changeRecipe((current) => ({ ...current, colors: update(current.colors) }));
   const [showControls, setShowControls] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const positionPanel = useCallback(() => {
@@ -144,8 +127,6 @@ export function ProfilePhoto() {
     panelRef.current?.hidePopover();
     photoRef.current?.querySelector<HTMLButtonElement>("button")?.focus({ preventScroll: true });
   };
-  const [settings, setSettings] = useState(DEFAULT_SETTINGS);
-  const [colors, setColors] = useState<Record<"dither" | "ascii", EffectColor>>({ dither: null, ascii: null });
   const activeEffect = imageEffect === "normal" ? "dither" : imageEffect;
   const active = settings[activeEffect];
   const update = (patch: Partial<EffectSettings>) => setSettings((current) => ({
@@ -157,24 +138,28 @@ export function ProfilePhoto() {
   };
 
   return (
+          <div>
           <div ref={photoRef} className={styles.photoRoot}>
             <TiltPhoto
+              disabled={shared.status === "loading"}
               onClick={openFromPhoto}
               expanded={showControls}
               onHoverChange={setIsHovered}
             >
               <EffectImage
+                ready={shared.status !== "loading"}
                 src="/assets/profile.png"
                 effect={imageEffect}
                 settings={active}
                 color={activeEffect === "pixelate" ? null : colors[activeEffect]}
               />
               <span ref={photoRippleRef} className={styles.ripple} aria-hidden="true" />
+              <span className={styles.editGrid} data-active={showControls} aria-hidden="true" />
               {/* Edit icon - appears on hover */}
               {/* Edit icon indicator */}
               <motion.div
                 initial={{ opacity: 0 }}
-                animate={{ opacity: isHovered || showControls ? 1 : 0 }}
+                animate={{ opacity: shared.status !== "loading" && (isHovered || showControls) ? 1 : 0 }}
                 transition={{ duration: 0.2 }}
                 className="[@media(hover:none)]:!opacity-100 pointer-events-none absolute bottom-3 right-3 rounded-full bg-black/50 p-2 text-white/70 backdrop-blur-sm"
                 aria-hidden="true"
@@ -206,7 +191,10 @@ export function ProfilePhoto() {
               popover="auto"
               role="region"
               aria-label="Photo effects"
-              onToggle={(event) => setShowControls(event.newState === "open")}
+              onToggle={(event) => {
+                setShowControls(event.newState === "open");
+                if (event.newState === "closed") void shared.saveOnClose();
+              }}
               className={styles.panel}
             >
               <div className={styles.controls} data-empty={imageEffect === "normal"}>
@@ -260,7 +248,7 @@ export function ProfilePhoto() {
                   <div className={styles.parameters}>
                     {imageEffect === "dither" && <DitherPicker value={active.ditherType ?? "bayer"} onChange={(ditherType) => update({ ditherType })} />}
                     <EffectSlider label={imageEffect === "dither" ? "Dot size" : imageEffect === "pixelate" ? "Pixel size" : "Type size"}
-                      defaultValue={DEFAULT_SETTINGS[activeEffect].size} value={active.size} min={imageEffect === "dither" ? 1 : 4} max={imageEffect === "dither" ? 8 : 24} unit="px" onChange={(size) => update({ size })} />
+                      defaultValue={DEFAULT_SETTINGS[activeEffect].size} value={active.size} min={imageEffect === "dither" ? 1 : 4} max={imageEffect === "dither" ? 8 : imageEffect === "ascii" ? ASCII_MAX_SIZE : 24} unit="px" onChange={(size) => update({ size })} />
                     <EffectSlider defaultValue={0} label="Brightness" value={active.brightness} min={-50} max={50} unit="%" onChange={(brightness) => update({ brightness })} />
                     <EffectSlider defaultValue={100} label="Contrast" value={active.contrast} min={25} max={200} unit="%" onChange={(contrast) => update({ contrast })} />
                     {imageEffect === "dither" && <EffectSlider defaultValue={50} label="Threshold" value={active.threshold} min={0} max={100} unit="%" onChange={(threshold) => update({ threshold })} />}
@@ -269,25 +257,20 @@ export function ProfilePhoto() {
                       <fieldset className={styles.glyphPicker}>
                         <legend>Character set</legend>
                         <div className={styles.glyphOptions}>
-                          <button type="button" aria-pressed={active.glyphs === "blocks"} onClick={() => update({ glyphs: "blocks" })}><span>░▒▓█</span>Blocks</button>
-                          <button type="button" aria-pressed={active.glyphs === "classic"} onClick={() => update({ glyphs: "classic" })}><span>.:+&#35;@</span>Classic</button>
+                          {(Object.keys(ASCII_SETS) as AsciiSet[]).map((glyphs) => (
+                            <button key={glyphs} type="button" aria-label={ASCII_SETS[glyphs].label} aria-pressed={active.glyphs === glyphs} onClick={() => update({ glyphs })}>
+                              <span aria-hidden="true">{ASCII_SETS[glyphs].sample}</span>
+                            </button>
+                          ))}
                         </div>
                       </fieldset>
                       <EffectSlider defaultValue={0} label="Letter spacing" value={active.gap} min={0} max={3} step={0.5} unit="px" onChange={(gap) => update({ gap })} />
                     </>}
                     {imageEffect !== "pixelate" && (
-                      <div className={styles.colorRow}>
-                        <label className="flex items-center gap-2">
-                          Ink color
-                          <input type="color" aria-label="Ink color" className={styles.colorInput}
-                            value={toHex(colors[imageEffect] ?? (imageEffect === "ascii" ? BLAZE_ORANGE : { r: 255, g: 255, b: 255 }))}
-                            onChange={(event) => {
-                              const hex = event.target.value;
-                              setColors((current) => ({ ...current, [imageEffect]: { r: parseInt(hex.slice(1, 3), 16), g: parseInt(hex.slice(3, 5), 16), b: parseInt(hex.slice(5, 7), 16) } }));
-                            }} />
-                        </label>
-                        <button type="button" className="hover:text-foreground" onClick={() => setColors((current) => ({ ...current, [imageEffect]: getRandomColor() }))}>Random color</button>
-                      </div>
+                      <InkPicker
+                        value={colors[imageEffect] ?? (imageEffect === "ascii" ? BLAZE_ORANGE : { r: 255, g: 255, b: 255 })}
+                        onChange={(color) => setColors((current) => ({ ...current, [imageEffect]: color }))}
+                      />
                     )}
                     <div className={styles.footer}>
                       <label className="flex cursor-pointer items-center gap-2">
@@ -298,23 +281,35 @@ export function ProfilePhoto() {
                     </div>
                   </div>
                 )}
+                {shared.location && (
+                  <div className={styles.saveOptions}>
+                    <label title="Approximate location, based on your internet connection">
+                      <input type="checkbox" checked={shared.shareLocation} onChange={(event) => shared.setShareLocation(event.target.checked)} />
+                      Include {shared.location}
+                    </label>
+                  </div>
+                )}
               </div>
               <div className={styles.panelPreview} aria-hidden="true">
                 <EffectImage
+                  ready={shared.status !== "loading"}
                   src="/assets/profile.png"
                   effect={imageEffect}
                   settings={active}
                   color={activeEffect === "pixelate" ? null : colors[activeEffect]}
                 />
                 <span ref={previewRippleRef} className={styles.ripple} aria-hidden="true" />
+                <span className={styles.editGrid} data-active={showControls} aria-hidden="true" />
               </div>
             </div>
           </div>
+          <p className={styles.attribution} role="status" aria-live="polite">
+            {shared.message ? shared.message
+              : shared.savedEdit?.location ? `Last edit from ${shared.savedEdit.location.replace(/, /g, " ")}`
+              : null}
+          </p>
+          </div>
   );
-}
-
-function toHex(color: NonNullable<EffectColor>) {
-  return "#" + [color.r, color.g, color.b].map((value) => value.toString(16).padStart(2, "0")).join("");
 }
 
 function EffectSlider({ label, value, min, max, step = 1, unit = "", defaultValue, onChange }: {

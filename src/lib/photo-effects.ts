@@ -1,6 +1,17 @@
 export type ImageEffect = "normal" | "dither" | "pixelate" | "ascii";
 export type EffectColor = { r: number; g: number; b: number } | null;
 
+export const ASCII_MAX_SIZE = 96;
+export const ASCII_SETS = {
+  blocks: { label: "Blocks", sample: "░▒▓█", ramp: " ░▒▓█" },
+  classic: { label: "Classic", sample: ".:+#@", ramp: " .,:;irsXA253hMHGS#9B&@" },
+  braille: { label: "Braille", sample: "⠁⠃⠇⡇⣿", ramp: " ⠁⠃⠇⡇⡏⡟⡿⣿" },
+  dots: { label: "Dots", sample: "·∙•●", ramp: " ·∙•●" },
+  lines: { label: "Lines", sample: "╴─┼╬", ramp: " ╴─┼╬█" },
+  binary: { label: "Binary", sample: "0101", ramp: " 01" },
+} as const;
+export type AsciiSet = keyof typeof ASCII_SETS;
+
 export type DitherType = "bayer" | "floyd-steinberg" | "atkinson" | "noise";
 
 export type EffectSettings = {
@@ -12,9 +23,9 @@ export type EffectSettings = {
   threshold: number;
   levels: number;
   gap: number;
-  glyphs: "blocks" | "classic";
+  glyphs: AsciiSet;
 };
-export const BLAZE_ORANGE = { r: 255, g: 103, b: 0 };
+export const BLAZE_ORANGE = { r: 255, g: 92, b: 0 };
 export const DEFAULT_SETTINGS: Record<Exclude<ImageEffect, "normal">, EffectSettings> = {
   dither: { size: 2, brightness: 0, contrast: 100, invert: false, threshold: 50, levels: 256, gap: 0, glyphs: "blocks", ditherType: "bayer" },
   pixelate: { size: 10, brightness: 0, contrast: 100, invert: false, threshold: 50, levels: 256, gap: 0, glyphs: "blocks", ditherType: "bayer" },
@@ -120,7 +131,7 @@ export function renderPhotoEffect(
   ctx.fillStyle = "#0a0a0a";
   ctx.fillRect(0, 0, width, height);
   ctx.fillStyle = `rgb(${ink.r}, ${ink.g}, ${ink.b})`;
-  const glyphs = settings.glyphs === "classic" ? " .,:;irsXA253hMHGS#9B&@" : " ░▒▓█";
+  const glyphs = ASCII_SETS[settings.glyphs]?.ramp ?? ASCII_SETS.blocks.ramp;
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
   const cw = width / cols;

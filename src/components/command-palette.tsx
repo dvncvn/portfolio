@@ -299,8 +299,9 @@ export function CommandPalette({ isOpen, onClose, currentPath = "/" }: CommandPa
               })}
             </div>
 
-            <div className="border-t border-white/5 px-3 py-1.5" role="group" aria-label="Accent color">
-              <div className="flex items-center gap-0.5">
+            <div className="flex items-center justify-between border-t border-white/5 px-4 py-2" role="group" aria-label="Accent color">
+              <span className="text-[13px] text-muted-foreground">Accent</span>
+              <div className="flex items-center">
                 {accentItems.map((item) => {
                   const color = ACCENTS[item.accent];
                   const selectableIdx = selectableItems.indexOf(item);
@@ -315,13 +316,15 @@ export function CommandPalette({ isOpen, onClose, currentPath = "/" }: CommandPa
                       aria-pressed={active}
                       onClick={() => handleSelect(item)}
                       onMouseEnter={() => setSelectedIndex(selectableIdx)}
-                      className={`flex h-8 w-8 items-center justify-center rounded-full transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/70 ${highlighted ? "bg-white/[0.06]" : "hover:bg-white/[0.04]"}`}
+                      className={`relative flex h-8 w-5 items-center justify-center focus-visible:z-10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/70 ${highlighted ? "brightness-110" : "hover:brightness-110"}`}
                     >
                       <span
-                        className={`h-3.5 w-3.5 rounded-full ${active ? "ring-1 ring-white/60 ring-offset-[3px] ring-offset-[#151413]" : ""}`}
+                        className="relative h-5 w-5"
                         style={{ backgroundColor: color.hex }}
                         aria-hidden="true"
-                      />
+                      >
+                        {active && <span className="absolute bottom-1 left-1/2 h-0.5 w-2 -translate-x-1/2 rounded-full bg-black/50" />}
+                      </span>
                     </button>
                   );
                 })}

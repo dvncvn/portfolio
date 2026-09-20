@@ -7,7 +7,8 @@ import { motion, useMotionTemplate, useSpring } from "framer-motion";
 // useSpring passes duration straight to the generator, where it is milliseconds.
 const spring = { visualDuration: 0.5, bounce: 0.2 };
 
-export function TiltPhoto({ children, onClick, expanded, onHoverChange }: {
+export function TiltPhoto({ children, onClick, expanded, onHoverChange, disabled = false }: {
+  disabled?: boolean;
   children: ReactNode;
   onClick: (event: MouseEvent<HTMLButtonElement>) => void;
   expanded: boolean;
@@ -47,7 +48,7 @@ export function TiltPhoto({ children, onClick, expanded, onHoverChange }: {
     onHoverChange(false);
   };
   const track = (event: PointerEvent<HTMLDivElement>) => {
-    if (expanded || !enabled.current || event.pointerType === "touch" || !surface.current) return;
+    if (disabled || expanded || !enabled.current || event.pointerType === "touch" || !surface.current) return;
     // Measure the stationary wrapper so the rotated photo cannot feed back into tracking.
     const bounds = surface.current.getBoundingClientRect();
     const x = Math.max(-1, Math.min(1, (event.clientX - bounds.left) / bounds.width * 2 - 1));
@@ -59,6 +60,7 @@ export function TiltPhoto({ children, onClick, expanded, onHoverChange }: {
   return (
     <div ref={surface} onPointerEnter={() => onHoverChange(true)} onPointerMove={track} onPointerLeave={reset} onPointerCancel={reset}>
       <button
+        disabled={disabled}
         type="button"
         aria-label="Edit photo effects"
         aria-expanded={expanded}

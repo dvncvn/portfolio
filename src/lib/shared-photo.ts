@@ -1,9 +1,9 @@
-import { ASCII_MAX_SIZE, ASCII_SETS, DEFAULT_SETTINGS, type AsciiSet, type EffectColor, type EffectSettings, type ImageEffect } from "./photo-effects";
+import { PIXEL_MAX_SIZE, ASCII_MAX_SIZE, ASCII_SETS, DEFAULT_SETTINGS, type AsciiSet, type EffectColor, type EffectSettings, type ImageEffect } from "./photo-effects";
 
 export type PhotoRecipe = {
   effect: ImageEffect;
   settings: Record<Exclude<ImageEffect, "normal">, EffectSettings>;
-  colors: Record<"dither" | "ascii", EffectColor>;
+  colors: Record<Exclude<ImageEffect, "normal">, EffectColor>;
 };
 
 export type PhotoEdit = {
@@ -13,12 +13,13 @@ export type PhotoEdit = {
   location: string | null;
 };
 
-export type PhotoHistory = { version: 1; current: PhotoEdit; previous: PhotoEdit | null };
+export const PHOTO_HISTORY_LIMIT = 4;
+export type PhotoHistory = { version: 2; current: PhotoEdit; previous: PhotoEdit[] };
 
 export const INITIAL_PHOTO: PhotoRecipe = {
   effect: "normal",
   settings: DEFAULT_SETTINGS,
-  colors: { dither: null, ascii: null },
+  colors: { dither: null, ascii: null, pixelate: null },
 };
 
 function record(value: unknown): Record<string, unknown> {
@@ -47,7 +48,7 @@ function settings(value: unknown, effect: Exclude<ImageEffect, "normal">): Effec
   }
   return {
     ditherType: s.ditherType as EffectSettings["ditherType"],
-    size: number(s.size, effect === "dither" ? 1 : 4, effect === "dither" ? 8 : effect === "ascii" ? ASCII_MAX_SIZE : 24),
+    size: number(s.size, effect === "dither" ? 1 : 4, effect === "dither" ? 8 : effect === "ascii" ? ASCII_MAX_SIZE : PIXEL_MAX_SIZE),
     brightness: number(s.brightness, -50, 50),
     contrast: number(s.contrast, 25, 200),
     invert: s.invert,
@@ -67,7 +68,7 @@ export function parsePhotoRecipe(value: unknown): PhotoRecipe {
   return {
     effect: input.effect as ImageEffect,
     settings: { dither: settings(s.dither, "dither"), pixelate: settings(s.pixelate, "pixelate"), ascii: settings(s.ascii, "ascii") },
-    colors: { dither: color(c.dither), ascii: color(c.ascii) },
+    colors: { dither: color(c.dither), ascii: color(c.ascii), pixelate: c.pixelate === undefined ? null : color(c.pixelate) },
   };
 }
 
@@ -87,8 +88,11 @@ export function parsePhotoEdit(value: unknown): PhotoEdit {
 
 export function parsePhotoHistory(value: unknown): PhotoHistory {
   const history = record(value);
-  if (history.version !== 1) throw new Error("Unsupported photo version");
-  return { version: 1, current: parsePhotoEdit(history.current), previous: history.previous === null ? null : parsePhotoEdit(history.previous) };
+  if (history.version !== 1 && history.version !== 2) throw new Error("Unsupported photo version");
+  const previous = history.version === 1
+    ? (history.previous === null ? [] : [history.previous]) : history.previous;
+  if (!Array.isArray(previous) || previous.length > PHOTO_HISTORY_LIMIT) throw new Error("Invalid photo history");
+  return { version: 2, current: parsePhotoEdit(history.current), previous: previous.map(parsePhotoEdit) };
 }
 
 export function photoLocation(headers: Headers): string | null {

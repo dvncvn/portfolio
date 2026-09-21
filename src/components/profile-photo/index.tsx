@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useId, useRef, useState, type MouseEvent, type CSSProperties } from "react";
 import { motion } from "framer-motion";
+import { PhotoHistory } from "./photo-history";
 import { EffectImage } from "./effect-image";
 import styles from "./controls.module.css";
 import { NormalState } from "./normal-state";
@@ -10,7 +11,7 @@ import { InkPicker } from "./ink-picker";
 import { TiltPhoto, usePhotoTilt } from "./tilt-photo";
 import { useSharedPhoto } from "./use-shared-photo";
 import type { PhotoRecipe } from "@/lib/shared-photo";
-import { ASCII_MAX_SIZE, ASCII_SETS, BLAZE_ORANGE, DEFAULT_SETTINGS, type AsciiSet, type EffectSettings, type ImageEffect } from "@/lib/photo-effects";
+import { PIXEL_MAX_SIZE, ASCII_MAX_SIZE, ASCII_SETS, BLAZE_ORANGE, DEFAULT_SETTINGS, type AsciiSet, type EffectSettings, type ImageEffect } from "@/lib/photo-effects";
 
 function EffectButton({
   label,
@@ -151,7 +152,7 @@ export function ProfilePhoto() {
   }));
   const reset = () => {
     setSettings((current) => ({ ...current, [activeEffect]: DEFAULT_SETTINGS[activeEffect] }));
-    if (activeEffect !== "pixelate") setColors((current) => ({ ...current, [activeEffect]: null }));
+    setColors((current) => ({ ...current, [activeEffect]: null }));
   };
 
   return (
@@ -169,7 +170,7 @@ export function ProfilePhoto() {
                 src="/assets/profile.png"
                 effect={imageEffect}
                 settings={active}
-                color={activeEffect === "pixelate" ? null : colors[activeEffect]}
+                color={colors[activeEffect]}
               />
               <span ref={photoRippleRef} className={styles.ripple} aria-hidden="true" />
               <span className={styles.editGrid} data-active={showControls} aria-hidden="true" />
@@ -266,11 +267,11 @@ export function ProfilePhoto() {
                   <div className={styles.parameters}>
                     {imageEffect === "dither" && <DitherPicker value={active.ditherType ?? "bayer"} onChange={(ditherType) => update({ ditherType })} />}
                     <EffectSlider label={imageEffect === "dither" ? "Dot size" : imageEffect === "pixelate" ? "Pixel size" : "Type size"}
-                      defaultValue={DEFAULT_SETTINGS[activeEffect].size} value={active.size} min={imageEffect === "dither" ? 1 : 4} max={imageEffect === "dither" ? 8 : imageEffect === "ascii" ? ASCII_MAX_SIZE : 24} unit="px" onChange={(size) => update({ size })} />
+                      defaultValue={DEFAULT_SETTINGS[activeEffect].size} value={active.size} min={imageEffect === "dither" ? 1 : 4} max={imageEffect === "dither" ? 8 : imageEffect === "ascii" ? ASCII_MAX_SIZE : PIXEL_MAX_SIZE} unit="px" onChange={(size) => update({ size })} />
                     <EffectSlider defaultValue={0} label="Brightness" value={active.brightness} min={-50} max={50} unit="%" onChange={(brightness) => update({ brightness })} />
                     <EffectSlider defaultValue={100} label="Contrast" value={active.contrast} min={25} max={200} unit="%" onChange={(contrast) => update({ contrast })} />
                     {imageEffect === "dither" && <EffectSlider defaultValue={50} label="Threshold" value={active.threshold} min={0} max={100} unit="%" onChange={(threshold) => update({ threshold })} />}
-                    {imageEffect === "pixelate" && <EffectSlider defaultValue={256} label="Color levels" value={active.levels} min={2} max={256} onChange={(levels) => update({ levels })} />}
+                    {imageEffect === "pixelate" && <EffectSlider defaultValue={256} label="Tone levels" value={active.levels} min={2} max={256} onChange={(levels) => update({ levels })} />}
                     {imageEffect === "ascii" && <>
                       <fieldset className={styles.glyphPicker}>
                         <legend>Character set</legend>
@@ -284,12 +285,10 @@ export function ProfilePhoto() {
                       </fieldset>
                       <EffectSlider defaultValue={0} label="Letter spacing" value={active.gap} min={0} max={3} step={0.5} unit="px" onChange={(gap) => update({ gap })} />
                     </>}
-                    {imageEffect !== "pixelate" && (
-                      <InkPicker
+                    <InkPicker
                         value={colors[imageEffect] ?? (imageEffect === "ascii" ? BLAZE_ORANGE : { r: 255, g: 255, b: 255 })}
                         onChange={(color) => setColors((current) => ({ ...current, [imageEffect]: color }))}
-                      />
-                    )}
+                    />
                     <div className={styles.footer}>
                       <label className="flex cursor-pointer items-center gap-2">
                         <input type="checkbox" checked={active.invert} onChange={(event) => update({ invert: event.target.checked })} className={styles.toggle} />
@@ -314,7 +313,7 @@ export function ProfilePhoto() {
                   src="/assets/profile.png"
                   effect={imageEffect}
                   settings={active}
-                  color={activeEffect === "pixelate" ? null : colors[activeEffect]}
+                  color={colors[activeEffect]}
                 />
                 <span ref={previewRippleRef} className={styles.ripple} aria-hidden="true" />
                 <span className={styles.editGrid} data-active={showControls} aria-hidden="true" />
@@ -329,6 +328,7 @@ export function ProfilePhoto() {
               : shared.savedEdit?.location ? `Last edit from ${shared.savedEdit.location.replace(/, /g, " ")}`
               : null}
           </p>
+          <PhotoHistory edits={shared.previous} />
           </div>
   );
 }

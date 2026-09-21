@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { INITIAL_PHOTO, parsePhotoEdit, photoFingerprint, type PhotoEdit, type PhotoRecipe } from "@/lib/shared-photo";
+import { INITIAL_PHOTO, PHOTO_HISTORY_LIMIT, parsePhotoEdit, photoFingerprint, type PhotoEdit, type PhotoRecipe } from "@/lib/shared-photo";
 import { createPhotoEditId } from "@/lib/photo-edit-id";
 
 type PendingSave = { id: string; recipe: PhotoRecipe; shareLocation: boolean };
@@ -13,6 +13,7 @@ export function useSharedPhoto() {
   const touched = useRef(false);
   const baseline = useRef(photoFingerprint(INITIAL_PHOTO));
   const [savedEdit, setSavedEdit] = useState<PhotoEdit | null>(null);
+  const [previous, setPrevious] = useState<PhotoEdit[]>([]);
   const [location, setLocation] = useState<string | null>(null);
   const [shareLocation, setShareLocation] = useState(true);
   const [status, setStatus] = useState<SaveStatus>("loading");
@@ -34,6 +35,7 @@ export function useSharedPhoto() {
         // A late initial response must never roll back a new edit or save.
         if (saveStarted.current) return;
         setSavedEdit(edit);
+        setPrevious(Array.isArray(data.previous) ? data.previous.slice(0, PHOTO_HISTORY_LIMIT).map(parsePhotoEdit) : []);
         baseline.current = photoFingerprint(edit?.recipe ?? INITIAL_PHOTO);
         if (!touched.current && edit) {
           recipeRef.current = edit.recipe;
@@ -93,9 +95,10 @@ export function useSharedPhoto() {
         }
         if (!response?.ok) throw new Error("Save failed");
         const data = await response.json();
-        const edit = parsePhotoEdit(data.current);
+        const edit = parsePhotoEdit(data.saved);
         baseline.current = photoFingerprint(edit.recipe);
-        setSavedEdit(edit);
+        setSavedEdit(parsePhotoEdit(data.current));
+        setPrevious(data.previous.map(parsePhotoEdit));
       }
       setStatus("saved");
     } catch {
@@ -105,5 +108,5 @@ export function useSharedPhoto() {
     } finally { saving.current = false; }
   }, [shareLocation]);
 
-  return { recipe, changeRecipe, savedEdit, location, shareLocation, setShareLocation, status, message, saveOnClose };
+  return { recipe, changeRecipe, savedEdit, previous, location, shareLocation, setShareLocation, status, message, saveOnClose };
 }

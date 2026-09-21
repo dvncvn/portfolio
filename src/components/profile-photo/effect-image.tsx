@@ -5,12 +5,13 @@ import { AsciiLoading } from "./ascii-loading";
 import { renderPhotoEffect, type EffectSettings, type EffectColor, type ImageEffect } from "@/lib/photo-effects";
 import styles from "./effect-image.module.css";
 
-export function EffectImage({ src, effect, settings, color, ready = true }: {
+export function EffectImage({ src, effect, settings, color, ready = true, renderWidth }: {
   src: string;
   effect: ImageEffect;
   settings: EffectSettings;
   color: EffectColor;
   ready?: boolean;
+  renderWidth?: number;
 }) {
   const imageRef = useRef<HTMLImageElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -48,7 +49,7 @@ export function EffectImage({ src, effect, settings, color, ready = true }: {
         sampleRef.current ??= document.createElement("canvas");
         try {
           const rendered = renderPhotoEffect(canvas, sampleRef.current, image, effect, settings, color,
-            container.clientWidth, container.clientHeight, Math.min(window.devicePixelRatio || 1, 2));
+            renderWidth ?? container.clientWidth, renderWidth ? renderWidth * container.clientHeight / container.clientWidth : container.clientHeight, Math.min(window.devicePixelRatio || 1, 2));
           canvas.style.opacity = rendered ? "1" : "0";
           image.style.visibility = rendered ? "hidden" : "visible";
         } catch {
@@ -73,7 +74,7 @@ export function EffectImage({ src, effect, settings, color, ready = true }: {
       image.removeEventListener("error", fail);
       window.removeEventListener("resize", render);
     };
-  }, [src, effect, settings, color, ready]);
+  }, [src, effect, settings, color, ready, renderWidth]);
 
   return (
     <div ref={containerRef} aria-busy="true" className={`relative aspect-[4/5] w-full ${styles.photo}`}>

@@ -11,7 +11,7 @@ const respond = (body: unknown, status = 200, extraHeaders: Record<string, strin
 export async function GET(request: NextRequest) {
   try {
     const saved = await readPhotoHistory();
-    return respond({ current: saved?.history.current ?? null, location: process.env.VERCEL === "1" ? photoLocation(request.headers) : null });
+    return respond({ current: saved?.history.current ?? null, previous: saved?.history.previous ?? [], location: process.env.VERCEL === "1" ? photoLocation(request.headers) : null });
   } catch {
     return respond({ error: "Couldn't load the last edit. You can still play with the photo." }, 503);
   }
@@ -51,13 +51,13 @@ export async function POST(request: NextRequest) {
   } catch { return respond({ error: "Those photo settings couldn't be saved." }, 400); }
 
   try {
-    const current = await savePhotoEdit({
+    const result = await savePhotoEdit({
       id: input.id,
       recipe: input.recipe,
       savedAt: new Date().toISOString(),
       location: input.shareLocation && process.env.VERCEL === "1" ? photoLocation(request.headers) : null,
     });
-    return respond({ current });
+    return respond({ current: result.history.current, previous: result.history.previous, saved: result.edit });
   } catch (error) {
     if (error instanceof PhotoSaveBusy) return respond({ error: "Another edit just arrived. Trying again…" }, 429, { "Retry-After": String(error.retryAfter) });
     return respond({ error: "Couldn't save this edit. Open and close the controls to try again." }, 503);

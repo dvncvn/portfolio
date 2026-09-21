@@ -241,3 +241,40 @@
   }
   .footer { flex-wrap: wrap; row-gap: 8px; }
 }
+
+.history { margin-top: 16px; }
+.historyGrid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+.historyItem > button { overflow: hidden; border-radius: 10px; cursor: pointer; border: 1px solid #ffffff18; }
+
+.historyItem > button:focus-visible, .historyHeading button:focus-visible { outline: 2px solid var(--foreground); outline-offset: 3px; }
+.historyDialog { position: fixed; inset: 0; margin: auto; padding: 0; width: min(400px, calc(100vw - 32px)); max-height: calc(100dvh - 32px); overflow: auto; border: 1px solid #ffffff20; border-radius: 20px; color: var(--foreground); background: #151412; }
+.historyDialog::backdrop { background: #000b; }
+.historyPreview { padding: 16px; }
+.historyHeading { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 12px; font-size: 13px; }
+.historyHeading button { display: grid; place-items: center; min-width: 44px; min-height: 44px; padding: 8px; cursor: pointer; color: var(--muted-foreground); }
+.historyPortrait { max-width: min(100%, 48dvh); margin-inline: auto; overflow: hidden; border-radius: 12px; }
+.historyPreview > p { margin-top: 12px; font-size: 12px; line-height: 1.6; color: var(--muted-foreground); }
+
+.historyItem { position: relative; min-width: 0; }
+.historyItem > button { display: block; width: 100%; }
+.historyItem:focus-within { z-index: 2; }
+.historyLocation {
+  position: absolute; z-index: 3; left: 50%; top: calc(100% + 8px);
+  width: max-content; max-width: 180px; padding: 7px 10px;
+  border: 1px solid #ffffff20; border-radius: 8px;
+  background: #24221f; color: #eee; box-shadow: 0 4px 16px #0005;
+  font-size: 11px; line-height: 1.4; text-align: center;
+  pointer-events: none; opacity: 0; transform: translateX(-50%);
+  transition: opacity 150ms ease;
+}
+.historyItem:first-child .historyLocation { left: 0; transform: none; }
+.historyItem:last-child:not(:first-child) .historyLocation { left: auto; right: 0; transform: none; }
+.historyItem:has(button:focus-visible) .historyLocation { opacity: 1; transition: none; }
+@media (hover: hover) and (pointer: fine) {
+  .historyItem:hover { z-index: 2; }
+  .historyItem > button:hover { border-color: #ffffff70; }
+  .historyItem:hover .historyLocation { opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .historyLocation { transition-duration: 100ms; }
+}

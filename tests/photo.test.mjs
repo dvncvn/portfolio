@@ -33,8 +33,8 @@ const edit = (id = '00000000-0000-4000-8000-000000000001', savedAt = new Date(Da
   id, savedAt, recipe: freshRecipe(), location: null,
 });
 
-function storeFixture() {
-  let history = null;
+function storeFixture(initial = null) {
+  let history = initial;
   let etag = 'initial';
   let writes = 0;
   let collide = false;
@@ -129,7 +129,7 @@ test('preserves the previous recipe and retries saves idempotently', async () =>
   const second = edit('00000000-0000-4000-8000-000000000002');
   second.recipe.effect = 'ascii';
   await fixture.store.savePhotoEdit(second);
-  assert.deepEqual(fixture.history.previous, first);
+  assert.deepEqual(fixture.history.previous, [first]);
   assert.deepEqual(fixture.history.current, second);
   await fixture.store.savePhotoEdit(second);
   await fixture.store.savePhotoEdit(first);
@@ -155,7 +155,7 @@ function routeFixture() {
     saved,
     route: load('src/app/api/photo/route.ts', {
       '@/lib/shared-photo': shared,
-      '@/lib/photo-store': { PhotoSaveBusy: Busy, readPhotoHistory: async () => null, savePhotoEdit: async (value) => { saved.push(value); return value; } },
+      '@/lib/photo-store': { PhotoSaveBusy: Busy, readPhotoHistory: async () => null, savePhotoEdit: async (value) => { saved.push(value); return { edit: value, history: { current: value, previous: [] } }; } },
     }),
   };
 }
@@ -178,4 +178,62 @@ test('anonymous saves ignore client-supplied attribution and timestamp', async (
   assert.equal(saved[0].location, null);
   assert.notEqual(saved[0].savedAt, '2000-01-01');
   assert.equal(response.headers.get('cache-control'), 'private, no-store');
+});
+
+
+test('migrates legacy history and retains only the four most recent previous edits', async () => {
+  const first = edit();
+  const fixture = storeFixture({ version: 1, current: first, previous: null });
+  assert.deepEqual((await fixture.store.readPhotoHistory()).history.previous, []);
+  const values = [first];
+  for (let i = 2; i <= 7; i++) {
+    const next = edit(`00000000-0000-4000-8000-${String(i).padStart(12, '0')}`);
+    values.push(next);
+    await fixture.store.savePhotoEdit(next);
+  }
+  assert.equal(fixture.history.version, 2);
+  assert.deepEqual(fixture.history.current, values[6]);
+  assert.deepEqual(fixture.history.previous, values.slice(2, 6).reverse());
+  const retried = await fixture.store.savePhotoEdit(values[2]);
+  assert.deepEqual(retried.edit, values[2]);
+  assert.deepEqual(retried.history.current, values[6]);
+  assert.equal(fixture.writes, 6);
+  assert.deepEqual(shared.parsePhotoHistory({ version: 1, current: values[1], previous: first }).previous, [first]);
+});
+
+test('rejects malformed and unbounded history', () => {
+  for (const previous of [null, {}, [null], Array(5).fill(edit())]) {
+    assert.throws(() => shared.parsePhotoHistory({ version: 2, current: edit(), previous }));
+  }
+});
+
+test('pixel ink survives saving and older recipes default to white ink', () => {
+  const recipe = freshRecipe();
+  delete recipe.colors.pixelate;
+  assert.equal(shared.parsePhotoRecipe(recipe).colors.pixelate, null);
+  recipe.colors.pixelate = { r: 255, g: 92, b: 0 };
+  assert.deepEqual(shared.parsePhotoRecipe(recipe).colors.pixelate, recipe.colors.pixelate);
+  recipe.colors.pixelate.r = 999;
+  assert.throws(() => shared.parsePhotoRecipe(recipe));
+});
+
+test('pixelate maps stepped tones to the selected ink and preserves alpha', () => {
+  const data = new Uint8ClampedArray([0, 0, 0, 128, 128, 128, 128, 255, 255, 255, 255, 255]);
+  effects.colorPixelate(data, 3, { r: 240, g: 100, b: 20 });
+  assert.deepEqual(Array.from(data), [0, 0, 0, 128, 120, 50, 10, 255, 240, 100, 20, 255]);
+  const white = new Uint8ClampedArray([255, 255, 255, 255]);
+  effects.colorPixelate(white, 2, null);
+  assert.deepEqual(Array.from(white), [255, 255, 255, 255]);
+});
+
+
+test('large pixel sizes survive saving and remain bounded', () => {
+  const recipe = freshRecipe();
+  recipe.effect = 'pixelate';
+  for (const size of [24, 32, 48, effects.PIXEL_MAX_SIZE]) {
+    recipe.settings.pixelate.size = size;
+    assert.equal(shared.parsePhotoRecipe(recipe).settings.pixelate.size, size);
+  }
+  recipe.settings.pixelate.size = effects.PIXEL_MAX_SIZE + 1;
+  assert.throws(() => shared.parsePhotoRecipe(recipe));
 });

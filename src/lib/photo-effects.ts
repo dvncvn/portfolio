@@ -2,6 +2,7 @@ export type ImageEffect = "normal" | "dither" | "pixelate" | "ascii";
 export type EffectColor = { r: number; g: number; b: number } | null;
 
 export const ASCII_MAX_SIZE = 96;
+export const PIXEL_MAX_SIZE = 64;
 export const ASCII_SETS = {
   blocks: { label: "Blocks", sample: "░▒▓█", ramp: " ░▒▓█" },
   classic: { label: "Classic", sample: ".:+#@", ramp: " .,:;irsXA253hMHGS#9B&@" },
@@ -102,11 +103,7 @@ export function renderPhotoEffect(
     }
   }
   if (effect === "pixelate") {
-    for (let i = 0; i < pixels.data.length; i += 4) {
-      for (let channel = 0; channel < 3; channel++) {
-        pixels.data[i + channel] = Math.round(pixels.data[i + channel] / 255 * (levels - 1)) / (levels - 1) * 255;
-      }
-    }
+    colorPixelate(pixels.data, levels, color);
     source.putImageData(pixels, 0, 0);
     ctx.imageSmoothingEnabled = false;
     ctx.drawImage(sample, 0, 0, width, height);
@@ -184,4 +181,15 @@ export function ditherMask(tones: Float32Array, width: number, height: number, t
     }
   }
   return output;
+}
+
+/** Use the same black-to-ink treatment as Dither and ASCII, with stepped tones. */
+export function colorPixelate(data: Uint8ClampedArray, levels: number, color: EffectColor) {
+  const ink = color ?? { r: 255, g: 255, b: 255 };
+  for (let i = 0; i < data.length; i += 4) {
+    const tone = Math.round(luminance(data, i) * (levels - 1)) / (levels - 1);
+    data[i] = tone * ink.r;
+    data[i + 1] = tone * ink.g;
+    data[i + 2] = tone * ink.b;
+  }
 }

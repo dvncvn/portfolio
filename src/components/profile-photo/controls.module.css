@@ -4,8 +4,8 @@
   --ease-expand: cubic-bezier(0.32, 0.72, 0, 1);
   --ease-reveal: cubic-bezier(0.23, 1, 0.32, 1);
   --panel-radius: 32px;
-  /* Keep the preview measured and rendered before entering the top layer. */
-  display: grid;
+  /* Closed popovers must not contribute overflow inside transformed ancestors. */
+  display: none;
   visibility: hidden;
   pointer-events: none;
   box-sizing: border-box;
@@ -27,16 +27,17 @@
   clip-path: inset(var(--closed-inset, 0 0 0 0 round 32px));
   /* Retract first, then hand the portrait back to the underlying surface. */
   transition: clip-path 250ms var(--ease-expand), opacity 80ms ease 170ms,
-    visibility 250ms allow-discrete, overlay 250ms allow-discrete;
+    visibility 250ms allow-discrete, display 250ms allow-discrete, overlay 250ms allow-discrete;
 }
 .panel:popover-open {
+  display: grid;
   visibility: visible;
   pointer-events: auto;
   grid-template-columns: minmax(0, 1fr);
   opacity: 1;
   clip-path: inset(0 0 0 0 round var(--panel-radius));
   transition: clip-path 280ms var(--ease-expand), opacity 100ms ease,
-    visibility 280ms allow-discrete, overlay 280ms allow-discrete;
+    visibility 280ms allow-discrete, display 280ms allow-discrete, overlay 280ms allow-discrete;
 }
 .panel[data-beside="true"] { grid-template-columns: minmax(0, 1fr) var(--photo-width); gap: 16px; }
 @starting-style {
@@ -99,7 +100,7 @@
 .attribution { margin: 12px 8px 0; color: #888; font-size: 11px; line-height: 1.5; text-wrap: pretty; }
 .attribution:empty { display: none; }
 @media (prefers-reduced-motion: reduce) {
-  .panel, .panel:popover-open { clip-path: none; transition: opacity 150ms ease, visibility 150ms allow-discrete, overlay 150ms allow-discrete; }
+  .panel, .panel:popover-open { clip-path: none; transition: opacity 150ms ease, visibility 150ms allow-discrete, display 150ms allow-discrete, overlay 150ms allow-discrete; }
   .controls, .panel:popover-open .controls { transform: none; transition: opacity 150ms ease; }
   @starting-style {
     .panel:popover-open { clip-path: none; }

@@ -62,18 +62,29 @@ export function ProfilePhoto() {
     const panel = panelRef.current;
     if (!photo || !panel) return;
     const rect = photo.getBoundingClientRect();
-    const controlsWidth = Math.min(360, window.innerWidth - 32);
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
+    const controlsWidth = Math.min(360, viewportWidth - 32);
     const beside = rect.left >= controlsWidth + 32;
     const padding = 8;
     const gap = 16;
     const width = beside ? controlsWidth + gap + rect.width + padding * 2 : controlsWidth;
-    const top = beside ? rect.top - padding : Math.max(16, Math.min(rect.top, window.innerHeight - rect.height - 16));
-    const left = beside ? rect.left - controlsWidth - gap - padding : Math.max(16, Math.min(rect.right - width, window.innerWidth - width - 16));
+    const availableHeight = viewportHeight - 32;
+    // On small screens the portrait is too short to be a useful control panel.
+    // Give the editor enough room to scroll comfortably while keeping it inside
+    // the visual viewport, and keep it aligned with the photo when possible.
+    const stackedHeight = Math.min(Math.max(rect.height, 560), availableHeight);
+    const top = beside
+      ? rect.top - padding
+      : Math.max(16, Math.min(rect.top, viewportHeight - stackedHeight - 16));
+    const left = beside
+      ? rect.left - controlsWidth - gap - padding
+      : Math.max(16, Math.min(rect.left + (rect.width - width) / 2, viewportWidth - width - 16));
     panel.dataset.beside = String(beside);
     panel.style.left = `${left}px`;
     panel.style.top = `${top}px`;
     panel.style.width = `${width}px`;
-    panel.style.height = `${rect.height + (beside ? padding * 2 : 0)}px`;
+    panel.style.height = `${beside ? rect.height + padding * 2 : stackedHeight}px`;
     panel.style.setProperty("--photo-width", `${rect.width}px`);
     panel.style.setProperty("--closed-inset", beside ? `8px 8px 8px ${controlsWidth + gap + padding}px round 24px` : "0 0 0 0 round 32px");
   }, []);
@@ -200,7 +211,7 @@ export function ProfilePhoto() {
               <div className={styles.controls} data-empty={imageEffect === "normal"}>
                 {/* Effect selector row */}
                 <div className={styles.panelHeader} data-has-controls={imageEffect !== "normal"}>
-                  <div className="flex items-center gap-1">
+                  <div className={styles.effectTabs}>
                     <EffectButton
                       label="Normal"
                       isActive={imageEffect === "normal"}

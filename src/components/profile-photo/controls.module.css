@@ -70,6 +70,8 @@
   background: #151412;
 }
 .panelHeader[data-has-controls="false"] { border-bottom-color: transparent; }
+.effectTabs { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px; min-width: 0; flex: 1; }
+.effectTabs > button { min-width: 0; }
 .parameters {
   display: grid;
   align-content: start;
@@ -194,3 +196,33 @@
   mask-image: radial-gradient(ellipse at center, transparent 12%, #000 55%, transparent 100%);
 }
 .normalState p { position: relative; margin: 0; color: #bdb9b2; font-size: 14px; font-weight: 400; letter-spacing: -0.01em; }
+
+@media (max-width: 480px) {
+  .panel {
+    padding: 6px;
+    border-radius: 24px;
+  }
+  .panel:popover-open { clip-path: inset(0 0 0 0 round 24px); }
+  .controls { padding: 0 10px 10px; }
+  .panelHeader {
+    padding: 10px 42px 10px 0;
+  }
+  .panelHeader > button {
+    position: absolute;
+    right: 0;
+    display: grid;
+    width: 40px;
+    height: 40px;
+    place-items: center;
+    padding: 0;
+  }
+  .effectTabs > button {
+    min-height: 40px;
+    padding-inline: 4px;
+  }
+  .parameters {
+    gap: 16px;
+    padding: 16px 2px 28px;
+  }
+  .footer { flex-wrap: wrap; row-gap: 8px; }
+}

@@ -135,6 +135,12 @@ const BURST_REVEAL_COUNT = 3; // How many extra checkboxes appear at once
 export function WelcomeModal({ visitor, onClose, onStartPresentation }: WelcomeModalProps) {
   const [ratChecks, setRatChecks] = useState<boolean[]>([false, false, false, false, false, false, false, false]);
   const [ratModeEnabled, setRatModeEnabled] = useState(false);
+  useEffect(() => {
+    const sync = (event: Event) => setRatModeEnabled((event as CustomEvent<{ active: boolean }>).detail.active);
+    window.addEventListener("ratModeChanged", sync);
+    return () => window.removeEventListener("ratModeChanged", sync);
+  }, []);
+
   const [mounted, setMounted] = useState(false);
   const [burstTriggered, setBurstTriggered] = useState(false);
   
@@ -353,7 +359,7 @@ export function WelcomeModal({ visitor, onClose, onStartPresentation }: WelcomeM
                             Rat Mode Active
                           </p>
                           <p className="font-mono text-[12px] text-muted-foreground">
-                            A rat now follows your cursor everywhere
+                            Click empty space to feed the rats.
                           </p>
                         </div>
                       </div>
@@ -380,7 +386,7 @@ export function WelcomeModal({ visitor, onClose, onStartPresentation }: WelcomeM
                       className="space-y-4"
                     >
                       <p className="font-mono text-[14px] text-muted-foreground">
-                        Ready to unleash chaos?
+                        They are waiting outside.
                       </p>
                       <button
                         onClick={() => {

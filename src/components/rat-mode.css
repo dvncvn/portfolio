@@ -1,0 +1,51 @@
+/* Geist Pixel has one native weight; avoid blurring its grid with faux bold. */
+.rat-takeover, .rat-dialog, .rat-infested main h1, .rat-infested main h2 { font-synthesis: none; font-weight: 500; }
+.rat-census strong, .rat-actions kbd { font-family: inherit; font-weight: inherit; }
+.rat-infested main { outline: 2px dashed color-mix(in srgb, var(--highlight) 55%, transparent); outline-offset: -12px; }
+.rat-infested main h1, .rat-infested main h2 { font-family: var(--font-geist-pixel-square), monospace; }
+.rat-takeover { position: fixed; inset: 0; z-index: 9990; pointer-events: none; color: var(--foreground); font-family: var(--font-geist-pixel-square), monospace; }
+.rat-notice { position: absolute; inset: 0 0 auto; padding: 7px 16px; background: var(--surface); color: var(--highlight); border-bottom: 1px solid color-mix(in srgb, var(--highlight) 35%, transparent); font-size: 12px; font-weight: 500; letter-spacing: .06em; text-align: center; }
+.rat-notice span { margin-left: 24px; font-size: 10px; font-weight: 500; }
+.rat-stamp { position: absolute; right: 28px; top: 115px; border: 4px double var(--highlight); color: var(--highlight); padding: 12px; font-size: 23px; line-height: 1; font-weight: 500; text-align: center; transform: rotate(12deg); }
+.rat-stamp small { font-size: 10px; font-weight: 500; }
+.rat-resident { position: absolute; left: 0; top: 0; width: 76px; height: 68px; will-change: transform; }
+.rat-resident img { width: 100%; height: 100%; object-fit: contain; image-rendering: pixelated; filter: drop-shadow(2px 4px 0 #0005); }
+.rat-boss img { scale: 1.8; }
+.rat-boss span { display: block; background: var(--highlight); color: var(--highlight-foreground); padding: 2px 4px; font-size: 10px; }
+.rat-crumb { position: absolute; top: 0; left: 0; color: var(--highlight); opacity: 0; font-size: 24px; }
+.rat-controls { pointer-events: auto; position: absolute; bottom: max(18px, env(safe-area-inset-bottom)); right: 18px; width: min(360px, calc(100vw - 36px)); padding: 17px; background: var(--surface); border: 1px solid color-mix(in srgb, var(--highlight) 35%, transparent); box-shadow: 5px 5px 0 var(--background); }
+.rat-census { display: flex; gap: 14px; align-items: center; font-size: 13px; }
+.rat-census strong { color: var(--highlight); font-size: 46px; line-height: 1; letter-spacing: -.08em; }
+.rat-census small { font-size: 10px; }
+.rat-controls p { font-size: 11px; margin: 14px 0; padding-top: 12px; border-top: 1px dashed var(--border); }
+.rat-actions { display: flex; gap: 6px; }
+.rat-actions button, .rat-dialog button { cursor: pointer; border: 1px solid color-mix(in srgb, var(--highlight) 35%, transparent); background: color-mix(in srgb, var(--highlight) 8%, var(--surface)); padding: 9px 10px; font: 500 11px var(--font-geist-pixel-square), monospace; color: var(--highlight); }
+.rat-actions button:last-child { margin-left: auto; background: var(--background); color: var(--foreground); }
+.rat-actions button:disabled { opacity: .45; cursor: default; }
+.rat-actions button:focus-visible, .rat-dialog button:focus-visible { outline: 3px solid var(--highlight); outline-offset: 3px; }
+.rat-actions kbd { font-size: 9px; opacity: .65; }
+.rat-dialog { margin: auto; width: min(420px, calc(100vw - 32px)); padding: 28px; background: var(--surface); color: var(--foreground); border: 1px solid color-mix(in srgb, var(--highlight) 35%, transparent); box-shadow: 7px 7px 0 var(--background); font-family: var(--font-geist-pixel-square), monospace; }
+.rat-dialog-stack::backdrop { background: #000b; }
+.rat-dialog img { width: 110px; height: 90px; object-fit: contain; image-rendering: pixelated; margin: 0 auto 16px; }
+.rat-dialog h2 { font-size: 32px; font-weight: 500; line-height: 1; letter-spacing: -.06em; margin-bottom: 18px; }
+.rat-dialog p { font-size: 13px; line-height: 1.6; margin-bottom: 18px; }
+.rat-dialog small { display: block; font-size: 10px; margin-bottom: 22px; }
+.rat-dialog footer { display: flex; justify-content: space-between; gap: 12px; }
+@media (max-width: 600px) { .rat-notice span { display: none; } .rat-stamp { top: 85px; right: 18px; font-size: 17px; } }
+@media (prefers-reduced-motion: reduce) { .rat-resident { will-change: auto; } }
+
+.rat-census small, .rat-controls p, .rat-dialog small, .rat-notice span { color: var(--muted-foreground); }
+.rat-admission-progress { display: flex; justify-content: space-between; gap: 12px; margin-bottom: 18px; color: var(--muted-foreground); font-size: 10px; letter-spacing: .06em; }
+.rat-admission-progress span:last-child { color: var(--highlight); }
+.rat-dialog h2:focus { outline: none; }
+.rat-dialog footer button { flex: 1; min-height: 44px; }
+
+/* One native modal owns focus; previous disclaimers remain as inert sheets. */
+.rat-dialog-stack { --rat-stack-offset: 18px; margin: auto; padding: 0; width: min(494px, calc(100vw - 32px)); max-height: calc(100dvh - 32px); background: transparent; border: 0; overflow: auto; }
+.rat-dialog-pile { display: grid; padding: 0 calc(3 * var(--rat-stack-offset) + 8px) calc(3 * var(--rat-stack-offset) + 8px) 0; }
+.rat-dialog-layer { grid-area: 1 / 1; position: relative; align-self: start; width: 100%; margin: 0; transform: translate(calc(var(--rat-layer) * var(--rat-stack-offset)), calc(var(--rat-layer) * var(--rat-stack-offset))); }
+.rat-dialog-layer[inert] { pointer-events: none; }
+@media (max-width: 600px) {
+  .rat-dialog-stack { --rat-stack-offset: 10px; }
+  .rat-dialog-layer { padding: 20px; }
+}

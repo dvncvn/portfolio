@@ -4,7 +4,6 @@ import Link from "next/link";
 import dynamic from "next/dynamic";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { createPortal } from "react-dom";
 import { motion, useMotionValueEvent, useScroll, AnimatePresence } from "framer-motion";
 import { HyperText } from "@/components/ui/hyper-text";
 import { ResumeProvider, useResume } from "@/contexts/resume-context";
@@ -16,6 +15,7 @@ const CommandPalette = dynamic(
   () => import("@/components/command-palette").then((m) => ({ default: m.CommandPalette })),
   { ssr: false }
 );
+const RatMode = dynamic(() => import("@/components/rat-mode").then((m) => m.RatMode), { ssr: false });
 const RatModeDialog = dynamic(
   () => import("@/components/rat-mode-dialog").then((m) => ({ default: m.RatModeDialog })),
   { ssr: false }
@@ -85,7 +85,6 @@ function SiteShellContent({ children }: SiteShellProps) {
   const [ratModeDialogOpen, setRatModeDialogOpen] = useState(false);
   const [ratModeActive, setRatModeActive] = useState(false);
   const [emailCopied, setEmailCopied] = useState(false);
-  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const keySequenceRef = useRef("");
   const { isOpen: isResumeOpen, closeResume, resumeData } = useResume();
   const { isViewerOpen: isMarkdownOpen, closeViewer: closeMarkdown, markdown } = usePageContent();
@@ -93,7 +92,6 @@ function SiteShellContent({ children }: SiteShellProps) {
   // Track which overlay chunks have been loaded (load on first trigger, keep mounted for exit animations)
   const [overlayLoaded, setOverlayLoaded] = useState({
     commandPalette: false,
-    ratModeDialog: false,
     resume: false,
     markdown: false,
   });
@@ -103,10 +101,6 @@ function SiteShellContent({ children }: SiteShellProps) {
       setOverlayLoaded((prev) => ({ ...prev, commandPalette: true }));
   }, [commandPaletteOpen, overlayLoaded.commandPalette]);
 
-  useEffect(() => {
-    if (ratModeDialogOpen && !overlayLoaded.ratModeDialog)
-      setOverlayLoaded((prev) => ({ ...prev, ratModeDialog: true }));
-  }, [ratModeDialogOpen, overlayLoaded.ratModeDialog]);
 
   useEffect(() => {
     if (isResumeOpen && !overlayLoaded.resume)
@@ -162,7 +156,7 @@ function SiteShellContent({ children }: SiteShellProps) {
         target.tagName === "INPUT" ||
         target.tagName === "TEXTAREA" ||
         target.isContentEditable ||
-        ratModeDialogOpen
+        ratModeDialogOpen || ratModeActive || e.metaKey || e.ctrlKey || e.altKey || e.repeat
       ) {
         return;
       }
@@ -186,24 +180,26 @@ function SiteShellContent({ children }: SiteShellProps) {
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [ratModeDialogOpen]);
+  }, [ratModeDialogOpen, ratModeActive]);
 
   const handleRatModeConfirm = () => {
     setRatModeActive(true);
     setRatModeDialogOpen(false);
-    console.log("🐀 Rat mode activated!");
   };
 
   // Listen for direct rat mode toggle from welcome modal
   useEffect(() => {
     const handleDirectToggle = (e: CustomEvent<{ active: boolean }>) => {
       setRatModeActive(e.detail.active);
-      console.log(`🐀 Rat mode ${e.detail.active ? "activated" : "deactivated"} via welcome modal`);
     };
 
     window.addEventListener("ratModeToggle", handleDirectToggle as EventListener);
     return () => window.removeEventListener("ratModeToggle", handleDirectToggle as EventListener);
   }, []);
+
+  useEffect(() => {
+    window.dispatchEvent(new CustomEvent("ratModeChanged", { detail: { active: ratModeActive } }));
+  }, [ratModeActive]);
 
   // ESC to exit rat mode
   useEffect(() => {
@@ -213,7 +209,6 @@ function SiteShellContent({ children }: SiteShellProps) {
       if (e.key === "Escape") {
         e.preventDefault();
         setRatModeActive(false);
-        console.log("🐀 Rat mode deactivated");
       }
     };
 
@@ -221,249 +216,6 @@ function SiteShellContent({ children }: SiteShellProps) {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [ratModeActive]);
 
-  // Track mouse for rat follower
-  useEffect(() => {
-    if (!ratModeActive) return;
-
-    const handleMouseMove = (e: MouseEvent) => {
-      setMousePos({ x: e.clientX, y: e.clientY });
-    };
-
-    window.addEventListener("mousemove", handleMouseMove);
-    return () => window.removeEventListener("mousemove", handleMouseMove);
-  }, [ratModeActive]);
-
-  // Apply rat-mode class to html element for full effect
-  useEffect(() => {
-    if (ratModeActive) {
-      document.documentElement.classList.add("rat-mode");
-    } else {
-      document.documentElement.classList.remove("rat-mode");
-    }
-    return () => {
-      document.documentElement.classList.remove("rat-mode");
-    };
-  }, [ratModeActive]);
-
-  // 🐀 RAT MODE CLICK SOUND
-  useEffect(() => {
-    if (!ratModeActive) return;
-
-    let audioContext: AudioContext | null = null;
-
-    const playClick = () => {
-      if (!audioContext) {
-        audioContext = new AudioContext();
-      }
-
-      // Create a short "squeak" click
-      const osc = audioContext.createOscillator();
-      const osc2 = audioContext.createOscillator();
-      const gain = audioContext.createGain();
-
-      // Random high-pitched squeak
-      const baseFreq = 800 + Math.random() * 1200;
-      osc.type = "square";
-      osc.frequency.value = baseFreq;
-      osc2.type = "triangle";
-      osc2.frequency.value = baseFreq * 1.5;
-
-      osc.connect(gain);
-      osc2.connect(gain);
-      gain.connect(audioContext.destination);
-
-      const now = audioContext.currentTime;
-      gain.gain.setValueAtTime(0.15, now);
-      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
-
-      // Pitch bend up for squeak effect
-      osc.frequency.exponentialRampToValueAtTime(baseFreq * 2, now + 0.05);
-      osc2.frequency.exponentialRampToValueAtTime(baseFreq * 3, now + 0.05);
-
-      osc.start(now);
-      osc2.start(now);
-      osc.stop(now + 0.08);
-      osc2.stop(now + 0.08);
-    };
-
-    const handleClick = () => {
-      playClick();
-    };
-
-    document.addEventListener("click", handleClick);
-
-    return () => {
-      document.removeEventListener("click", handleClick);
-      if (audioContext) {
-        audioContext.close();
-      }
-    };
-  }, [ratModeActive]);
-
-  // 🐀 RAT MODE MUSIC - MAXIMUM CHAOS EDITION
-  useEffect(() => {
-    if (!ratModeActive) return;
-
-    let audioContext: AudioContext | null = null;
-    let isPlaying = true;
-
-    const startMusic = () => {
-      audioContext = new AudioContext();
-      const masterGain = audioContext.createGain();
-      masterGain.gain.value = 0.12;
-      masterGain.connect(audioContext.destination);
-
-      // Chaotic chromatic notes - embrace the dissonance
-      const notes = [
-        130.81, 146.83, 164.81, 174.61, 196.00, 220.00, 246.94, // Low octave
-        261.63, 293.66, 311.13, 349.23, 392.00, 440.00, 493.88, // Mid octave
-        523.25, 587.33, 622.25, 698.46, 783.99, 880.00, 987.77, // High octave
-      ];
-      
-      // Main chaotic melody voice
-      const playNote = () => {
-        if (!audioContext || !isPlaying) return;
-
-        const osc = audioContext.createOscillator();
-        const noteGain = audioContext.createGain();
-        
-        const waveforms: OscillatorType[] = ["square", "sawtooth", "triangle", "square"];
-        osc.type = waveforms[Math.floor(Math.random() * waveforms.length)];
-        
-        const baseNote = notes[Math.floor(Math.random() * notes.length)];
-        const octaveShift = Math.random() > 0.6 ? (Math.random() > 0.5 ? 2 : 0.5) : 1;
-        osc.frequency.value = baseNote * octaveShift;
-        osc.detune.value = (Math.random() - 0.5) * 50; // Random detune for chaos
-        
-        osc.connect(noteGain);
-        noteGain.connect(masterGain);
-        
-        const now = audioContext.currentTime;
-        const duration = 0.05 + Math.random() * 0.15;
-        noteGain.gain.setValueAtTime(0.25 + Math.random() * 0.15, now);
-        noteGain.gain.exponentialRampToValueAtTime(0.01, now + duration);
-        
-        // Random pitch slide for extra chaos
-        if (Math.random() > 0.7) {
-          const targetNote = notes[Math.floor(Math.random() * notes.length)];
-          osc.frequency.exponentialRampToValueAtTime(targetNote, now + duration * 0.8);
-        }
-        
-        osc.start(now);
-        osc.stop(now + duration);
-
-        // Very erratic timing - sometimes rapid fire bursts
-        const nextTime = Math.random() > 0.85 ? 30 + Math.random() * 40 : 60 + Math.random() * 140;
-        setTimeout(playNote, nextTime);
-      };
-
-      // Second chaotic voice - offset timing
-      const playNote2 = () => {
-        if (!audioContext || !isPlaying) return;
-
-        const osc = audioContext.createOscillator();
-        const noteGain = audioContext.createGain();
-        
-        osc.type = Math.random() > 0.5 ? "square" : "sawtooth";
-        const baseNote = notes[Math.floor(Math.random() * notes.length)];
-        osc.frequency.value = baseNote * (Math.random() > 0.5 ? 1.5 : 0.75);
-        osc.detune.value = (Math.random() - 0.5) * 80;
-        
-        osc.connect(noteGain);
-        noteGain.connect(masterGain);
-        
-        const now = audioContext.currentTime;
-        noteGain.gain.setValueAtTime(0.15, now);
-        noteGain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
-        
-        osc.start(now);
-        osc.stop(now + 0.1);
-
-        setTimeout(playNote2, 100 + Math.random() * 200);
-      };
-
-      // Noise burst generator
-      const playNoise = () => {
-        if (!audioContext || !isPlaying) return;
-
-        const bufferSize = audioContext.sampleRate * 0.05;
-        const buffer = audioContext.createBuffer(1, bufferSize, audioContext.sampleRate);
-        const data = buffer.getChannelData(0);
-        for (let i = 0; i < bufferSize; i++) {
-          data[i] = (Math.random() * 2 - 1) * 0.5;
-        }
-
-        const noise = audioContext.createBufferSource();
-        const noiseGain = audioContext.createGain();
-        noise.buffer = buffer;
-        noise.connect(noiseGain);
-        noiseGain.connect(masterGain);
-
-        const now = audioContext.currentTime;
-        noiseGain.gain.setValueAtTime(0.08, now);
-        noiseGain.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
-
-        noise.start(now);
-
-        // Random noise bursts
-        setTimeout(playNoise, 200 + Math.random() * 800);
-      };
-
-      // Start all the chaos
-      playNote();
-      setTimeout(playNote2, 50);
-      setTimeout(playNoise, 100);
-
-      // Wobbly bass drone
-      const bassOsc = audioContext.createOscillator();
-      const bassGain = audioContext.createGain();
-      bassOsc.type = "sawtooth";
-      bassOsc.frequency.value = 55; // Low A
-      bassGain.gain.value = 0.06;
-      bassOsc.connect(bassGain);
-      bassGain.connect(masterGain);
-      bassOsc.start();
-
-      // Aggressive bass wobble
-      const lfo = audioContext.createOscillator();
-      const lfoGain = audioContext.createGain();
-      lfo.frequency.value = 8;
-      lfoGain.gain.value = 15;
-      lfo.connect(lfoGain);
-      lfoGain.connect(bassOsc.frequency);
-      lfo.start();
-
-      // Second bass for thickness (detuned)
-      const bassOsc2 = audioContext.createOscillator();
-      const bassGain2 = audioContext.createGain();
-      bassOsc2.type = "square";
-      bassOsc2.frequency.value = 55.5;
-      bassGain2.gain.value = 0.04;
-      bassOsc2.connect(bassGain2);
-      bassGain2.connect(masterGain);
-      bassOsc2.start();
-
-      // Random bass note jumps
-      const jumpBass = () => {
-        if (!audioContext || !isPlaying) return;
-        const bassNotes = [55, 65.41, 73.42, 82.41, 98];
-        const newNote = bassNotes[Math.floor(Math.random() * bassNotes.length)];
-        bassOsc.frequency.value = newNote;
-        bassOsc2.frequency.value = newNote + 0.5;
-        setTimeout(jumpBass, 500 + Math.random() * 1000);
-      };
-      setTimeout(jumpBass, 500);
-    };
-
-    startMusic();
-
-    return () => {
-      isPlaying = false;
-      if (audioContext) {
-        audioContext.close();
-      }
-    };
-  }, [ratModeActive]);
 
   return (
     <div className="flex min-h-screen flex-col bg-background text-foreground">
@@ -728,7 +480,7 @@ function SiteShellContent({ children }: SiteShellProps) {
       )}
 
       {/* Rat Mode Dialog (chunk loads on first trigger) */}
-      {overlayLoaded.ratModeDialog && (
+      {ratModeDialogOpen && (
         <RatModeDialog
           isOpen={ratModeDialogOpen}
           onClose={() => setRatModeDialogOpen(false)}
@@ -736,54 +488,7 @@ function SiteShellContent({ children }: SiteShellProps) {
         />
       )}
 
-      {/* Rat Mode Exit Hint - rendered via portal to escape transformed parents */}
-      {ratModeActive && typeof document !== "undefined" &&
-        createPortal(
-          <>
-            <div 
-              style={{
-                position: "fixed",
-                bottom: "24px",
-                right: "24px",
-                zIndex: 99999,
-                background: "rgba(0, 0, 0, 0.9)",
-                backdropFilter: "blur(8px)",
-                padding: "12px 20px",
-                borderRadius: "8px",
-                fontFamily: "ui-monospace, SFMono-Regular, monospace",
-                fontSize: "13px",
-                color: "white",
-                border: "1px solid rgba(255, 255, 255, 0.2)",
-                animation: "none",
-                transform: "none",
-              }}
-            >
-              🐀 Press ESC to exit rat mode
-            </div>
-            {/* Cursor-following rat */}
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="/assets/rat.png"
-              alt=""
-              style={{
-                position: "fixed",
-                left: mousePos.x + 20,
-                top: mousePos.y - 30,
-                width: "60px",
-                height: "60px",
-                objectFit: "contain",
-                imageRendering: "pixelated",
-                pointerEvents: "none",
-                zIndex: 9999,
-                filter: "drop-shadow(0 0 10px rgba(255, 255, 0, 0.8))",
-                transition: "left 0.1s ease-out, top 0.1s ease-out",
-                transform: mousePos.x > (typeof window !== "undefined" ? window.innerWidth / 2 : 500) ? "scaleX(-1)" : "scaleX(1)",
-              }}
-            />
-          </>,
-          document.body
-        )
-      }
+      {ratModeActive && <RatMode onExit={() => setRatModeActive(false)} />}
 
       {/* Resume Takeover (chunk loads on first open) */}
       {overlayLoaded.resume && (

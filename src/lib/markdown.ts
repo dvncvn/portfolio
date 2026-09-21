@@ -365,7 +365,7 @@ export function homePageToMarkdown(projects: HomePageProject[]): string {
 
   lines.push("# Simon Duncan – Staff Product Designer");
   lines.push("");
-  lines.push("Staff Product Designer focused on AI data platforms at IBM. I turn complex systems into clear, usable, and durable products. Experienced across OSS, startups, and enterprise.");
+  lines.push("I'm a Staff Product Designer working on AI data platforms at IBM. I turn complex systems into clear, usable, and durable products. I'm experienced across OSS, startups, and enterprise.");
   lines.push("");
 
   lines.push("## Selected Work");

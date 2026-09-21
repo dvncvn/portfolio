@@ -62,7 +62,9 @@ export function ProfilePhoto() {
     const panel = panelRef.current;
     if (!photo || !panel) return;
     const rect = photo.getBoundingClientRect();
-    const viewportWidth = window.innerWidth;
+    const viewportWidth = document.documentElement.clientWidth;
+    // The site's stable scrollbar gutters offset the fixed top-layer origin.
+    const viewportLeft = document.documentElement.getBoundingClientRect().left + window.scrollX;
     const viewportHeight = window.innerHeight;
     const controlsWidth = Math.min(360, viewportWidth - 32);
     const beside = rect.left >= controlsWidth + 32;
@@ -81,15 +83,17 @@ export function ProfilePhoto() {
       ? rect.left - controlsWidth - gap - padding
       : Math.max(16, Math.min(rect.left + (rect.width - width) / 2, viewportWidth - width - 16));
     panel.dataset.beside = String(beside);
-    panel.style.left = `${left}px`;
+    panel.style.left = `${left - viewportLeft}px`;
     panel.style.top = `${top}px`;
     panel.style.width = `${width}px`;
     panel.style.height = `${beside ? rect.height + padding * 2 : stackedHeight}px`;
     panel.style.setProperty("--photo-width", `${rect.width}px`);
-    panel.style.setProperty("--closed-inset", beside ? `8px 8px 8px ${controlsWidth + gap + padding}px round 24px` : "0 0 0 0 round 32px");
+    panel.style.setProperty("--closed-inset", beside
+      ? `8px 8px 8px ${controlsWidth + gap + padding}px round 24px`
+      : `${Math.max(0, rect.top - top)}px ${Math.max(0, left + width - rect.right)}px ${Math.max(0, top + stackedHeight - rect.bottom)}px ${Math.max(0, rect.left - left)}px round 24px`);
   }, []);
   useEffect(() => {
-    if (!showControls) return;
+    positionPanel();
     let frame = 0;
     const reposition = () => {
       cancelAnimationFrame(frame);
@@ -105,9 +109,10 @@ export function ProfilePhoto() {
       window.removeEventListener("resize", reposition);
       window.removeEventListener("scroll", reposition, true);
     };
-  }, [showControls, positionPanel]);
+  }, [positionPanel]);
   const openFromPhoto = (event: MouseEvent<HTMLButtonElement>) => {
     positionPanel();
+    if (panelRef.current) panelRef.current.dataset.keyboard = String(event.detail === 0);
     cancelAnimationFrame(rippleFrame.current);
     rippleAnimation.current?.cancel();
     // Keyboard activation opens the editor without a decorative pointer response.

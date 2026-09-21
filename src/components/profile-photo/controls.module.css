@@ -1,8 +1,13 @@
 .photoRoot { position: relative; }
-.photoRoot [data-photo-surface] { opacity: 1; transition: opacity 70ms ease-in-out 90ms; }
-.photoRoot:has(.panel[data-beside="true"]:popover-open) [data-photo-surface] { opacity: 0; transition: opacity 90ms ease-in-out; }
 .photoRoot:has(.panel:popover-open) > div > button { outline: none; }
 .panel {
+  --ease-expand: cubic-bezier(0.32, 0.72, 0, 1);
+  --ease-reveal: cubic-bezier(0.23, 1, 0.32, 1);
+  --panel-radius: 32px;
+  /* Keep the preview measured and rendered before entering the top layer. */
+  display: grid;
+  visibility: hidden;
+  pointer-events: none;
   box-sizing: border-box;
   max-height: none;
   max-width: none;
@@ -14,23 +19,24 @@
   grid-template-rows: minmax(0, 1fr);
   overflow: hidden;
   border: 0;
-  border-radius: 32px;
+  border-radius: var(--panel-radius);
   background: #151412;
   color: #ddd;
   box-shadow: 0 16px 64px #0009, 0 0 0 1px #ffffff18;
   opacity: 0;
   clip-path: inset(var(--closed-inset, 0 0 0 0 round 32px));
-  /* On close, retain the shell until it has nearly retracted into the image. */
-  transition: clip-path 160ms ease-in-out, opacity 70ms ease-in-out 90ms,
-    display 160ms allow-discrete, overlay 160ms allow-discrete;
+  /* Retract first, then hand the portrait back to the underlying surface. */
+  transition: clip-path 250ms var(--ease-expand), opacity 80ms ease 170ms,
+    visibility 250ms allow-discrete, overlay 250ms allow-discrete;
 }
 .panel:popover-open {
-  display: grid;
+  visibility: visible;
+  pointer-events: auto;
   grid-template-columns: minmax(0, 1fr);
   opacity: 1;
-  clip-path: inset(0 0 0 0 round 32px);
-  transition: clip-path 180ms ease-in-out, opacity 90ms ease-in-out,
-    display 180ms allow-discrete, overlay 180ms allow-discrete;
+  clip-path: inset(0 0 0 0 round var(--panel-radius));
+  transition: clip-path 280ms var(--ease-expand), opacity 100ms ease,
+    visibility 280ms allow-discrete, overlay 280ms allow-discrete;
 }
 .panel[data-beside="true"] { grid-template-columns: minmax(0, 1fr) var(--photo-width); gap: 16px; }
 @starting-style {
@@ -49,10 +55,15 @@
   scrollbar-color: #ffffff30 transparent;
   padding: 0 14px 14px;
   opacity: 0;
-  transition: opacity 70ms ease-in-out;
+  transform: translateX(8px);
+  transition: opacity 100ms ease, transform 200ms var(--ease-reveal);
 }
-.panel:popover-open .controls { opacity: 1; transition: opacity 120ms ease-in-out 30ms; }
-@starting-style { .panel:popover-open .controls { opacity: 0; } }
+.panel:popover-open .controls {
+  opacity: 1;
+  transform: translateX(0);
+  transition: opacity 180ms ease 50ms, transform 250ms var(--ease-reveal) 30ms;
+}
+@starting-style { .panel:popover-open .controls { opacity: 0; transform: translateX(8px); } }
 .panelPreview { display: none; position: relative; }
 .panel[data-beside="true"] .panelPreview { display: block; overflow: hidden; border-radius: 24px; min-height: 0; height: 100%; align-self: stretch; }
 .panelPreview > div { height: 100%; aspect-ratio: auto; }
@@ -88,11 +99,14 @@
 .attribution { margin: 12px 8px 0; color: #888; font-size: 11px; line-height: 1.5; text-wrap: pretty; }
 .attribution:empty { display: none; }
 @media (prefers-reduced-motion: reduce) {
-  .photoRoot [data-photo-surface], .photoRoot:has(.panel[data-beside="true"]:popover-open) [data-photo-surface] { transition: opacity 150ms ease; }
-  .panel, .panel:popover-open { clip-path: none; transition: opacity 150ms ease, display 150ms allow-discrete, overlay 150ms allow-discrete; }
-  .panel:popover-open .controls { transition-delay: 0ms; }
-  @starting-style { .panel:popover-open { clip-path: none; } }
+  .panel, .panel:popover-open { clip-path: none; transition: opacity 150ms ease, visibility 150ms allow-discrete, overlay 150ms allow-discrete; }
+  .controls, .panel:popover-open .controls { transform: none; transition: opacity 150ms ease; }
+  @starting-style {
+    .panel:popover-open { clip-path: none; }
+    .panel:popover-open .controls { transform: none; }
+  }
 }
+.panel[data-keyboard="true"], .panel[data-keyboard="true"] .controls { transition: none; }
 .sliderHeading { display: flex; align-items: center; justify-content: space-between; min-height: 24px; }
 .sliderHeading label { font-size: 12px; color: #ddd; }
 .readout { display: flex; align-items: center; gap: 3px; font-size: 11px; color: #888; }
@@ -199,10 +213,10 @@
 
 @media (max-width: 480px) {
   .panel {
+    --panel-radius: 24px;
     padding: 6px;
     border-radius: 24px;
   }
-  .panel:popover-open { clip-path: inset(0 0 0 0 round 24px); }
   .controls { padding: 0 10px 10px; }
   .panelHeader {
     padding: 10px 42px 10px 0;

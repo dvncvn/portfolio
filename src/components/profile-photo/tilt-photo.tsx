@@ -39,7 +39,7 @@ export function TiltPhoto({ children, onClick, expanded, onHoverChange, disabled
 
   useEffect(() => {
     if (expanded) {
-      rx.jump(0); ry.jump(0); shineOpacity.jump(0);
+      rx.set(0); ry.set(0); shineOpacity.set(0);
     }
   }, [expanded, rx, ry, shineOpacity]);
 

@@ -148,7 +148,7 @@ export function RatMode({ onExit }: { onExit: () => void }) {
   return createPortal(
     <div className="rat-takeover">
       <div className="rat-notice">RAT_MODE==TRUE</div>
-      <div className="rat-stamp" aria-hidden="true">RAT RAVE<br /><small>Stay clear</small></div>
+      <div className="rat-stamp" aria-hidden="true">RAT SWARM<br /><small>Stay clear</small></div>
       <div ref={foodLayer} className="rat-food-layer" aria-hidden="true" />
       <div ref={field} className="rat-field" aria-hidden="true">
         {Array.from({ length: population }, (_, i) => (

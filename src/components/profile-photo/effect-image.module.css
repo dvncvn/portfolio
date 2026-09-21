@@ -1,0 +1,31 @@
+.photo > img,
+.photo > canvas {
+  transition: opacity 150ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.photo > img { opacity: 0; }
+.photo[data-loaded="true"] > img { opacity: 1; }
+
+.loading {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: var(--muted-foreground);
+  font-size: 12px;
+  background: rgb(128 128 128 / 4%);
+  overflow: hidden;
+  container-type: inline-size;
+}
+
+.noise {
+  margin: 0;
+  font-family: "Courier New", monospace;
+  font-size: calc(100cqw / 28.8);
+  line-height: 1.2;
+  letter-spacing: 0;
+  opacity: 0.3;
+  user-select: none;
+  pointer-events: none;
+  mask-image: radial-gradient(ellipse at center, black 20%, transparent 75%);
+}

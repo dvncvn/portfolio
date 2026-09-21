@@ -7,14 +7,8 @@ import { motion, useMotionTemplate, useSpring } from "framer-motion";
 // useSpring passes duration straight to the generator, where it is milliseconds.
 const spring = { visualDuration: 0.5, bounce: 0.2 };
 
-export function TiltPhoto({ children, onClick, expanded, onHoverChange, disabled = false }: {
-  disabled?: boolean;
-  children: ReactNode;
-  onClick: (event: MouseEvent<HTMLButtonElement>) => void;
-  expanded: boolean;
-  onHoverChange: (hovered: boolean) => void;
-}) {
-  const surface = useRef<HTMLDivElement>(null);
+// Both portrait surfaces subscribe to the same springs, including their velocity.
+export function usePhotoTilt() {
   const enabled = useRef(false);
   const rx = useSpring(0, spring);
   const ry = useSpring(0, spring);
@@ -37,11 +31,25 @@ export function TiltPhoto({ children, onClick, expanded, onHoverChange, disabled
     return () => query.removeEventListener("change", update);
   }, [rx, ry, shineOpacity]);
 
+  return { enabled, rx, ry, shineX, shineY, shineOpacity, transform, reflection };
+}
+
+export function TiltPhoto({ children, onClick, expanded, onHoverChange, tilt, disabled = false }: {
+  disabled?: boolean;
+  children: ReactNode;
+  onClick: (event: MouseEvent<HTMLButtonElement>) => void;
+  expanded: boolean;
+  onHoverChange: (hovered: boolean) => void;
+  tilt: ReturnType<typeof usePhotoTilt>;
+}) {
+  const surface = useRef<HTMLDivElement>(null);
+  const { enabled, rx, ry, shineX, shineY, shineOpacity, transform, reflection } = tilt;
+
   useEffect(() => {
     if (expanded) {
-      rx.set(0); ry.set(0); shineOpacity.set(0);
+      rx.set(0); ry.set(0); shineX.set(0); shineY.set(0); shineOpacity.set(0);
     }
-  }, [expanded, rx, ry, shineOpacity]);
+  }, [expanded, rx, ry, shineX, shineY, shineOpacity]);
 
   const reset = () => {
     rx.set(0); ry.set(0); shineX.set(0); shineY.set(0); shineOpacity.set(0);
@@ -66,7 +74,10 @@ export function TiltPhoto({ children, onClick, expanded, onHoverChange, disabled
         aria-expanded={expanded}
         aria-controls="photo-effects"
         popoverTarget="photo-effects"
-        onClick={onClick}
+        onClick={(event) => {
+          reset();
+          onClick(event);
+        }}
         onFocus={() => onHoverChange(true)}
         onBlur={reset}
         onKeyDown={reset}

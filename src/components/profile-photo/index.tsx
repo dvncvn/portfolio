@@ -7,7 +7,7 @@ import styles from "./controls.module.css";
 import { NormalState } from "./normal-state";
 import { DitherPicker } from "./dither-picker";
 import { InkPicker } from "./ink-picker";
-import { TiltPhoto } from "./tilt-photo";
+import { TiltPhoto, usePhotoTilt } from "./tilt-photo";
 import { useSharedPhoto } from "./use-shared-photo";
 import type { PhotoRecipe } from "@/lib/shared-photo";
 import { ASCII_MAX_SIZE, ASCII_SETS, BLAZE_ORANGE, DEFAULT_SETTINGS, type AsciiSet, type EffectSettings, type ImageEffect } from "@/lib/photo-effects";
@@ -38,6 +38,7 @@ function EffectButton({
 }
 
 export function ProfilePhoto() {
+  const tilt = usePhotoTilt();
   const photoRef = useRef<HTMLDivElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
   const photoRippleRef = useRef<HTMLSpanElement>(null);
@@ -157,6 +158,7 @@ export function ProfilePhoto() {
           <div>
           <div ref={photoRef} className={styles.photoRoot}>
             <TiltPhoto
+              tilt={tilt}
               disabled={shared.status === "loading"}
               onClick={openFromPhoto}
               expanded={showControls}
@@ -306,7 +308,7 @@ export function ProfilePhoto() {
                   </div>
                 )}
               </div>
-              <div className={styles.panelPreview} aria-hidden="true">
+              <motion.div className={styles.panelPreview} style={{ transform: tilt.transform }} aria-hidden="true">
                 <EffectImage
                   ready={shared.status !== "loading"}
                   src="/assets/profile.png"
@@ -316,7 +318,10 @@ export function ProfilePhoto() {
                 />
                 <span ref={previewRippleRef} className={styles.ripple} aria-hidden="true" />
                 <span className={styles.editGrid} data-active={showControls} aria-hidden="true" />
-              </div>
+                <motion.span aria-hidden="true" style={{ transform: tilt.reflection, opacity: tilt.shineOpacity }}
+                  className="pointer-events-none absolute -inset-1/2 bg-[radial-gradient(ellipse_at_center,white,transparent_60%)]" />
+                <span aria-hidden="true" className="pointer-events-none absolute inset-0 rounded-[24px] border border-white/10" />
+              </motion.div>
             </div>
           </div>
           <p className={styles.attribution} role="status" aria-live="polite">

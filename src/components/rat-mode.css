@@ -5,14 +5,12 @@
 .rat-infested main h1, .rat-infested main h2 { font-family: var(--font-geist-pixel-square), monospace; }
 .rat-takeover { position: fixed; inset: 0; z-index: 9990; pointer-events: none; color: var(--foreground); font-family: var(--font-geist-pixel-square), monospace; }
 .rat-notice { position: absolute; inset: 0 0 auto; padding: 7px 16px; background: var(--surface); color: var(--highlight); border-bottom: 1px solid color-mix(in srgb, var(--highlight) 35%, transparent); font-size: 12px; font-weight: 500; letter-spacing: .06em; text-align: center; }
-.rat-notice span { margin-left: 24px; font-size: 10px; font-weight: 500; }
 .rat-stamp { position: absolute; right: 28px; top: 115px; border: 4px double var(--highlight); color: var(--highlight); padding: 12px; font-size: 23px; line-height: 1; font-weight: 500; text-align: center; transform: rotate(12deg); }
 .rat-stamp small { font-size: 10px; font-weight: 500; }
 .rat-resident { position: absolute; left: 0; top: 0; width: 76px; height: 68px; will-change: transform; }
 .rat-resident img { width: 100%; height: 100%; object-fit: contain; image-rendering: pixelated; filter: drop-shadow(2px 4px 0 #0005); }
 .rat-boss img { scale: 1.8; }
 .rat-boss span { display: block; background: var(--highlight); color: var(--highlight-foreground); padding: 2px 4px; font-size: 10px; }
-.rat-crumb { position: absolute; top: 0; left: 0; color: var(--highlight); opacity: 0; font-size: 24px; }
 .rat-controls { pointer-events: auto; position: absolute; bottom: max(18px, env(safe-area-inset-bottom)); right: 18px; width: min(360px, calc(100vw - 36px)); padding: 17px; background: var(--surface); border: 1px solid color-mix(in srgb, var(--highlight) 35%, transparent); box-shadow: 5px 5px 0 var(--background); }
 .rat-census { display: flex; gap: 14px; align-items: center; font-size: 13px; }
 .rat-census strong { color: var(--highlight); font-size: 46px; line-height: 1; letter-spacing: -.08em; }
@@ -31,10 +29,10 @@
 .rat-dialog p { font-size: 13px; line-height: 1.6; margin-bottom: 18px; }
 .rat-dialog small { display: block; font-size: 10px; margin-bottom: 22px; }
 .rat-dialog footer { display: flex; justify-content: space-between; gap: 12px; }
-@media (max-width: 600px) { .rat-notice span { display: none; } .rat-stamp { top: 85px; right: 18px; font-size: 17px; } }
+@media (max-width: 600px) { .rat-stamp { top: 85px; right: 18px; font-size: 17px; } }
 @media (prefers-reduced-motion: reduce) { .rat-resident { will-change: auto; } }
 
-.rat-census small, .rat-controls p, .rat-dialog small, .rat-notice span { color: var(--muted-foreground); }
+.rat-census small, .rat-controls p, .rat-dialog small { color: var(--muted-foreground); }
 .rat-admission-progress { display: flex; justify-content: space-between; gap: 12px; margin-bottom: 18px; color: var(--muted-foreground); font-size: 10px; letter-spacing: .06em; }
 .rat-admission-progress span:last-child { color: var(--highlight); }
 .rat-dialog h2:focus { outline: none; }
@@ -49,3 +47,80 @@
   .rat-dialog-stack { --rat-stack-offset: 10px; }
   .rat-dialog-layer { padding: 20px; }
 }
+
+/* Rat pressure uses independent transforms, preserving existing card transforms. */
+.rat-infested :where(main .work-card, main .play-card, main h1, main h2, main p, header nav a) {
+  translate: 0 0;
+  rotate: 0deg;
+  scale: 1;
+  transition: translate 160ms cubic-bezier(0.23, 1, 0.32, 1), rotate 160ms cubic-bezier(0.23, 1, 0.32, 1), scale 160ms cubic-bezier(0.23, 1, 0.32, 1), opacity 180ms ease;
+}
+.rat-infested .rat-trampled {
+  translate: var(--rat-impact-x, 0px) var(--rat-impact-y, 0px);
+  rotate: var(--rat-impact-angle, 0deg);
+  scale: var(--rat-impact-scale, 1);
+  outline: 2px dashed var(--highlight);
+  outline-offset: 4px;
+  box-shadow: 7px 7px 0 color-mix(in srgb, var(--highlight) 40%, transparent);
+  background-color: color-mix(in srgb, var(--highlight) 9%, var(--background));
+  opacity: 1;
+}
+@media (prefers-reduced-motion: reduce) {
+  .rat-infested .rat-trampled, .rat-infested :where(main .work-card, main .play-card, main h1, main h2, main p, header nav a) { translate: none; rotate: none; scale: none; transition: opacity 180ms ease; }
+}
+.rat-infested .work-card.rat-trampled { opacity: 1; }
+.rat-infested header nav a { display: inline-block; }
+
+.rat-context-menu { position: fixed; inset: auto; margin: 0; width: min(280px, calc(100vw - 16px)); max-height: calc(100dvh - 16px); overflow-y: auto; padding: 6px; pointer-events: auto; background: var(--surface); color: var(--foreground); border: 1px solid color-mix(in srgb, var(--highlight) 45%, transparent); box-shadow: 5px 5px 0 var(--background); font: 500 12px var(--font-geist-pixel-square), monospace; font-synthesis: none; }
+.rat-context-menu::backdrop { background: transparent; }
+.rat-context-heading { padding: 8px 10px 12px; color: var(--highlight); font-size: 11px; }
+.rat-context-heading span { display: block; margin-top: 4px; color: var(--muted-foreground); font-size: 10px; }
+.rat-context-menu button { display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%; min-height: 40px; padding: 10px; text-align: left; font: inherit; cursor: pointer; }
+.rat-context-menu button span { font-size: 10px; color: var(--muted-foreground); }
+.rat-context-menu button:focus { outline: 1px solid var(--highlight); outline-offset: -1px; background: color-mix(in srgb, var(--highlight) 12%, var(--surface)); color: var(--highlight); }
+.rat-context-menu button:disabled { opacity: .4; cursor: default; }
+.rat-context-menu [role="separator"] { margin: 5px 4px; border-top: 1px dashed var(--border); }
+.rat-context-hint { padding: 10px; font-size: 9px; color: var(--muted-foreground); }
+@media (hover: hover) and (pointer: fine) { .rat-context-menu button:not(:disabled):hover { background: color-mix(in srgb, var(--highlight) 12%, var(--surface)); color: var(--highlight); } }
+
+.rat-food-layer { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+.rat-food-scrap, .rat-food-bit { position: absolute; top: 0; left: 0; color: color-mix(in srgb, var(--foreground) 80%, var(--highlight)); filter: drop-shadow(2px 3px 0 var(--background)); }
+.rat-food-scrap svg { display: block; width: 100%; height: 100%; shape-rendering: crispEdges; }
+.rat-food-bit { background: color-mix(in srgb, var(--foreground) 60%, var(--highlight)); clip-path: polygon(0 0, 75% 0, 75% 25%, 100% 25%, 100% 100%, 25% 100%, 25% 75%, 0 75%); }
+
+.rat-instrument { position: absolute; bottom: -8px; right: -10px; width: 42px; height: 42px; color: var(--highlight); filter: drop-shadow(2px 2px 0 var(--background)); }
+.rat-instrument svg { width: 100%; height: 100%; }
+.rat-band { margin: -5px -5px 16px; border-bottom: 1px dashed color-mix(in srgb, var(--highlight) 40%, transparent); padding-bottom: 12px; }
+.rat-band-heading { display: flex; justify-content: space-between; gap: 8px; color: var(--highlight); font-size: 11px; }
+.rat-band-heading span:last-child { font-size: 9px; color: var(--muted-foreground); }
+.rat-band-lineup { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 4px; padding: 16px 0 10px; background: radial-gradient(ellipse at 50% 100%, color-mix(in srgb, var(--highlight) 12%, transparent), transparent 70%); }
+.rat-band-player { display: flex; align-items: center; flex-direction: column; gap: 4px; color: var(--muted-foreground); opacity: .4; font-size: 10px; }
+.rat-band-player[data-playing="true"] { color: var(--highlight); opacity: 1; }
+.rat-band-player svg { width: 34px; height: 34px; }
+.rat-band-player small { font-size: 8px; color: var(--muted-foreground); }
+.rat-band-floor { display: flex; align-items: center; justify-content: space-between; border-top: 3px double var(--highlight); padding-top: 8px; font-size: 9px; color: var(--muted-foreground); }
+.rat-band-meter { display: flex; align-items: end; gap: 3px; height: 14px; }
+.rat-band-meter i { display: block; width: 4px; height: 14px; background: var(--highlight); transform: scaleY(.2); transform-origin: bottom; }
+.rat-controls { max-height: calc(100dvh - 64px); overflow-y: auto; }
+
+.rat-census { margin-bottom: 14px; }
+.rat-band-floor { justify-content: flex-end; }
+.rat-stamp small { display: block; margin-top: 8px; font-size: 12px; }
+
+.rat-band-transport { min-height: 28px; padding: 8px 0; font-size: 9px; color: var(--muted-foreground); }
+.rat-mixer-channels { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; margin: 8px 0 16px; }
+.rat-mixer-channel { display: flex; align-items: center; flex-direction: column; gap: 8px; font-size: 11px; }
+.rat-mixer-channel input { writing-mode: vertical-lr; direction: rtl; height: 80px; width: 24px; }
+.rat-mixer-channel output { font-size: 9px; color: var(--muted-foreground); font-variant-numeric: tabular-nums; }
+.rat-mixer-effects { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 12px 0; border-top: 1px dashed var(--border); }
+.rat-mixer-effects label { min-width: 0; font-size: 10px; }
+.rat-mixer-effects label > span { display: flex; justify-content: space-between; gap: 6px; margin-bottom: 6px; }
+.rat-mixer-effects output { color: var(--muted-foreground); font-size: 9px; }
+.rat-mixer-effects input { width: 100%; }
+.rat-band input[type="range"] { accent-color: var(--highlight); cursor: pointer; }
+.rat-band input:focus-visible, .rat-band button:focus-visible { outline: 2px solid var(--highlight); outline-offset: 3px; }
+.rat-mixer-cues { display: flex; gap: 6px; padding-bottom: 12px; }
+.rat-mixer-cues button { flex: 1; cursor: pointer; padding: 9px 4px; border: 1px solid color-mix(in srgb, var(--highlight) 35%, transparent); color: var(--highlight); font: inherit; font-size: 10px; }
+.rat-band-floor { justify-content: space-between; }
+.rat-band-floor button { color: var(--muted-foreground); cursor: pointer; font: inherit; padding: 4px 0; }
+@media (hover: hover) and (pointer: fine) { .rat-mixer-cues button:hover { background: color-mix(in srgb, var(--highlight) 12%, transparent); } }

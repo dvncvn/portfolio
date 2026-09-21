@@ -59,12 +59,26 @@ function RatAdmission({ onClose, onConfirm }: Omit<RatModeDialogProps, "isOpen">
   }, []);
 
   useEffect(() => {
-    // Announce the new screen and prevent a held Enter key skipping the copy.
+    // Announce each new screen; Enter on the heading advances the confirmation.
     heading.current?.focus();
   }, [step]);
 
+  const advance = () => {
+    if (step === DISCLAIMERS.length - 1) onConfirm();
+    else setStep(step + 1);
+  };
+
   return (
     <dialog ref={dialog} className="rat-dialog-stack" aria-labelledby={`rat-mode-title-${step}`} aria-describedby={`rat-mode-description-${step}`}
+      onKeyDown={(event) => {
+        if (event.key !== "Enter" || event.nativeEvent.isComposing || event.altKey || event.ctrlKey || event.metaKey) return;
+        if (event.repeat) { event.preventDefault(); return; }
+        // Respect an explicitly focused button, including the cancel action.
+        if ((event.target as HTMLElement).closest("button")) return;
+        event.preventDefault();
+        event.stopPropagation();
+        advance();
+      }}
       onCancel={(event) => { event.preventDefault(); onClose(); }}
       onClick={(event) => { if (event.target === event.currentTarget) onClose(); }}>
       <div className="rat-dialog-pile">
@@ -85,7 +99,7 @@ function RatAdmission({ onClose, onConfirm }: Omit<RatModeDialogProps, "isOpen">
               <footer>
                 <button onClick={onClose}>{disclaimer.cancel}</button>
                 <button onKeyDown={(event) => { if (event.repeat) event.preventDefault(); }}
-                  onClick={() => step === DISCLAIMERS.length - 1 ? onConfirm() : setStep(step + 1)}>
+                  onClick={advance}>
                   {disclaimer.accept}
                 </button>
               </footer>

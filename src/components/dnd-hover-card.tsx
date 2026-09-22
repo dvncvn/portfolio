@@ -18,10 +18,12 @@ const GAP = 12;
 export function DndHoverCard({ children, zIndex = 50, position = "above" }: DndHoverCardProps) {
   const [isHovered, setIsHovered] = useState(false);
   const [overlayOpen, setOverlayOpen] = useState(false);
+  const [popoverStyles, setPopoverStyles] = useState<React.CSSProperties>({});
   const triggerRef = useRef<HTMLSpanElement>(null);
+  const suppressHoverRef = useRef(false);
   const closeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Calculate position synchronously from trigger ref
+  // Measure on hover, before displaying the preview.
   const getStyles = useCallback((): React.CSSProperties => {
     if (!triggerRef.current) return { position: "fixed", opacity: 0 };
     const rect = triggerRef.current.getBoundingClientRect();
@@ -44,12 +46,14 @@ export function DndHoverCard({ children, zIndex = 50, position = "above" }: DndH
   }, [position, zIndex]);
 
   const handleMouseEnter = useCallback(() => {
+    if (suppressHoverRef.current) return;
     if (closeTimeoutRef.current) {
       clearTimeout(closeTimeoutRef.current);
       closeTimeoutRef.current = null;
     }
+    setPopoverStyles(getStyles());
     setIsHovered(true);
-  }, []);
+  }, [getStyles]);
 
   const handleMouseLeave = useCallback(() => {
     // Generous delay to allow moving between trigger and popover
@@ -68,6 +72,11 @@ export function DndHoverCard({ children, zIndex = 50, position = "above" }: DndH
   }, []);
 
   const handleClick = () => {
+    suppressHoverRef.current = true;
+    if (closeTimeoutRef.current) {
+      clearTimeout(closeTimeoutRef.current);
+      closeTimeoutRef.current = null;
+    }
     setIsHovered(false);
     setOverlayOpen(true);
   };
@@ -77,7 +86,12 @@ export function DndHoverCard({ children, zIndex = 50, position = "above" }: DndH
       <span
         ref={triggerRef}
         className="cursor-pointer border-b border-dashed border-muted-foreground/50 transition-colors hover:border-foreground hover:text-foreground"
-        onMouseEnter={handleMouseEnter}
+        onMouseEnter={() => {
+          if (!overlayOpen) {
+            suppressHoverRef.current = false;
+            handleMouseEnter();
+          }
+        }}
         onMouseLeave={handleMouseLeave}
       >
         {children}
@@ -85,13 +99,13 @@ export function DndHoverCard({ children, zIndex = 50, position = "above" }: DndH
       {typeof document !== "undefined" &&
         createPortal(
           <AnimatePresence>
-            {isHovered && (
+            {isHovered && !overlayOpen && (
               <motion.div
                 initial={{ opacity: 0, y: position === "above" ? 8 : -8, scale: 0.95 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, y: position === "above" ? 8 : -8, scale: 0.95 }}
                 transition={{ duration: 0.15, ease: "easeOut" }}
-                style={getStyles()}
+                style={popoverStyles}
                 onMouseEnter={handleMouseEnter}
                 onMouseLeave={handleMouseLeave}
               >

@@ -10,22 +10,27 @@ type DndCharacterOverlayProps = {
 };
 
 export function DndCharacterOverlay({ isOpen, onClose }: DndCharacterOverlayProps) {
-  // Lock body scroll when open
+  if (typeof window === "undefined") return null;
+
+  return createPortal(
+    <AnimatePresence>
+      {isOpen && <CharacterTakeover onClose={onClose} />}
+    </AnimatePresence>,
+    document.body
+  );
+}
+
+function CharacterTakeover({ onClose }: Pick<DndCharacterOverlayProps, "onClose">) {
+  // Keep the lock until AnimatePresence finishes removing the takeover.
   useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "";
-    }
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
     return () => {
-      document.body.style.overflow = "";
+      document.body.style.overflow = originalOverflow;
     };
-  }, [isOpen]);
+  }, []);
 
-  // Close on escape - stopImmediatePropagation prevents presentation mode from also closing
   useEffect(() => {
-    if (!isOpen) return;
-
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
         e.preventDefault();
@@ -34,15 +39,12 @@ export function DndCharacterOverlay({ isOpen, onClose }: DndCharacterOverlayProp
       }
     };
 
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [isOpen, onClose]);
+    // Intercept Escape before the page or a parent presentation handles it.
+    window.addEventListener("keydown", handleKeyDown, true);
+    return () => window.removeEventListener("keydown", handleKeyDown, true);
+  }, [onClose]);
 
-  if (typeof window === "undefined") return null;
-
-  return createPortal(
-    <AnimatePresence>
-      {isOpen && (
+  return (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -223,8 +225,5 @@ export function DndCharacterOverlay({ isOpen, onClose }: DndCharacterOverlayProp
             </div>
           </motion.div>
         </motion.div>
-      )}
-    </AnimatePresence>,
-    document.body
   );
 }

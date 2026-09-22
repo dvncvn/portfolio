@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { createPortal } from "react-dom";
 
 type DndCharacterOverlayProps = {
@@ -10,18 +10,16 @@ type DndCharacterOverlayProps = {
 };
 
 export function DndCharacterOverlay({ isOpen, onClose }: DndCharacterOverlayProps) {
-  if (typeof window === "undefined") return null;
+  if (!isOpen || typeof window === "undefined") return null;
 
   return createPortal(
-    <AnimatePresence>
-      {isOpen && <CharacterTakeover onClose={onClose} />}
-    </AnimatePresence>,
+    <CharacterTakeover onClose={onClose} />,
     document.body
   );
 }
 
 function CharacterTakeover({ onClose }: Pick<DndCharacterOverlayProps, "onClose">) {
-  // Keep the lock until AnimatePresence finishes removing the takeover.
+  // Restore the page scroll state when the takeover is dismissed.
   useEffect(() => {
     const originalOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
@@ -44,11 +42,11 @@ function CharacterTakeover({ onClose }: Pick<DndCharacterOverlayProps, "onClose"
     return () => window.removeEventListener("keydown", handleKeyDown, true);
   }, [onClose]);
 
+  // Dismiss immediately: fading this opaque surface crossfades two pages of text.
   return (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
           transition={{ duration: 0.2 }}
           className="fixed inset-0 z-[100] bg-background"
         >

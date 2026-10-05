@@ -1,14 +1,13 @@
 import { ChevronRight } from "lucide-react";
-import { DEFAULT_SETTINGS, EFFECT_LABELS, type ImageEffect } from "@/lib/photo-effects";
+import { DEFAULT_SETTINGS, EFFECT_LABELS, EDITABLE_EFFECTS, type ImageEffect } from "@/lib/photo-effects";
 import { EffectImage } from "./effect-image";
 import styles from "./controls.module.css";
 
-const effects: Exclude<ImageEffect, "normal">[] = ["dither", "pixelate", "ascii", "gradient", "slice", "scanlines", "offset", "chromatic", "vhs", "decay"];
 
 export function EffectChooser({ onChoose }: { onChoose: (effect: Exclude<ImageEffect, "normal">) => void }) {
   return (
     <div className={styles.effectChoices} data-effect-chooser>
-      {effects.map((effect) => <button type="button" key={effect} className={styles.effectChoice}
+      {EDITABLE_EFFECTS.map((effect) => <button type="button" key={effect} className={styles.effectChoice}
         aria-label={`Choose ${EFFECT_LABELS[effect]}`} onClick={() => onChoose(effect)}>
         <span className={styles.effectThumbnail} aria-hidden="true">
           <EffectImage src="/assets/profile.png" effect={effect} color={null} renderWidth={120}

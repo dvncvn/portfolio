@@ -506,3 +506,22 @@ test('chromatic angle changes separation and full edge bias preserves the center
   const center = (50 * width + 50) * 4;
   assert.deepEqual(horizontal.slice(center, center + 4), input.slice(center, center + 4));
 });
+
+test('random designs have six unique supported layers with valid, independently editable settings', () => {
+  const { randomPhotoLayers } = load('src/lib/photo-randomize.ts', {
+    './photo-effects': effects, './shared-photo': shared, './photo-edit-id': { createPhotoEditId },
+  });
+  const defaults = structuredClone(effects.DEFAULT_SETTINGS);
+  let seed = 73;
+  const random = () => ((seed = Math.imul(seed, 1664525) + 1013904223 >>> 0) / 4294967296);
+  for (let roll = 0; roll < 100; roll++) {
+    const layers = randomPhotoLayers(random);
+    assert.equal(layers.length, shared.PHOTO_LAYER_LIMIT);
+    assert.equal(new Set(layers.map(layer => layer.id)).size, 6);
+    assert.equal(new Set(layers.map(layer => layer.effect)).size, 6);
+    assert.ok(layers.every(layer => effects.EDITABLE_EFFECTS.includes(layer.effect) && layer.enabled));
+    const recipe = { ...freshRecipe(), layers, effect: layers.at(-1).effect };
+    assert.deepEqual(shared.parsePhotoRecipe(recipe), recipe);
+  }
+  assert.deepEqual(effects.DEFAULT_SETTINGS, defaults);
+});

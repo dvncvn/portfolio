@@ -4,7 +4,7 @@ import { useEffect, useId, useRef, useState, type CSSProperties, type MouseEvent
 import { flushSync } from "react-dom";
 import { useStudioTransition } from "./studio-transition";
 import { motion, useReducedMotion } from "framer-motion";
-import { ChevronDown, Plus, RotateCcw, X } from "lucide-react";
+import { ChevronDown, Dices, Plus, RotateCcw, X } from "lucide-react";
 import { LayerList } from "./layer-list";
 import { PhotoHistory } from "./photo-history";
 import { EffectImage } from "./effect-image";
@@ -16,6 +16,7 @@ import { GradientPicker } from "./gradient-picker";
 import { TiltPhoto, usePhotoTilt } from "./tilt-photo";
 import { useSharedPhoto } from "./use-shared-photo";
 import { photoLayers, PHOTO_LAYER_LIMIT, type PhotoLayer, type PhotoRecipe } from "@/lib/shared-photo";
+import { randomPhotoEffect, randomPhotoLayers } from "@/lib/photo-randomize";
 import { createPhotoEditId } from "@/lib/photo-edit-id";
 import { GRADIENT_PRESETS, EFFECT_LABELS, PIXEL_MAX_SIZE, ASCII_MAX_SIZE, ASCII_SETS, BLAZE_ORANGE, DEFAULT_SETTINGS, type AsciiSet, type EffectSettings } from "@/lib/photo-effects";
 
@@ -202,35 +203,16 @@ export function ProfilePhoto() {
   };
   const randomize = () => {
     if (!selectedLayer) return;
-    const integer = (min: number, max: number) => min + Math.floor(Math.random() * (max - min + 1));
-    const pick = <T,>(values: readonly T[]) => values[integer(0, values.length - 1)];
-    if (imageEffect === "gradient") {
-      const { shadows, highlights } = pick(GRADIENT_PRESETS); update({ shadows, highlights }); return;
-    }
-    if (imageEffect === "chromatic") { update({ amount: integer(1, 6), rotation: integer(-180, 180), edgeBias: integer(25, 100) }); return; }
-    if (imageEffect === "vhs") { update({ bleed: integer(20, 85), tracking: integer(10, 65), wear: integer(15, 70), seed: integer(1, 1000000) }); return; }
-    if (imageEffect === "decay") { update({ amount: integer(15, 65), size: integer(8, 40), repetition: integer(10, 90), seed: integer(1, 1000000) }); return; }
-    if (imageEffect === "slice") { update({ seed: integer(1, 1000000), bands: integer(5, 24), amount: integer(4, 25), rotation: pick([-90, -45, -30, 0, 30, 45, 90]) }); return; }
-    if (imageEffect === "scanlines") { update({ size: integer(3, 16), coverage: integer(15, 55), amount: integer(30, 80) }); return; }
-    if (imageEffect === "offset") {
-      update({ x: pick([-10, -6, -3, 3, 6, 10]), y: integer(-6, 6) });
-      setColors((current) => ({ ...current, offset: pick([BLAZE_ORANGE, { r: 1, g: 248, b: 165 }, { r: 232, g: 228, b: 220 }]) })); return;
-    }
-    // Keep tonal adjustments moderate so a roll usually retains the portrait.
-    update({
-      brightness: integer(-20, 20),
-      contrast: integer(70, 150),
-      invert: Math.random() < 0.25,
-      ...(imageEffect === "dither" ? {
-        size: integer(1, 6), threshold: integer(30, 70),
-        ditherType: pick(["bayer", "floyd-steinberg", "atkinson", "noise"] as const),
-      } : imageEffect === "pixelate" ? {
-        size: integer(4, 32), levels: pick([4, 8, 16, 32, 64, 128, 256]),
-      } : {
-        size: integer(4, 24), gap: integer(0, 6) / 2,
-        glyphs: pick(Object.keys(ASCII_SETS) as AsciiSet[]),
-      }),
-    });
+    const next = randomPhotoEffect(selectedLayer.effect);
+    changeLayers((current) => current.map((layer) => layer.id === selectedLayer.id ? { ...layer, ...next } : layer));
+  };
+  const randomizeDesign = () => {
+    if (closingRef.current) return;
+    const next = randomPhotoLayers();
+    changeLayers(() => next);
+    setSelectedLayerId(next[0].id);
+    setEffectPicker(null);
+    setAddTooltipPosition(null);
   };
 
   return (
@@ -290,7 +272,8 @@ export function ProfilePhoto() {
                   <div className={styles.layersHeading}>
                     <h2>Layers</h2>
                     <div className={styles.layerHeaderActions}>
-                    {layers.length > 0 && <button type="button" className={styles.layerAdd} aria-label="New design" title="New design" onClick={newDesign}><RotateCcw size={14} aria-hidden="true" /></button>}
+                    <button type="button" className={styles.layerAdd} aria-label="Randomize design" title="Randomize design · 6 layers" onClick={randomizeDesign}><Dices size={14} aria-hidden="true" /></button>
+                    <button type="button" className={styles.layerAdd} aria-label="New design" title="New design" disabled={layers.length === 0} onClick={newDesign}><RotateCcw size={14} aria-hidden="true" /></button>
                     <span className={styles.layerAddWrap}
                       onPointerEnter={(event) => { if (event.pointerType !== "touch") showAddTooltip(event.currentTarget); }}
                       onPointerLeave={() => setAddTooltipPosition(null)}

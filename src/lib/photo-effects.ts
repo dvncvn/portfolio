@@ -1,6 +1,7 @@
 import { ACCENTS } from "./accents";
 
 export type ImageEffect = "normal" | "dither" | "pixelate" | "ascii" | "gradient" | "grain" | "sticker" | "slice" | "scanlines" | "offset" | "chromatic" | "vhs" | "decay";
+export const EDITABLE_EFFECTS = ["dither", "pixelate", "ascii", "gradient", "slice", "scanlines", "offset", "chromatic", "vhs", "decay"] as const;
 export type EffectColor = { r: number; g: number; b: number } | null;
 
 export const ASCII_MAX_SIZE = 96;

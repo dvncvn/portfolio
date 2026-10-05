@@ -88,7 +88,7 @@ export default function InfoPage() {
               Hi, I&apos;m Simon
             </h1>
             <p className="text-base leading-relaxed text-muted-foreground lg:max-w-[768px]">
-              I&apos;m a Staff Product Designer working on AI data platforms at IBM. I turn complex systems into clear, usable, and durable products. I&apos;m experienced across OSS, startups, and enterprise.
+              I’m a Staff Product Designer and builder with a high bar for craft and a bias toward action, drawn to complex products across AI, developer tools, and data.
             </p>
           </div>
 
@@ -110,13 +110,13 @@ export default function InfoPage() {
                 Ways of Working
               </h2>
               <ul className="list-disc space-y-2 pl-5 text-base leading-relaxed text-muted-foreground">
-                <li>End-to-end: problem framing through shipped UI</li>
-                <li>Strong in ambiguous, zero-to-one spaces</li>
-                <li>Strong product intuition. I make calls and keep momentum without waiting on perfect inputs or PM coverage</li>
-                <li>Systems-minded, human-centered. Clarity, hierarchy, intent over novelty</li>
-                <li>Partner tightly with engineering, often in code or prototypes</li>
-                <li>Flexible on process and tools. I&apos;ll use what works and drop what doesn&apos;t</li>
-                <li>Focused on developer tools and agentic systems where UX shapes what&apos;s possible</li>
+                <li><strong>High craft, high agency.</strong> I care about the details, but I don&apos;t wait for perfect inputs to move. I&apos;ll make the call, build something, get signal, and keep going.</li>
+                <li><strong>End-to-end ownership.</strong> I like working from an ambiguous problem through product direction, interaction design, prototyping, and shipped UI.</li>
+                <li><strong>I&apos;m a builder.</strong> I work close to engineering and increasingly directly in code, using prototypes and working software to explore ideas quickly.</li>
+                <li><strong>I like working through ambiguity toward clarity.</strong> I’m comfortable when the problem isn’t fully formed, and I enjoy turning complexity into clearer models, language, and product direction.</li>
+                <li><strong>Coherence over uniformity.</strong> I care more about a product making sense as a system than forcing every surface into the same pattern. The underlying concepts, language, and behavior should still be clear and dependable.</li>
+                <li><strong>I’m interested in genuinely AI-native products.</strong> That means embracing non-determinism, designing for people and agents together, and rethinking interaction models where AI changes what’s possible, rather than adding a copilot to familiar workflows.</li>
+                <li><strong>Pragmatic about process.</strong> I&apos;ll use whatever helps us understand the problem and ship a better product, and drop whatever doesn&apos;t.</li>
               </ul>
             </div>
           </BlurFade>
@@ -128,11 +128,11 @@ export default function InfoPage() {
                 Outside of Work
               </h2>
               <p className="text-base leading-relaxed text-muted-foreground">
-                Outside of product design, I&apos;m a parent, husband, runner, musician, and{" "}
+                I&apos;m a parent, husband, runner, musician, and{" "}
                 <DndHoverCard>D&amp;D player</DndHoverCard>.
               </p>
               <p className="text-base leading-relaxed text-muted-foreground">
-                I spend a lot of time thinking about creativity, constraint, and sustainability. I make music that blends ambient, electronic, and guitar-driven textures, and I&apos;m interested in long-term lifestyle design, balancing ambition with family, health, and creative output.
+                I&apos;ve been making electronic music for years, alongside a longstanding interest in guitars and recording. These days I spend a lot of my free time making music, running, getting outside, and figuring out how to balance ambitious work with having a life I actually want to live.
               </p>
             </div>
           </BlurFade>

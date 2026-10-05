@@ -39,6 +39,7 @@ export async function HomeWorkSection() {
             {[HOME_WORK_CARDS[0], HOME_WORK_CARDS[1]].map((project) => (
               <BlurFade
                 key={project.slug}
+                initial="hidden"
                 delay={HOME_CARD_BLUR_DELAY[project.slug] ?? 0}
                 className="work-grid-item"
               >
@@ -63,6 +64,7 @@ export async function HomeWorkSection() {
             {[HOME_WORK_CARDS[2], HOME_WORK_CARDS[3]].map((project) => (
               <BlurFade
                 key={project.slug}
+                initial="hidden"
                 delay={HOME_CARD_BLUR_DELAY[project.slug] ?? 0}
                 className="work-grid-item"
               >

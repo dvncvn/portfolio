@@ -3,8 +3,8 @@ import type { WorkProject, WorkProjectAsset, PlayItem } from "@/content/types";
 // Site-level context that gets prepended to each page
 const SITE_CONTEXT = `---
 **Source:** Simon Duncan's Portfolio (simonduncan.co)
-**Author:** Simon Duncan – Staff Product Designer at IBM
-**Focus:** AI data platforms, developer tools, and complex systems design
+**Author:** Simon Duncan – Staff Product Designer and builder
+**Focus:** AI, developer tools, data, and complex products
 **Contact:** simonfraserduncan@gmail.com
 ---
 
@@ -206,7 +206,7 @@ export function infoPageToMarkdown(): string {
 
 ## Introduction
 
-I'm a Staff Product Designer working on AI data platforms at IBM. I turn complex systems into clear, usable, and durable products. I'm experienced across OSS, startups, and enterprise.
+I’m a Staff Product Designer and builder with a high bar for craft and a bias toward action, drawn to complex products across AI, developer tools, and data.
 
 ## Current Role
 
@@ -227,13 +227,13 @@ I'm a Staff Product Designer working on AI data platforms at IBM. I turn complex
 
 ## Ways of Working
 
-- End-to-end: problem framing through shipped UI
-- Strong in ambiguous, zero-to-one spaces
-- Strong product intuition. I make calls and keep momentum without waiting on perfect inputs or PM coverage
-- Systems-minded, human-centered. Clarity, hierarchy, intent over novelty
-- Partner tightly with engineering, often in code or prototypes
-- Flexible on process and tools. I'll use what works and drop what doesn't
-- Focused on developer tools and agentic systems where UX shapes what's possible
+- **High craft, high agency.** I care about the details, but I don't wait for perfect inputs to move. I'll make the call, build something, get signal, and keep going.
+- **End-to-end ownership.** I like working from an ambiguous problem through product direction, interaction design, prototyping, and shipped UI.
+- **I'm a builder.** I work close to engineering and increasingly directly in code, using prototypes and working software to explore ideas quickly.
+- **I like working through ambiguity toward clarity.** I’m comfortable when the problem isn’t fully formed, and I enjoy turning complexity into clearer models, language, and product direction.
+- **Coherence over uniformity.** I care more about a product making sense as a system than forcing every surface into the same pattern. The underlying concepts, language, and behavior should still be clear and dependable.
+- **I’m interested in genuinely AI-native products.** That means embracing non-determinism, designing for people and agents together, and rethinking interaction models where AI changes what’s possible, rather than adding a copilot to familiar workflows.
+- **Pragmatic about process.** I'll use whatever helps us understand the problem and ship a better product, and drop whatever doesn't.
 
 ## Skills
 
@@ -248,9 +248,9 @@ Product strategy, problem framing, information architecture, interaction design,
 
 ## Outside of Work
 
-Outside of product design, I'm a parent, husband, runner, musician, and D&D player.
+I'm a parent, husband, runner, musician, and D&D player.
 
-I spend a lot of time thinking about creativity, constraint, and sustainability. I make music that blends ambient, electronic, and guitar-driven textures, and I'm interested in long-term lifestyle design, balancing ambition with family, health, and creative output.
+I've been making electronic music for years, alongside a longstanding interest in guitars and recording. These days I spend a lot of my free time making music, running, getting outside, and figuring out how to balance ambitious work with having a life I actually want to live.
 
 ## Contact
 
@@ -365,7 +365,7 @@ export function homePageToMarkdown(projects: HomePageProject[]): string {
 
   lines.push("# Simon Duncan – Staff Product Designer");
   lines.push("");
-  lines.push("I'm a Staff Product Designer working on AI data platforms at IBM. I turn complex systems into clear, usable, and durable products. I'm experienced across OSS, startups, and enterprise.");
+  lines.push("I’m a Staff Product Designer and builder with a high bar for craft and a bias toward action, drawn to complex products across AI, developer tools, and data.");
   lines.push("");
 
   lines.push("## Selected Work");

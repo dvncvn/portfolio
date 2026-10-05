@@ -534,11 +534,11 @@ function SlideContent({ slide, slideIndex, totalSlides, onLightboxStateChange }:
               className="text-[20px] leading-relaxed text-foreground md:text-[24px] lg:text-[28px] xl:text-[32px] 2xl:text-[36px]"
             >
               <p>
-                Outside of product design, I&apos;m a parent, husband, runner, musician, and{" "}
+                I&apos;m a parent, husband, runner, musician, and{" "}
                 <DndHoverCard zIndex={9999} position="below">D&D player</DndHoverCard>.
               </p>
               <p className="mt-5 md:mt-6 xl:mt-8">
-                I spend a lot of time thinking about creativity, constraint, and sustainability. I make music that blends ambient, electronic, and guitar-driven textures, and I&apos;m interested in long-term lifestyle design, balancing ambition with family, health, and creative output.
+                I&apos;ve been making electronic music for years, alongside a longstanding interest in guitars and recording. These days I spend a lot of my free time making music, running, getting outside, and figuring out how to balance ambitious work with having a life I actually want to live.
               </p>
             </motion.div>
           </div>

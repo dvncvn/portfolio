@@ -2,12 +2,13 @@
 
 import { useEffect, useRef, type ReactNode, type PointerEvent, type MouseEvent } from "react";
 import { motion, useMotionTemplate, useSpring } from "framer-motion";
+import styles from "./controls.module.css";
 
 // visualDuration uses seconds and preserves velocity when the pointer changes direction.
 // useSpring passes duration straight to the generator, where it is milliseconds.
 const spring = { visualDuration: 0.5, bounce: 0.2 };
 
-// Both portrait surfaces subscribe to the same springs, including their velocity.
+// Keep the profile portrait's pointer response smooth between interactions.
 export function usePhotoTilt() {
   const enabled = useRef(false);
   const rx = useSpring(0, spring);
@@ -34,8 +35,9 @@ export function usePhotoTilt() {
   return { enabled, rx, ry, shineX, shineY, shineOpacity, transform, reflection };
 }
 
-export function TiltPhoto({ children, onClick, expanded, onHoverChange, tilt, disabled = false }: {
+export function TiltPhoto({ children, onClick, expanded, onHoverChange, tilt, disabled = false, saving = false }: {
   disabled?: boolean;
+  saving?: boolean;
   children: ReactNode;
   onClick: (event: MouseEvent<HTMLButtonElement>) => void;
   expanded: boolean;
@@ -72,16 +74,24 @@ export function TiltPhoto({ children, onClick, expanded, onHoverChange, tilt, di
         type="button"
         aria-label="Edit photo effects"
         aria-expanded={expanded}
+        aria-busy={saving}
+        data-saving={saving}
+        aria-haspopup="dialog"
         aria-controls="photo-effects"
-        popoverTarget="photo-effects"
         onClick={(event) => {
           reset();
           onClick(event);
         }}
-        onFocus={() => onHoverChange(true)}
-        onBlur={reset}
-        onKeyDown={reset}
-        className="relative block w-full cursor-pointer rounded-[24px] text-left focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--highlight)]"
+        onFocus={(event) => onHoverChange(!event.currentTarget.hasAttribute("data-restored-pointer-focus"))}
+        onBlur={(event) => {
+          event.currentTarget.removeAttribute("data-restored-pointer-focus");
+          reset();
+        }}
+        onKeyDown={(event) => {
+          event.currentTarget.removeAttribute("data-restored-pointer-focus");
+          reset();
+        }}
+        className={`${styles.photoTrigger} relative block w-full cursor-pointer rounded-[24px] text-left focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--highlight)]`}
       >
         {/* Only the visual surface moves; hit testing stays on the stationary button. */}
         <motion.div
@@ -92,7 +102,6 @@ export function TiltPhoto({ children, onClick, expanded, onHoverChange, tilt, di
         {children}
         <motion.span aria-hidden="true" style={{ transform: reflection, opacity: shineOpacity }}
           className="pointer-events-none absolute -inset-1/2 bg-[radial-gradient(ellipse_at_center,white,transparent_60%)]" />
-        <span aria-hidden="true" className="pointer-events-none absolute inset-0 rounded-[24px] border border-white/10" />
         </motion.div>
       </button>
     </div>

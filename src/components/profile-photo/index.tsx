@@ -1,149 +1,195 @@
 "use client";
 
-import { useCallback, useEffect, useId, useRef, useState, type MouseEvent, type CSSProperties } from "react";
-import { motion } from "framer-motion";
+import { useEffect, useId, useRef, useState, type CSSProperties, type MouseEvent } from "react";
+import { flushSync } from "react-dom";
+import { useStudioTransition } from "./studio-transition";
+import { motion, useReducedMotion } from "framer-motion";
+import { ChevronDown, Plus, RotateCcw, X } from "lucide-react";
+import { LayerList } from "./layer-list";
 import { PhotoHistory } from "./photo-history";
 import { EffectImage } from "./effect-image";
+import { EffectChooser } from "./effect-chooser";
 import styles from "./controls.module.css";
-import { NormalState } from "./normal-state";
 import { DitherPicker } from "./dither-picker";
 import { InkPicker } from "./ink-picker";
+import { GradientPicker } from "./gradient-picker";
 import { TiltPhoto, usePhotoTilt } from "./tilt-photo";
 import { useSharedPhoto } from "./use-shared-photo";
-import type { PhotoRecipe } from "@/lib/shared-photo";
-import { PIXEL_MAX_SIZE, ASCII_MAX_SIZE, ASCII_SETS, BLAZE_ORANGE, DEFAULT_SETTINGS, type AsciiSet, type EffectSettings, type ImageEffect } from "@/lib/photo-effects";
-
-function EffectButton({
-  label,
-  isActive,
-  onClick,
-}: {
-  label: string;
-  isActive: boolean;
-  onClick: () => void;
-}) {
-  return (
-    <button
-      type="button"
-      aria-pressed={isActive}
-      onClick={onClick}
-      className={`rounded-md px-3 py-1.5 text-[12px] font-medium transition-colors duration-200 ${
-        isActive
-          ? "bg-white/[0.12] text-foreground"
-          : "text-muted-foreground hover:bg-white/[0.06] hover:text-foreground"
-      }`}
-    >
-      {label}
-    </button>
-  );
-}
+import { photoLayers, PHOTO_LAYER_LIMIT, type PhotoLayer, type PhotoRecipe } from "@/lib/shared-photo";
+import { createPhotoEditId } from "@/lib/photo-edit-id";
+import { GRADIENT_PRESETS, EFFECT_LABELS, PIXEL_MAX_SIZE, ASCII_MAX_SIZE, ASCII_SETS, BLAZE_ORANGE, DEFAULT_SETTINGS, type AsciiSet, type EffectSettings } from "@/lib/photo-effects";
 
 export function ProfilePhoto() {
   const tilt = usePhotoTilt();
+  const reducedMotion = useReducedMotion();
+  const guideMaskId = useId();
+  const addLayerTooltipId = useId();
+  const [addTooltipPosition, setAddTooltipPosition] = useState<{ left: number; top: number } | null>(null);
+  const showAddTooltip = (element: HTMLElement) => {
+    const anchor = element.getBoundingClientRect();
+    const panel = panelRef.current?.getBoundingClientRect();
+    if (panel) {
+      const fitsRight = anchor.right + 140 <= panel.right;
+      setAddTooltipPosition({
+        left: fitsRight ? anchor.right - panel.left + 8 : Math.max(16, panel.width - 132),
+        top: fitsRight ? anchor.top - panel.top + anchor.height / 2 : anchor.bottom - panel.top + 24,
+      });
+    }
+  };
+  const [guidesReady, setGuidesReady] = useState(false);
   const photoRef = useRef<HTMLDivElement>(null);
-  const panelRef = useRef<HTMLDivElement>(null);
-  const photoRippleRef = useRef<HTMLSpanElement>(null);
-  const previewRippleRef = useRef<HTMLSpanElement>(null);
-  const rippleAnimation = useRef<Animation | null>(null);
-  const rippleFrame = useRef(0);
-  useEffect(() => () => {
-    cancelAnimationFrame(rippleFrame.current);
-    rippleAnimation.current?.cancel();
-  }, []);
+  const panelRef = useRef<HTMLDialogElement>(null);
+  const previewRef = useRef<HTMLDivElement>(null);
+  const transitionStudio = useStudioTransition();
+  const closingRef = useRef(false);
+  const openedWithPointer = useRef(false);
   const shared = useSharedPhoto();
-  const { effect: imageEffect, settings, colors } = shared.recipe;
-  const setImageEffect = (effect: ImageEffect) => shared.changeRecipe((current) => ({ ...current, effect }));
-  const setSettings = (update: (current: PhotoRecipe["settings"]) => PhotoRecipe["settings"]) =>
-    shared.changeRecipe((current) => ({ ...current, settings: update(current.settings) }));
-  const setColors = (update: (current: PhotoRecipe["colors"]) => PhotoRecipe["colors"]) =>
-    shared.changeRecipe((current) => ({ ...current, colors: update(current.colors) }));
+  const [effectPicker, setEffectPicker] = useState<"add" | "replace" | null>(null);
+  const [selectedLayerId, setSelectedLayerId] = useState<string | null>(null);
+  const layers = photoLayers(shared.recipe);
+  const selectedLayer = layers.find((layer) => layer.id === selectedLayerId) ?? layers.at(0);
+  const imageEffect = selectedLayer?.effect ?? "normal";
+  const choosingEffect = effectPicker !== null || imageEffect === "normal" || imageEffect === "sticker" || imageEffect === "grain";
+  const settings = selectedLayer ? { ...shared.recipe.settings, [selectedLayer.effect]: selectedLayer.settings } : shared.recipe.settings;
+  const colors = selectedLayer ? { ...shared.recipe.colors, [selectedLayer.effect]: selectedLayer.color } : shared.recipe.colors;
+  const changeLayers = (update: (current: PhotoLayer[]) => PhotoLayer[]) => shared.changeRecipe((current) => {
+    const next = update(photoLayers(current));
+    return { ...current, layers: next, effect: next.filter((layer) => layer.enabled).at(-1)?.effect ?? "normal" };
+  });
+  const setSettings = (update: (current: PhotoRecipe["settings"]) => PhotoRecipe["settings"]) => {
+    if (!selectedLayer) return;
+    const next = update(settings)[selectedLayer.effect];
+    changeLayers((current) => current.map((layer) => layer.id === selectedLayer.id ? { ...layer, settings: next } : layer));
+  };
+  const setColors = (update: (current: PhotoRecipe["colors"]) => PhotoRecipe["colors"]) => {
+    if (!selectedLayer) return;
+    const next = update(colors)[selectedLayer.effect];
+    changeLayers((current) => current.map((layer) => layer.id === selectedLayer.id ? { ...layer, color: next } : layer));
+  };
+  const addLayer = (effect: PhotoLayer["effect"]) => {
+    if (layers.length >= PHOTO_LAYER_LIMIT) return;
+    const id = createPhotoEditId();
+    changeLayers((current) => [...current, { id, effect, enabled: true, settings: { ...DEFAULT_SETTINGS[effect] }, color: null }]);
+    setSelectedLayerId(id);
+  };
+  const selectEffect = (effect: PhotoLayer["effect"] | "normal") => {
+    if (!selectedLayer) {
+      if (effect !== "normal") addLayer(effect);
+      return;
+    }
+    changeLayers((current) => current.map((layer) => {
+      if (layer.id !== selectedLayer.id) return layer;
+      if (effect === "normal") return { ...layer, enabled: false };
+      return effect === layer.effect ? { ...layer, enabled: true } : {
+        ...layer, effect, enabled: true, settings: { ...DEFAULT_SETTINGS[effect] },
+      };
+    }));
+  };
+  const moveLayer = (id: string, direction: number) => changeLayers((current) => {
+    const index = current.findIndex((layer) => layer.id === id);
+    const next = [...current];
+    if (index + direction < 0 || index + direction >= next.length) return current;
+    [next[index], next[index + direction]] = [next[index + direction], next[index]];
+    return next;
+  });
+  const entryRecipe = useRef<PhotoRecipe | null>(null);
+  const entryLocation = useRef(true);
+  const [previewWidth, setPreviewWidth] = useState<number>();
+  const isSaving = shared.status === "saving";
   const [showControls, setShowControls] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
-  const positionPanel = useCallback(() => {
-    const photo = photoRef.current;
-    const panel = panelRef.current;
-    if (!photo || !panel) return;
-    const rect = photo.getBoundingClientRect();
-    const viewportWidth = document.documentElement.clientWidth;
-    // The site's stable scrollbar gutters offset the fixed top-layer origin.
-    const viewportLeft = document.documentElement.getBoundingClientRect().left + window.scrollX;
-    const viewportHeight = window.innerHeight;
-    const controlsWidth = Math.min(360, viewportWidth - 32);
-    const beside = rect.left >= controlsWidth + 32;
-    const padding = 8;
-    const gap = 16;
-    const width = beside ? controlsWidth + gap + rect.width + padding * 2 : controlsWidth;
-    const availableHeight = viewportHeight - 32;
-    // On small screens the portrait is too short to be a useful control panel.
-    // Give the editor enough room to scroll comfortably while keeping it inside
-    // the visual viewport, and keep it aligned with the photo when possible.
-    const stackedHeight = Math.min(Math.max(rect.height, 560), availableHeight);
-    const top = beside
-      ? rect.top - padding
-      : Math.max(16, Math.min(rect.top, viewportHeight - stackedHeight - 16));
-    const left = beside
-      ? rect.left - controlsWidth - gap - padding
-      : Math.max(16, Math.min(rect.left + (rect.width - width) / 2, viewportWidth - width - 16));
-    panel.dataset.beside = String(beside);
-    panel.style.left = `${left - viewportLeft}px`;
-    panel.style.top = `${top}px`;
-    panel.style.width = `${width}px`;
-    panel.style.height = `${beside ? rect.height + padding * 2 : stackedHeight}px`;
-    panel.style.setProperty("--photo-width", `${rect.width}px`);
-    panel.style.setProperty("--closed-inset", beside
-      ? `8px 8px 8px ${controlsWidth + gap + padding}px round 24px`
-      : `${Math.max(0, rect.top - top)}px ${Math.max(0, left + width - rect.right)}px ${Math.max(0, top + stackedHeight - rect.bottom)}px ${Math.max(0, rect.left - left)}px round 24px`);
-  }, []);
   useEffect(() => {
-    positionPanel();
-    let frame = 0;
-    const reposition = () => {
-      cancelAnimationFrame(frame);
-      frame = requestAnimationFrame(positionPanel);
-    };
-    const observer = new ResizeObserver(reposition);
-    if (photoRef.current) observer.observe(photoRef.current);
-    window.addEventListener("resize", reposition);
-    window.addEventListener("scroll", reposition, true);
+    if (!showControls) return;
+    const previousOverflow = document.documentElement.style.overflow;
+    document.documentElement.style.overflow = "hidden";
     return () => {
-      cancelAnimationFrame(frame);
-      observer.disconnect();
-      window.removeEventListener("resize", reposition);
-      window.removeEventListener("scroll", reposition, true);
+      document.documentElement.style.overflow = previousOverflow;
     };
-  }, [positionPanel]);
-  const openFromPhoto = (event: MouseEvent<HTMLButtonElement>) => {
-    positionPanel();
-    if (panelRef.current) panelRef.current.dataset.keyboard = String(event.detail === 0);
-    cancelAnimationFrame(rippleFrame.current);
-    rippleAnimation.current?.cancel();
-    // Keyboard activation opens the editor without a decorative pointer response.
-    if (!event.detail || panelRef.current?.matches(":popover-open")) return;
-    const bounds = event.currentTarget.getBoundingClientRect();
-    const x = Math.max(0, Math.min(bounds.width, event.clientX - bounds.left));
-    const y = Math.max(0, Math.min(bounds.height, event.clientY - bounds.top));
-    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const diameter = reduced ? 100 : Math.hypot(Math.max(x, bounds.width - x), Math.max(y, bounds.height - y)) * 2;
-    // Wait for the native popover to open, then draw on the visible copy of the photo.
-    rippleFrame.current = requestAnimationFrame(() => {
-      if (!panelRef.current?.matches(":popover-open")) return;
-      const ripple = panelRef.current.dataset.beside === "true" ? previewRippleRef.current : photoRippleRef.current;
-      if (!ripple) return;
-      Object.assign(ripple.style, {
-        width: `${diameter}px`, height: `${diameter}px`,
-        left: `${x - diameter / 2}px`, top: `${y - diameter / 2}px`,
-      });
-      rippleAnimation.current = ripple.animate([
-        { transform: reduced ? "scale(1)" : "scale(0.02)", opacity: 0, offset: 0 },
-        { opacity: 0.18, offset: 0.2 },
-        { opacity: 0.18, offset: 0.5 },
-        { transform: "scale(1)", opacity: 0, offset: 1 },
-      ], { duration: reduced ? 150 : 700, easing: "ease-in-out" });
+  }, [showControls]);
+  const focusPanel = (selector: string) => {
+    requestAnimationFrame(() => {
+      if (panelRef.current?.open && !closingRef.current) {
+        panelRef.current.querySelector<HTMLElement>(selector)?.focus({ preventScroll: true });
+      }
     });
   };
-  const closePanel = () => {
-    panelRef.current?.hidePopover();
-    photoRef.current?.querySelector<HTMLButtonElement>("button")?.focus({ preventScroll: true });
+  const cancelEffectPicker = () => {
+    setEffectPicker(null);
+    focusPanel(imageEffect === "normal" ? '[aria-label="Add layer"]' : "[data-effect-selector]");
+  };
+  const browseEffects = (mode: "add" | "replace") => {
+    setEffectPicker(mode);
+    focusPanel("[data-effect-chooser] button");
+  };
+  const newDesign = () => {
+    if (closingRef.current) return;
+    changeLayers(() => []);
+    setSelectedLayerId(null);
+    setAddTooltipPosition(null);
+    browseEffects("add");
+  };
+  const openFromPhoto = (event: MouseEvent<HTMLButtonElement>) => {
+    openedWithPointer.current = event.detail > 0;
+    setAddTooltipPosition(null);
+    setGuidesReady(false);
+    setEffectPicker(layers.length === 0 ? "add" : null);
+    entryRecipe.current = shared.recipe;
+    entryLocation.current = shared.shareLocation;
+    const panel = panelRef.current;
+    const source = photoRef.current?.querySelector<HTMLElement>("[data-photo-surface]");
+    if (!panel || !source) return;
+    closingRef.current = false;
+    delete panel.dataset.exiting;
+    delete panel.dataset.actionsRetracted;
+    panel.dataset.phase = "entering";
+    panel.showModal();
+    flushSync(() => { setPreviewWidth(source.clientWidth); setShowControls(true); });
+    panel.focus({ preventScroll: true });
+    setAddTooltipPosition(null);
+    if (previewRef.current) void transitionStudio(panel, source, previewRef.current, true, () => {
+      if (!closingRef.current) setGuidesReady(true);
+    });
+  };
+  const closeStudio = async () => {
+    if (closingRef.current) return;
+    closingRef.current = true;
+    setAddTooltipPosition(null);
+    const panel = panelRef.current;
+    const target = photoRef.current?.querySelector<HTMLElement>("[data-photo-surface]");
+    const actions = panel?.querySelector<HTMLElement>(`.${styles.saveActions}`);
+    let retract: Animation | undefined;
+    if (panel) panel.dataset.exiting = "true";
+    if (actions) {
+      // Tuck the tray behind the stationary portrait before its return flight.
+      const current = getComputedStyle(actions);
+      retract = actions.animate([
+        { transform: current.transform, opacity: current.opacity },
+        { transform: "translateY(-64px)", opacity: 1 },
+      ], { duration: reducedMotion ? 0 : 240, easing: "cubic-bezier(0.4, 0, 0.2, 1)", fill: "forwards" });
+      try { await retract.finished; } catch { /* The editor may unmount mid-transition. */ }
+    }
+    if (panel) panel.dataset.actionsRetracted = "true";
+    retract?.cancel();
+    if (panel?.isConnected && target && previewRef.current) await transitionStudio(panel, previewRef.current, target, false);
+    // Escape changes the browser’s focus modality; retain the way editing began.
+    const trigger = photoRef.current?.querySelector<HTMLButtonElement>("button");
+    if (openedWithPointer.current) trigger?.setAttribute("data-restored-pointer-focus", "true");
+    panel?.close();
+  };
+  const cancelEditing = () => {
+    if (closingRef.current) return;
+    if (entryRecipe.current) {
+      const original = entryRecipe.current;
+      shared.changeRecipe(() => original);
+      shared.setShareLocation(entryLocation.current);
+    }
+    void closeStudio();
+  };
+  const saveEditing = () => {
+    if (closingRef.current) return;
+    // The hook snapshots and queues the recipe independently of the editor.
+    void shared.saveChanges();
+    void closeStudio();
   };
   const activeEffect = imageEffect === "normal" ? "dither" : imageEffect;
   const active = settings[activeEffect];
@@ -154,117 +200,224 @@ export function ProfilePhoto() {
     setSettings((current) => ({ ...current, [activeEffect]: DEFAULT_SETTINGS[activeEffect] }));
     setColors((current) => ({ ...current, [activeEffect]: null }));
   };
+  const randomize = () => {
+    if (!selectedLayer) return;
+    const integer = (min: number, max: number) => min + Math.floor(Math.random() * (max - min + 1));
+    const pick = <T,>(values: readonly T[]) => values[integer(0, values.length - 1)];
+    if (imageEffect === "gradient") {
+      const { shadows, highlights } = pick(GRADIENT_PRESETS); update({ shadows, highlights }); return;
+    }
+    if (imageEffect === "chromatic") { update({ amount: integer(1, 6), rotation: integer(-180, 180), edgeBias: integer(25, 100) }); return; }
+    if (imageEffect === "vhs") { update({ bleed: integer(20, 85), tracking: integer(10, 65), wear: integer(15, 70), seed: integer(1, 1000000) }); return; }
+    if (imageEffect === "decay") { update({ amount: integer(15, 65), size: integer(8, 40), repetition: integer(10, 90), seed: integer(1, 1000000) }); return; }
+    if (imageEffect === "slice") { update({ seed: integer(1, 1000000), bands: integer(5, 24), amount: integer(4, 25), rotation: pick([-90, -45, -30, 0, 30, 45, 90]) }); return; }
+    if (imageEffect === "scanlines") { update({ size: integer(3, 16), coverage: integer(15, 55), amount: integer(30, 80) }); return; }
+    if (imageEffect === "offset") {
+      update({ x: pick([-10, -6, -3, 3, 6, 10]), y: integer(-6, 6) });
+      setColors((current) => ({ ...current, offset: pick([BLAZE_ORANGE, { r: 1, g: 248, b: 165 }, { r: 232, g: 228, b: 220 }]) })); return;
+    }
+    // Keep tonal adjustments moderate so a roll usually retains the portrait.
+    update({
+      brightness: integer(-20, 20),
+      contrast: integer(70, 150),
+      invert: Math.random() < 0.25,
+      ...(imageEffect === "dither" ? {
+        size: integer(1, 6), threshold: integer(30, 70),
+        ditherType: pick(["bayer", "floyd-steinberg", "atkinson", "noise"] as const),
+      } : imageEffect === "pixelate" ? {
+        size: integer(4, 32), levels: pick([4, 8, 16, 32, 64, 128, 256]),
+      } : {
+        size: integer(4, 24), gap: integer(0, 6) / 2,
+        glyphs: pick(Object.keys(ASCII_SETS) as AsciiSet[]),
+      }),
+    });
+  };
 
   return (
           <div>
           <div ref={photoRef} className={styles.photoRoot}>
             <TiltPhoto
               tilt={tilt}
+              saving={isSaving}
               disabled={shared.status === "loading"}
               onClick={openFromPhoto}
               expanded={showControls}
               onHoverChange={setIsHovered}
             >
               <EffectImage
+                layers={shared.recipe.layers}
                 ready={shared.status !== "loading"}
                 src="/assets/profile.png"
-                effect={imageEffect}
+                effect={shared.recipe.effect}
                 settings={active}
                 color={colors[activeEffect]}
               />
-              <span ref={photoRippleRef} className={styles.ripple} aria-hidden="true" />
-              <span className={styles.editGrid} data-active={showControls} aria-hidden="true" />
-              {/* Edit icon - appears on hover */}
-              {/* Edit icon indicator */}
+              {/* Edit label for the photo button - appears on hover or focus */}
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: shared.status !== "loading" && (isHovered || showControls) ? 1 : 0 }}
                 transition={{ duration: 0.2 }}
-                className="[@media(hover:none)]:!opacity-100 pointer-events-none absolute bottom-3 right-3 rounded-full bg-black/50 p-2 text-white/70 backdrop-blur-sm"
+                className="[@media(hover:none)]:!opacity-100 pointer-events-none absolute bottom-3 right-3 rounded-md bg-black/50 px-3 py-1.5 text-[14px] font-normal leading-5 text-white backdrop-blur-sm"
                 aria-hidden="true"
               >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <path d="M13 7 8.7 2.7a2.41 2.41 0 0 0-3.4 0L2.7 5.3a2.41 2.41 0 0 0 0 3.4L7 13" />
-                  <path d="m8 6 2-2" />
-                  <path d="m18 16 2-2" />
-                  <path d="m17 11 4.3 4.3c.94.94.94 2.46 0 3.4l-2.6 2.6c-.94.94-2.46.94-3.4 0L11 17" />
-                  <path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z" />
-                  <path d="m15 5 4 4" />
-                </svg>
+                Edit
               </motion.div>
             </TiltPhoto>
-            {/* Native popover stays above the page without changing its layout. */}
-            <div
+            <dialog
               ref={panelRef}
               id="photo-effects"
-              popover="auto"
-              role="region"
-              aria-label="Photo effects"
-              onToggle={(event) => {
-                setShowControls(event.newState === "open");
-                if (event.newState === "closed") void shared.saveOnClose();
+              aria-label="Edit photo"
+              tabIndex={-1}
+              autoFocus
+              onScrollCapture={() => setAddTooltipPosition(null)}
+              onKeyDown={(event) => {
+                if (event.defaultPrevented || event.repeat || !event.shiftKey || event.ctrlKey || event.metaKey || event.altKey || event.key.toLowerCase() !== "n") return;
+                if ((event.target as HTMLElement).closest('textarea, select, input:not([type="range"]):not([type="checkbox"]):not([type="radio"]):not([type="button"]), [contenteditable]:not([contenteditable="false"])')) return;
+                if (!showControls || closingRef.current || layers.length >= PHOTO_LAYER_LIMIT) return;
+                event.preventDefault();
+                event.stopPropagation();
+                browseEffects("add");
+              }}
+              onCancel={(event) => { event.preventDefault(); cancelEditing(); }}
+              onClose={() => {
+                setShowControls(false);
+                photoRef.current?.querySelector<HTMLButtonElement>("button")?.focus({ preventScroll: true });
               }}
               className={styles.panel}
             >
-              <div className={styles.controls} data-empty={imageEffect === "normal"}>
-                {/* Effect selector row */}
-                <div className={styles.panelHeader} data-has-controls={imageEffect !== "normal"}>
-                  <div className={styles.effectTabs}>
-                    <EffectButton
-                      label="Normal"
-                      isActive={imageEffect === "normal"}
-                      onClick={() => setImageEffect("normal")}
-                    />
-                    <EffectButton
-                      label="Dither"
-                      isActive={imageEffect === "dither"}
-                      onClick={() => setImageEffect("dither")}
-                    />
-                    <EffectButton
-                      label="Pixelate"
-                      isActive={imageEffect === "pixelate"}
-                      onClick={() => setImageEffect("pixelate")}
-                    />
-                    <EffectButton
-                      label="ASCII"
-                      isActive={imageEffect === "ascii"}
-                      onClick={() => setImageEffect("ascii")}
-                    />
+              <div className={styles.studioBody}>
+                <motion.aside layoutScroll className={styles.layersPanel} aria-label="Effect layers">
+                  <div className={styles.layersHeading}>
+                    <h2>Layers</h2>
+                    <div className={styles.layerHeaderActions}>
+                    {layers.length > 0 && <button type="button" className={styles.layerAdd} aria-label="New design" title="New design" onClick={newDesign}><RotateCcw size={14} aria-hidden="true" /></button>}
+                    <span className={styles.layerAddWrap}
+                      onPointerEnter={(event) => { if (event.pointerType !== "touch") showAddTooltip(event.currentTarget); }}
+                      onPointerLeave={() => setAddTooltipPosition(null)}
+                      onFocus={(event) => { if (event.target.matches(":focus-visible")) showAddTooltip(event.currentTarget); }}
+                      onBlur={() => setAddTooltipPosition(null)}>
+                      <button type="button" className={styles.layerAdd} aria-label="Add layer" aria-describedby={addLayerTooltipId} aria-keyshortcuts="Shift+N" disabled={layers.length >= PHOTO_LAYER_LIMIT || effectPicker === "add"} onClick={() => browseEffects("add")}><Plus size={16} aria-hidden="true" /></button>
+
+                    </span>
+                    </div>
                   </div>
-                  <button
-                    onClick={closePanel}
-                    className="rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-white/[0.06] hover:text-foreground"
-                    aria-label="Close controls"
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="14"
-                      height="14"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <line x1="18" y1="6" x2="6" y2="18" />
-                      <line x1="6" y1="6" x2="18" y2="18" />
-                    </svg>
-                  </button>
+                  <LayerList key={showControls ? "editing" : "closed"} layers={layers} selectedId={effectPicker === "add" ? undefined : selectedLayer?.id}
+                    onSelect={(id) => { setSelectedLayerId(id); setEffectPicker(null); }}
+                    onToggle={(id) => changeLayers((current) => current.map((item) => item.id === id ? { ...item, enabled: !item.enabled } : item))}
+                    onReorder={(ids) => {
+                      if (closingRef.current) return;
+                      changeLayers((current) => {
+                        if (ids.length !== current.length || !ids.every((id) => current.some((item) => item.id === id))) return current;
+                        return ids.map((id) => current.find((item) => item.id === id)!);
+                      });
+                    }}
+                    onRemove={(id) => {
+                      const index = layers.findIndex((layer) => layer.id === id);
+                      const next = layers[index + 1] ?? layers[index - 1];
+                      changeLayers((current) => current.filter((item) => item.id !== id));
+                      if (selectedLayer?.id === id) setSelectedLayerId(next?.id ?? null);
+                      focusPanel(next ? `[data-layer-id="${next.id}"]` : '[aria-label="Add layer"]');
+                    }}
+                    onMove={moveLayer} />
+                  {effectPicker === "add" && <div className={styles.pendingLayer}>
+                    <Plus size={14} aria-hidden="true" />
+                    <button type="button" className={styles.pendingLayerLabel} onClick={() => focusPanel("[data-effect-chooser] button")}>Choose effect</button>
+                    <button type="button" className={styles.layerRemove} aria-label="Cancel new layer" onClick={cancelEffectPicker}><X size={14} aria-hidden="true" /></button>
+                  </div>}
+                </motion.aside>
+                <section className={styles.stage} aria-label="Photo preview">
+                  <div className={styles.canvasArea}>
+                    <div className={styles.photoFrame}>
+                      <svg className={styles.photoGuides} viewBox="0 0 1200 1500" preserveAspectRatio="none" aria-hidden="true">
+                        <defs>
+                          <mask id={guideMaskId} maskUnits="userSpaceOnUse" x="0" y="0" width="1200" height="1500">
+                            <motion.rect fill="white"
+                              initial={{ x: 400, y: 500, width: 400, height: 500 }}
+                              animate={guidesReady ? { x: 0, y: 0, width: 1200, height: 1500 } : { x: 400, y: 500, width: 400, height: 500 }}
+                              transition={{ duration: guidesReady && !reducedMotion ? 2.4 : 0, ease: [0.2, 0.65, 0.25, 1] }} />
+                          </mask>
+                        </defs>
+                        <g mask={`url(#${guideMaskId})`} fill="none" stroke="currentColor" strokeWidth="1">
+                          <g><path d="M400 0V1500 M800 0V1500 M0 500H1200 M0 1000H1200" vectorEffect="non-scaling-stroke" /></g>
+                          <g><path d="M533.333 0V1500 M666.667 0V1500 M0 666.667H1200 M0 833.333H1200" strokeDasharray="3 5" vectorEffect="non-scaling-stroke" /></g>
+                          <g><path d="M0 0L1200 1500 M1200 0L0 1500" opacity=".6" vectorEffect="non-scaling-stroke" /></g>
+                        </g>
+                      </svg>
+                    <div ref={previewRef} className={styles.panelPreview}>
+                      {showControls && <EffectImage
+                        layers={shared.recipe.layers}
+                        renderWidth={previewWidth}
+                        ready={shared.status !== "loading"}
+                        src="/assets/profile.png"
+                        effect={shared.recipe.effect}
+                        settings={active}
+                        color={colors[activeEffect]}
+                      />}
+                    </div>
+                  <footer className={styles.saveActions}>
+                    <button type="button" onClick={cancelEditing} className={styles.editorButton}>Discard</button>
+                    <button type="button" onClick={saveEditing} className={`${styles.editorButton} ${styles.primaryButton}`}>Save</button>
+                  </footer>
+                    </div>
+                  </div>
+                </section>
+                <aside className={styles.inspector} aria-label="Photo controls">
+              <div className={styles.controls}>
+                <div className={`${styles.panelHeader} ${styles.effectNavigation}`}>
+                  {effectPicker === "add" ? <>
+                    <h3>Add effect</h3>
+                    <button type="button" className={`${styles.editorButton} ${styles.effectPickerCancel}`} aria-label="Cancel choosing an effect" onClick={cancelEffectPicker}><X size={14} aria-hidden="true" /></button>
+                  </> : imageEffect !== "normal" && imageEffect !== "sticker" && imageEffect !== "grain" ? (
+                    <button type="button" className={`${styles.editorButton} ${styles.effectSelector}`} aria-label={`Change effect: ${EFFECT_LABELS[imageEffect]}`} aria-expanded={choosingEffect}
+                      data-effect-selector onClick={() => choosingEffect ? cancelEffectPicker() : browseEffects("replace")}>
+                      <span>{EFFECT_LABELS[imageEffect]}</span>
+                      <ChevronDown size={16} aria-hidden="true" />
+                    </button>
+                  ) : <h3>Effects</h3>}
                 </div>
-                {imageEffect === "normal" && <NormalState />}
-                {imageEffect !== "normal" && (
+                {choosingEffect && showControls && <EffectChooser onChoose={(effect) => {
+                  if (effectPicker === "add" || !selectedLayer) addLayer(effect);
+                  else selectEffect(effect);
+                  setEffectPicker(null);
+                  focusPanel("[data-effect-selector]");
+                }} />}
+                {!choosingEffect && (
                   <div className={styles.parameters}>
+                    <EffectSlider label="Opacity" value={selectedLayer?.opacity ?? 100} min={0} max={100} defaultValue={100} unit="%"
+                      onChange={(opacity) => changeLayers((current) => current.map((layer) => layer.id === selectedLayer?.id ? { ...layer, opacity } : layer))} />
+                    {imageEffect === "chromatic" && <>
+                      <EffectSlider label="Amount" value={active.amount ?? 2} min={0} max={10} defaultValue={2} unit="%" onChange={(amount) => update({ amount })} />
+                      <EffectSlider label="Angle" value={active.rotation ?? 0} min={-180} max={180} defaultValue={0} unit="°" onChange={(rotation) => update({ rotation })} />
+                      <EffectSlider label="Edge bias" value={active.edgeBias ?? 70} min={0} max={100} defaultValue={70} unit="%" onChange={(edgeBias) => update({ edgeBias })} />
+                    </>}
+                    {imageEffect === "vhs" && <>
+                      <EffectSlider label="Color bleed" value={active.bleed ?? 45} min={0} max={100} defaultValue={45} unit="%" onChange={(bleed) => update({ bleed })} />
+                      <EffectSlider label="Tracking" value={active.tracking ?? 25} min={0} max={100} defaultValue={25} unit="%" onChange={(tracking) => update({ tracking })} />
+                      <EffectSlider label="Wear" value={active.wear ?? 30} min={0} max={100} defaultValue={30} unit="%" onChange={(wear) => update({ wear })} />
+                    </>}
+                    {imageEffect === "decay" && <>
+                      <EffectSlider label="Corruption" value={active.amount ?? 35} min={0} max={100} defaultValue={35} unit="%" onChange={(amount) => update({ amount })} />
+                      <EffectSlider label="Artifact scale" value={active.size} min={4} max={64} defaultValue={16} unit="px" onChange={(size) => update({ size })} />
+                      <EffectSlider label="Repetition" value={active.repetition ?? 50} min={0} max={100} defaultValue={50} unit="%" onChange={(repetition) => update({ repetition })} />
+                    </>}
+                    {imageEffect === "gradient" && <GradientPicker
+                      shadows={active.shadows ?? GRADIENT_PRESETS[0].shadows} highlights={active.highlights ?? GRADIENT_PRESETS[0].highlights} onChange={update} />}
+                    {imageEffect === "slice" && <>
+                      <EffectSlider label="Slices" value={active.bands ?? 12} min={2} max={40} defaultValue={12} onChange={(bands) => update({ bands })} />
+                      <EffectSlider label="Angle" value={active.rotation ?? 0} min={-180} max={180} defaultValue={0} unit="°" onChange={(rotation) => update({ rotation })} />
+                      <EffectSlider label="Displacement" value={active.amount ?? 12} min={0} max={35} defaultValue={12} unit="%" onChange={(amount) => update({ amount })} />
+                    </>}
+                    {imageEffect === "scanlines" && <>
+                      <EffectSlider label="Spacing" value={active.size} min={2} max={40} defaultValue={6} unit="px" onChange={(size) => update({ size })} />
+                      <EffectSlider label="Thickness" value={active.coverage ?? 25} min={5} max={75} defaultValue={25} unit="%" onChange={(coverage) => update({ coverage })} />
+                      <EffectSlider label="Strength" value={active.amount ?? 55} min={0} max={100} defaultValue={55} unit="%" onChange={(amount) => update({ amount })} />
+                    </>}
+                    {imageEffect === "offset" && <>
+                      <EffectSlider label="Horizontal offset" value={active.x ?? 4} min={-25} max={25} defaultValue={4} unit="%" onChange={(x) => update({ x })} />
+                      <EffectSlider label="Vertical offset" value={active.y ?? 1} min={-25} max={25} defaultValue={1} unit="%" onChange={(y) => update({ y })} />
+                      <InkPicker value={colors.offset ?? BLAZE_ORANGE} onChange={(color) => setColors((current) => ({ ...current, offset: color }))} />
+                    </>}
+                    {(["dither", "pixelate", "ascii"].includes(imageEffect)) && <>
                     {imageEffect === "dither" && <DitherPicker value={active.ditherType ?? "bayer"} onChange={(ditherType) => update({ ditherType })} />}
                     <EffectSlider label={imageEffect === "dither" ? "Dot size" : imageEffect === "pixelate" ? "Pixel size" : "Type size"}
                       defaultValue={DEFAULT_SETTINGS[activeEffect].size} value={active.size} min={imageEffect === "dither" ? 1 : 4} max={imageEffect === "dither" ? 8 : imageEffect === "ascii" ? ASCII_MAX_SIZE : PIXEL_MAX_SIZE} unit="px" onChange={(size) => update({ size })} />
@@ -294,7 +447,11 @@ export function ProfilePhoto() {
                         <input type="checkbox" checked={active.invert} onChange={(event) => update({ invert: event.target.checked })} className={styles.toggle} />
                         Invert tones
                       </label>
-                      <button type="button" onClick={reset} className="rounded px-2 py-1 hover:bg-white/5 hover:text-foreground">Reset effect</button>
+                    </div>
+                    </>}
+                    <div className={styles.studioActions}>
+                      <button type="button" onClick={randomize} className={styles.editorButton}>Randomize</button>
+                      <button type="button" onClick={reset} className={styles.editorButton}>Reset effect</button>
                     </div>
                   </div>
                 )}
@@ -307,26 +464,19 @@ export function ProfilePhoto() {
                   </div>
                 )}
               </div>
-              <motion.div className={styles.panelPreview} style={{ transform: tilt.transform }} aria-hidden="true">
-                <EffectImage
-                  ready={shared.status !== "loading"}
-                  src="/assets/profile.png"
-                  effect={imageEffect}
-                  settings={active}
-                  color={colors[activeEffect]}
-                />
-                <span ref={previewRippleRef} className={styles.ripple} aria-hidden="true" />
-                <span className={styles.editGrid} data-active={showControls} aria-hidden="true" />
-                <motion.span aria-hidden="true" style={{ transform: tilt.reflection, opacity: tilt.shineOpacity }}
-                  className="pointer-events-none absolute -inset-1/2 bg-[radial-gradient(ellipse_at_center,white,transparent_60%)]" />
-                <span aria-hidden="true" className="pointer-events-none absolute inset-0 rounded-[24px] border border-white/10" />
-              </motion.div>
-            </div>
+
+                </aside>
+              </div>
+              {addTooltipPosition && showControls && <span id={addLayerTooltipId} role="tooltip" className={styles.layerAddTooltip} style={addTooltipPosition}>
+                {layers.length >= PHOTO_LAYER_LIMIT ? "6 layer limit" : effectPicker === "add" ? "Choose an effect" : <>Add layer <kbd>⇧ N</kbd></>}
+              </span>}
+            </dialog>
           </div>
           <p className={styles.attribution} role="status" aria-live="polite">
-            {shared.message ? shared.message
+            {isSaving ? "Saving…" : shared.message ? shared.message
               : shared.savedEdit?.location ? `Last edit from ${shared.savedEdit.location.replace(/, /g, " ")}`
               : null}
+            {shared.saveFailed && <button type="button" className={styles.retrySave} onClick={() => { void shared.saveChanges(); }}>Retry</button>}
           </p>
           <PhotoHistory edits={shared.previous} />
           </div>

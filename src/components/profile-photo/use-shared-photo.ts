@@ -17,6 +17,7 @@ export function useSharedPhoto() {
   const [location, setLocation] = useState<string | null>(null);
   const [shareLocation, setShareLocation] = useState(true);
   const [status, setStatus] = useState<SaveStatus>("loading");
+  const [saveFailed, setSaveFailed] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const pending = useRef<PendingSave | null>(null);
   const saving = useRef(false);
@@ -59,18 +60,20 @@ export function useSharedPhoto() {
     setRecipe(next);
   }, []);
 
-  const saveOnClose = useCallback(async () => {
+  const saveChanges = useCallback(async () => {
+    setSaveFailed(false);
     try {
       const snapshot = recipeRef.current;
-      if (!touched.current || (!saving.current && photoFingerprint(snapshot) === baseline.current)) return;
+      if (!touched.current || (!saving.current && photoFingerprint(snapshot) === baseline.current)) return true;
       // Coalesce quick open/edit/close cycles; an older response cannot replace newer local settings.
       pending.current = { id: createPhotoEditId(), recipe: snapshot, shareLocation };
     } catch {
       setStatus("error");
-      setMessage("Couldn't prepare this edit to save. Open and close the controls to try again.");
-      return;
+      setSaveFailed(true);
+      setMessage("Couldn't prepare this edit to save. Please try saving again.");
+      return false;
     }
-    if (saving.current) return;
+    if (saving.current) return false;
     saving.current = true;
     saveStarted.current = true;
     setStatus("saving");
@@ -101,12 +104,15 @@ export function useSharedPhoto() {
         setPrevious(data.previous.map(parsePhotoEdit));
       }
       setStatus("saved");
+      return true;
     } catch {
       pending.current = null;
       setStatus("error");
-      setMessage("Couldn't save. Open and close the controls to try again.");
+      setSaveFailed(true);
+      setMessage("Couldn't save. Your changes are still here.");
+      return false;
     } finally { saving.current = false; }
   }, [shareLocation]);
 
-  return { recipe, changeRecipe, savedEdit, previous, location, shareLocation, setShareLocation, status, message, saveOnClose };
+  return { recipe, changeRecipe, savedEdit, previous, location, shareLocation, setShareLocation, status, message, saveFailed, saveChanges };
 }

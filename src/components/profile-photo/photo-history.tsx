@@ -10,7 +10,7 @@ function SavedPhoto({ edit }: { edit: PhotoEdit }) {
   const { effect, settings, colors } = edit.recipe;
   const active = effect === "normal" ? "dither" : effect;
   // Render at portrait scale so small thumbnails preserve the effect detail.
-  return <EffectImage renderWidth={320} src="/assets/profile.png" effect={effect} settings={settings[active]}
+  return <EffectImage layers={edit.recipe.layers} renderWidth={320} src="/assets/profile.png" effect={effect} settings={settings[active]}
     color={colors[active]} />;
 }
 
@@ -30,7 +30,7 @@ export function PhotoHistory({ edits }: { edits: PhotoEdit[] }) {
               animate={{ opacity: 1, transform: "translateY(0%) scale(1)" }}
               exit={{ opacity: 0, transform: reduceMotion ? "none" : "translateY(-10%) scale(0.95)" }}
               transition={{ duration: 0.2, ease: [0.23, 1, 0.32, 1], layout: { duration: 0.25, ease: [0.77, 0, 0.175, 1] } }}>
-              <button type="button" aria-label={`Preview previous edit ${index + 1}: ${edit.recipe.effect}`}
+              <button type="button" aria-label={`Preview previous edit ${index + 1}: ${edit.recipe.layers ? `${edit.recipe.layers.length} effect layers` : edit.recipe.effect}`}
                 aria-describedby={`${titleId}-${edit.id}`} aria-haspopup="dialog"
                 onClick={() => { setSelected(edit); dialog.current?.showModal(); }}>
                 <span aria-hidden="true"><SavedPhoto edit={edit} /></span>

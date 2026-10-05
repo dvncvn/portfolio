@@ -32,7 +32,7 @@ function formatYearsShort(years: string) {
 
 export function EmploymentTable({ rows, onViewHistory }: EmploymentTableProps) {
   return (
-    <div className="w-full max-w-[768px]">
+    <div className="group/history w-full max-w-[768px]">
       <table className="w-full table-fixed border-collapse text-[16px]">
         <colgroup>
           <col className="w-auto md:w-[50%]" />
@@ -87,7 +87,7 @@ export function EmploymentTable({ rows, onViewHistory }: EmploymentTableProps) {
         <button
           type="button"
           onClick={onViewHistory}
-          className="group/btn -ml-3 mt-6 inline-flex cursor-pointer items-center gap-2 rounded-md px-3 py-1.5 text-[14px] text-muted-foreground transition-all duration-200 ease-out hover:bg-white/[0.06] hover:text-foreground"
+          className="group/btn pointer-events-none -ml-3 mt-6 inline-flex translate-y-3 cursor-pointer items-center gap-2 rounded-md px-3 py-1.5 text-[14px] text-muted-foreground opacity-0 transition-all duration-300 ease-out group-hover/history:pointer-events-auto group-hover/history:translate-y-0 group-hover/history:opacity-100 group-focus-within/history:pointer-events-auto group-focus-within/history:translate-y-0 group-focus-within/history:opacity-100 hover:bg-white/[0.06] hover:text-foreground motion-reduce:transform-none motion-reduce:transition-none [@media(hover:none)]:pointer-events-auto [@media(hover:none)]:translate-y-0 [@media(hover:none)]:opacity-100"
         >
           <span>View full 14 year history</span>
           <svg
@@ -112,4 +112,3 @@ export function EmploymentTable({ rows, onViewHistory }: EmploymentTableProps) {
     </div>
   );
 }
-

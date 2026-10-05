@@ -15,7 +15,7 @@ export function IntroBlock({ animate = true }: { animate?: boolean }) {
         Hi, I&apos;m Simon
       </h1>
       <p className="text-base leading-relaxed text-muted-foreground max-w-[768px]">
-        I&apos;m a Staff Product Designer working on AI data platforms at IBM. I turn complex systems into clear, usable, and durable products. I&apos;m experienced across OSS, startups, and enterprise.
+        I’m a Staff Product Designer and builder with a high bar for craft and a bias toward action, drawn to complex products across AI, developer tools, and data.
       </p>
 
       {/* Hover to info affordance */}

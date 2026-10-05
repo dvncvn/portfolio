@@ -44,7 +44,11 @@ public/assets/    Images and media
 
 ### Shared photo edits
 
-The info-page photo loads the last visitor's effect settings and saves changed settings when the controls close (close button, Escape, or outside click). The current and previous recipes live in private Vercel Blob storage; image files are not uploaded.
+The info-page photo loads the last visitor's effect settings. Edit opens a full-screen studio with a live preview and up to six effect layers. Drag to reorder; select a layer to edit it and use its eye button to toggle visibility. The plus button or Shift+N adds a layer, and the reset icon starts a new design. Empty designs open with a Choose effect placeholder.
+
+Effects include Dither, Pixelate, ASCII, Gradient map, Slice, Scanlines, Offset, Chromatic aberration, VHS, and Digital decay. Click the current effect name to choose a different effect. Each layer supports opacity, randomization, and reset. Rendering runs on demand, caches unchanged layers, and uses seeded patterns rather than continuous animation. Legacy single-effect recipes still load.
+
+Save closes the editor and persists the edit in the background, with a shimmer around the photo while saving. Failed saves preserve local changes and offer Retry below the photo. Discard or Escape restores the settings from when the editor opened. The current and previous recipes live in private Vercel Blob storage; image files are not uploaded.
 
 Connect a private Blob store to the Vercel project. For local development, add `BLOB_STORE_ID` and `BLOB_READ_WRITE_TOKEN` to the ignored `.env.local` file. Production, individual preview deployments, and local development use separate paths under `photo-edits/`.
 

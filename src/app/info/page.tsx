@@ -110,13 +110,13 @@ export default function InfoPage() {
                 Ways of Working
               </h2>
               <ul className="list-disc space-y-2 pl-5 text-base leading-relaxed text-muted-foreground">
-                <li><strong>High craft, high agency.</strong> I care about the details, but I don&apos;t wait for perfect inputs to move. I&apos;ll make the call, build something, get signal, and keep going.</li>
-                <li><strong>End-to-end ownership.</strong> I like working from an ambiguous problem through product direction, interaction design, prototyping, and shipped UI.</li>
-                <li><strong>I&apos;m a builder.</strong> I work close to engineering and increasingly directly in code, using prototypes and working software to explore ideas quickly.</li>
-                <li><strong>I like working through ambiguity toward clarity.</strong> I’m comfortable when the problem isn’t fully formed, and I enjoy turning complexity into clearer models, language, and product direction.</li>
-                <li><strong>Coherence over uniformity.</strong> I care more about a product making sense as a system than forcing every surface into the same pattern. The underlying concepts, language, and behavior should still be clear and dependable.</li>
-                <li><strong>I’m interested in genuinely AI-native products.</strong> That means embracing non-determinism, designing for people and agents together, and rethinking interaction models where AI changes what’s possible, rather than adding a copilot to familiar workflows.</li>
-                <li><strong>Pragmatic about process.</strong> I&apos;ll use whatever helps us understand the problem and ship a better product, and drop whatever doesn&apos;t.</li>
+                <li>I care a lot about craft, but I also like to move. I’m comfortable making calls with incomplete information, putting something in front of people, and learning from it.</li>
+                <li>I like owning problems end-to-end, from figuring out what we should be doing through to the details of what actually ships.</li>
+                <li>I’m happiest working closely with engineers. Increasingly that means getting into the code myself, building prototypes, and using working software to think through problems.</li>
+                <li>I enjoy ambiguity and the process of finding clarity in it. A lot of design, to me, is gradually getting to a better understanding of the problem, the language around it, and what actually matters.</li>
+                <li>I care about systems, but not uniformity for its own sake. Different problems sometimes need different patterns. What matters more to me is that the whole thing feels coherent and that the underlying concepts are clear.</li>
+                <li>I’m particularly interested in what AI changes about how products should work. I think there’s limited value in taking familiar software patterns and adding a copilot to them. The more interesting work is figuring out what becomes possible when you design around AI and its non-determinism from the beginning.</li>
+                <li>I’m not precious about process or tools. I’ll use whatever helps me understand something, communicate it, or get it built.</li>
               </ul>
             </div>
           </BlurFade>
@@ -132,7 +132,7 @@ export default function InfoPage() {
                 <DndHoverCard>D&amp;D player</DndHoverCard>.
               </p>
               <p className="text-base leading-relaxed text-muted-foreground">
-                I&apos;ve been making electronic music for years, alongside a longstanding interest in guitars and recording. These days I spend a lot of my free time making music, running, getting outside, and figuring out how to balance ambitious work with having a life I actually want to live.
+                I&apos;ve made electronic music for most of my <s className="opacity-50">adult</s> life, and still spend a lot of time thinking about modular synthesizers. I run a lot, like being outside, and increasingly care about building a life where ambitious work can coexist with family, health, and having enough time left to make things just because I want to.
               </p>
             </div>
           </BlurFade>

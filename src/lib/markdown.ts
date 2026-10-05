@@ -227,13 +227,13 @@ I’m a Staff Product Designer and builder with a high bar for craft and a bias 
 
 ## Ways of Working
 
-- **High craft, high agency.** I care about the details, but I don't wait for perfect inputs to move. I'll make the call, build something, get signal, and keep going.
-- **End-to-end ownership.** I like working from an ambiguous problem through product direction, interaction design, prototyping, and shipped UI.
-- **I'm a builder.** I work close to engineering and increasingly directly in code, using prototypes and working software to explore ideas quickly.
-- **I like working through ambiguity toward clarity.** I’m comfortable when the problem isn’t fully formed, and I enjoy turning complexity into clearer models, language, and product direction.
-- **Coherence over uniformity.** I care more about a product making sense as a system than forcing every surface into the same pattern. The underlying concepts, language, and behavior should still be clear and dependable.
-- **I’m interested in genuinely AI-native products.** That means embracing non-determinism, designing for people and agents together, and rethinking interaction models where AI changes what’s possible, rather than adding a copilot to familiar workflows.
-- **Pragmatic about process.** I'll use whatever helps us understand the problem and ship a better product, and drop whatever doesn't.
+- I care a lot about craft, but I also like to move. I’m comfortable making calls with incomplete information, putting something in front of people, and learning from it.
+- I like owning problems end-to-end, from figuring out what we should be doing through to the details of what actually ships.
+- I’m happiest working closely with engineers. Increasingly that means getting into the code myself, building prototypes, and using working software to think through problems.
+- I enjoy ambiguity and the process of finding clarity in it. A lot of design, to me, is gradually getting to a better understanding of the problem, the language around it, and what actually matters.
+- I care about systems, but not uniformity for its own sake. Different problems sometimes need different patterns. What matters more to me is that the whole thing feels coherent and that the underlying concepts are clear.
+- I’m particularly interested in what AI changes about how products should work. I think there’s limited value in taking familiar software patterns and adding a copilot to them. The more interesting work is figuring out what becomes possible when you design around AI and its non-determinism from the beginning.
+- I’m not precious about process or tools. I’ll use whatever helps me understand something, communicate it, or get it built.
 
 ## Skills
 
@@ -250,7 +250,7 @@ Product strategy, problem framing, information architecture, interaction design,
 
 I'm a parent, husband, runner, musician, and D&D player.
 
-I've been making electronic music for years, alongside a longstanding interest in guitars and recording. These days I spend a lot of my free time making music, running, getting outside, and figuring out how to balance ambitious work with having a life I actually want to live.
+I've made electronic music for most of my ~~adult~~ life, and still spend a lot of time thinking about modular synthesizers. I run a lot, like being outside, and increasingly care about building a life where ambitious work can coexist with family, health, and having enough time left to make things just because I want to.
 
 ## Contact
 

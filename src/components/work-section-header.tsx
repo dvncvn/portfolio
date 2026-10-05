@@ -40,7 +40,7 @@ export function WorkSectionHeader({ projects }: WorkSectionHeaderProps) {
   const introText = {
     name: "Simon Duncan",
     bio: "I’m a Staff Product Designer and builder with a high bar for craft and a bias toward action, drawn to complex products across AI, developer tools, and data.",
-    personal: "I'm a parent, husband, runner, musician, and D&D player. I've been making electronic music for years, alongside a longstanding interest in guitars and recording. These days I spend a lot of my free time making music, running, getting outside, and figuring out how to balance ambitious work with having a life I actually want to live.",
+    personal: "I'm a parent, husband, runner, musician, and D&D player. I've made electronic music for most of my life, and still spend a lot of time thinking about modular synthesizers. I run a lot, like being outside, and increasingly care about building a life where ambitious work can coexist with family, health, and having enough time left to make things just because I want to.",
     imageSrc: "/assets/profile.png",
   };
 

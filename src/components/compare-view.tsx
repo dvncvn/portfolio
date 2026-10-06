@@ -2,7 +2,21 @@
 
 import { useMemo, useRef, useState, useCallback, useLayoutEffect, useEffect } from "react";
 import { BlurFade } from "@/components/ui/blur-fade";
-import { animate, useReducedMotion } from "framer-motion";
+import { animate, cubicBezier, motion, useReducedMotion } from "framer-motion";
+
+const compareDuration = 0.7;
+const compareEase = cubicBezier(0.65, 0, 0.25, 1);
+
+const trailPixels = Array.from({ length: 384 }, (_, index) => ({
+  // Sixteen particles per cluster, with a little irregularity along the divider.
+  y: 2 + (Math.floor(index / 16) / 23) * 96 + ((index * 7) % 5 - 2) * 0.3,
+  size: index % 3 === 0 ? 2 : 1,
+  spread: (4 + ((index * 7) % 9)) * (index % 5 === 0 ? -0.5 : 1),
+  lift: 2 + ((index * 11) % 6),
+  fall: 2 + ((index * 3) % 5),
+  shade: 180 + ((index * 13) % 76),
+  delay: (index === 383 ? 0.5 : 0.05 + (index % 16) * (0.33 / 15) + ((index * 5) % 7) * 0.016) * (compareDuration / 0.55),
+}));
 
 type CompareViewProps = {
   beforeSrc: string;
@@ -30,6 +44,8 @@ export function CompareView({
   const containerRef = useRef<HTMLDivElement>(null);
   const rafRef = useRef<number | null>(null);
   const slideRef = useRef<{ stop: () => void } | null>(null);
+  const trailIdRef = useRef(0);
+  const [trail, setTrail] = useState<{ id: number; from: number; to: number } | null>(null);
   const reduceMotion = useReducedMotion();
   const [containerWidth, setContainerWidth] = useState(0);
   const [actualAspectRatio, setActualAspectRatio] = useState<string | null>(null);
@@ -38,9 +54,12 @@ export function CompareView({
   const showImage = useCallback((target: number) => {
     slideRef.current?.stop();
     if (rafRef.current !== null) cancelAnimationFrame(rafRef.current);
+    setTrail(!reduceMotion && Math.abs(target - value) > 0.01
+      ? { id: ++trailIdRef.current, from: value, to: target }
+      : null);
     slideRef.current = animate(value, target, {
-      duration: reduceMotion ? 0 : 0.55,
-      ease: [0.4, 0, 0.2, 1],
+      duration: reduceMotion ? 0 : compareDuration,
+      ease: compareEase,
       onUpdate: setValue,
     });
   }, [value, reduceMotion]);
@@ -80,6 +99,7 @@ export function CompareView({
 
   const updateFromClientX = useCallback((clientX: number) => {
     slideRef.current?.stop();
+    setTrail(null);
     const rect = containerRef.current?.getBoundingClientRect();
     if (!rect) return;
     const next = (clientX - rect.left) / rect.width;
@@ -169,6 +189,30 @@ export function CompareView({
               draggable={false}
             />
           </div>
+
+          {trail && !reduceMotion ? (
+            <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
+              {trailPixels.map(({ y, size, spread, lift, fall, shade, delay }, index) => (
+                <motion.span
+                  key={`${trail.id}-${index}`}
+                  className="absolute"
+                  // Emit at the divider's position at this delay, then leave the pixel behind.
+                  style={{ left: `${(trail.from + (trail.to - trail.from) * compareEase(delay / compareDuration)) * 100}%`, top: `${y}%`, width: size, height: size, marginLeft: -size / 2, marginTop: -size / 2, backgroundColor: `rgb(${shade}, ${shade}, ${shade})` }}
+                  initial={{ x: 0, y: 0, scale: 0.4, opacity: 0 }}
+                  animate={{
+                    x: [0, 0.25, 0.65, 1].map(distance => -Math.sign(trail.to - trail.from) * spread * distance),
+                    y: [0, -lift * 0.4, -lift, fall],
+                    scale: [0.4, 1, 1, 0.25],
+                    opacity: [0, 0.45, 0.3, 0],
+                  }}
+                  transition={{ duration: 0.85, delay, times: [0, 0.18, 0.48, 1], ease: "easeOut" }}
+                  onAnimationComplete={index === trailPixels.length - 1 ? () => {
+                    setTrail(current => current?.id === trail.id ? null : current);
+                  } : undefined}
+                />
+              ))}
+            </div>
+          ) : null}
 
           <div className="absolute inset-y-0" style={{ left: lineLeft }}>
             <div className="pointer-events-none absolute left-1/2 top-0 h-full w-[2px] -translate-x-1/2 bg-white/35" />

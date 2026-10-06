@@ -2,37 +2,43 @@
 
 import { EmploymentTable, type EmploymentRow } from "@/components/employment-table";
 import { BlurFade } from "@/components/ui/blur-fade";
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { useResume } from "@/contexts/resume-context";
 import { PageContentRegistrar } from "@/components/page-content-registrar";
 import { infoPageToMarkdown } from "@/lib/markdown";
 import { ProfilePhoto } from "@/components/profile-photo";
+import styles from "./info.module.css";
 import { DndHoverCard } from "@/components/dnd-hover-card";
 
+const arrowBlocks = [
+  { x: 0, y: 8, opacity: .2 },
+  { x: 4, y: 8, opacity: .4 },
+  { x: 8, y: 8, opacity: .5 },
+  { x: 12, y: 8, opacity: .8 },
+  { x: 16, y: 0, opacity: 1 },
+  { x: 16, y: 4, opacity: 1 },
+  { x: 16, y: 12, opacity: 1 },
+  { x: 16, y: 16, opacity: 1 },
+  { x: 20, y: 4, opacity: 1 },
+  { x: 20, y: 8, opacity: 1 },
+  { x: 20, y: 12, opacity: 1 },
+  { x: 24, y: 8, opacity: 1 },
+];
+
 function ActivityIndicator() {
+  const reducedMotion = useReducedMotion();
   return (
     <motion.svg
-      width="26"
-      height="18"
-      viewBox="0 0 26 18"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      initial={{ opacity: 0, y: 12 }}
+      width="26" height="18" viewBox="0 0 26 18" fill="var(--highlight)"
+      aria-hidden="true" className={styles.activityArrow}
+      initial={{ opacity: 0, y: reducedMotion ? 0 : 12 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6, ease: "easeOut", delay: 0.2 }}
+      transition={{ duration: reducedMotion ? 0 : 0.6, ease: "easeOut", delay: reducedMotion ? 0 : 0.2 }}
     >
-      <rect x="18" y="3.99951" width="2" height="2" transform="rotate(90 18 3.99951)" fill="var(--highlight)"/>
-      <rect opacity="0.4" x="6" y="7.99951" width="2" height="2" transform="rotate(90 6 7.99951)" fill="var(--highlight)"/>
-      <rect x="22.001" y="4" width="2" height="2" transform="rotate(90 22.001 4)" fill="var(--highlight)"/>
-      <rect x="22" y="7.99951" width="2" height="2" transform="rotate(90 22 7.99951)" fill="var(--highlight)"/>
-      <rect opacity="0.5" x="10" y="7.99951" width="2" height="2" transform="rotate(90 10 7.99951)" fill="var(--highlight)"/>
-      <rect opacity="0.8" x="14" y="7.99951" width="2" height="2" transform="rotate(90 14 7.99951)" fill="var(--highlight)"/>
-      <rect opacity="0.2" x="2" y="7.99951" width="2" height="2" transform="rotate(90 2 7.99951)" fill="var(--highlight)"/>
-      <rect x="22.001" y="12" width="2" height="2" transform="rotate(90 22.001 12)" fill="var(--highlight)"/>
-      <rect x="18.001" y="12" width="2" height="2" transform="rotate(90 18.001 12)" fill="var(--highlight)"/>
-      <rect x="18.001" y="16" width="2" height="2" transform="rotate(90 18.001 16)" fill="var(--highlight)"/>
-      <rect x="26.001" y="8" width="2" height="2" transform="rotate(90 26.001 8)" fill="var(--highlight)"/>
-      <rect x="18.001" y="2.27308e-06" width="2" height="2" transform="rotate(90 18.001 2.27308e-06)" fill="var(--highlight)"/>
+      {arrowBlocks.map(({ x, y, opacity }) => (
+        <rect key={`${x}-${y}`} x={x} y={y} width="2" height="2" opacity={opacity}
+          style={{ "--block-opacity": opacity, animationDelay: `${x / 4 * 32}ms` } as React.CSSProperties} />
+      ))}
     </motion.svg>
   );
 }

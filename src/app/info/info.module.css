@@ -1,0 +1,14 @@
+.activityArrow { overflow: visible; }
+.activityArrow:hover rect {
+  animation: arrowBlockRipple 480ms cubic-bezier(.4, 0, .2, 1) both;
+}
+
+@keyframes arrowBlockRipple {
+  0%, 100% { transform: translateX(0); opacity: var(--block-opacity); }
+  30% { transform: translateX(-2px); opacity: .15; }
+  65% { transform: translateX(2px); opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .activityArrow:hover rect { animation: none; }
+}

@@ -2,6 +2,7 @@
 
 import { useMemo, useRef, useState, useCallback, useLayoutEffect, useEffect } from "react";
 import { BlurFade } from "@/components/ui/blur-fade";
+import { animate, useReducedMotion } from "framer-motion";
 
 type CompareViewProps = {
   beforeSrc: string;
@@ -28,8 +29,26 @@ export function CompareView({
   const [lightboxAlt, setLightboxAlt] = useState<string | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const rafRef = useRef<number | null>(null);
+  const slideRef = useRef<{ stop: () => void } | null>(null);
+  const reduceMotion = useReducedMotion();
   const [containerWidth, setContainerWidth] = useState(0);
   const [actualAspectRatio, setActualAspectRatio] = useState<string | null>(null);
+  const isComparisonCaption = /^before\s*\/\s*after$/i.test(description?.trim() ?? "");
+
+  const showImage = useCallback((target: number) => {
+    slideRef.current?.stop();
+    if (rafRef.current !== null) cancelAnimationFrame(rafRef.current);
+    slideRef.current = animate(value, target, {
+      duration: reduceMotion ? 0 : 0.55,
+      ease: [0.4, 0, 0.2, 1],
+      onUpdate: setValue,
+    });
+  }, [value, reduceMotion]);
+
+  useEffect(() => () => {
+    slideRef.current?.stop();
+    if (rafRef.current !== null) cancelAnimationFrame(rafRef.current);
+  }, []);
   
   const clip = useMemo(() => {
     if (!containerWidth) return "50%";
@@ -60,6 +79,7 @@ export function CompareView({
   }, []);
 
   const updateFromClientX = useCallback((clientX: number) => {
+    slideRef.current?.stop();
     const rect = containerRef.current?.getBoundingClientRect();
     if (!rect) return;
     const next = (clientX - rect.left) / rect.width;
@@ -159,7 +179,8 @@ export function CompareView({
               aria-valuemin={0}
               aria-valuemax={100}
               aria-valuenow={Math.round(value * 100)}
-              className="pointer-events-auto absolute left-1/2 top-0 h-full w-10 -translate-x-1/2 cursor-pointer"
+              aria-valuetext={`${Math.round((1 - value) * 100)}% before, ${Math.round(value * 100)}% after`}
+              className={`pointer-events-auto absolute left-1/2 top-0 h-full w-10 -translate-x-1/2 ${isDragging ? "cursor-grabbing" : "cursor-grab"}`}
               onPointerDown={handleHandlePointerDown}
               onPointerMove={handleHandlePointerMove}
               onPointerUp={handleHandlePointerUp}
@@ -230,7 +251,33 @@ export function CompareView({
       </BlurFade>
       {description ? (
         <div className="text-center">
-          <p className="text-[14px] leading-relaxed text-muted-foreground">{description}</p>
+          {isComparisonCaption ? (
+            <>
+              <p className="hidden items-center justify-center gap-2 text-[14px] leading-relaxed text-muted-foreground sm:flex">
+                {[{ label: "Before", share: 1 - value }, { label: "After", share: value }].map(({ label, share }, index) => (
+                  <span key={label} className="contents">
+                    {index > 0 ? <span className="opacity-40">/</span> : null}
+                    <button
+                      type="button"
+                      className="relative cursor-pointer rounded-sm pb-1 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-highlight"
+                      onClick={() => showImage(index === 0 ? 0 : 1)}
+                      aria-label={`Show all of ${label.toLowerCase()}`}
+                      aria-pressed={share === 1}
+                    >
+                      {label}
+                      <span aria-hidden="true" className="absolute inset-x-0 top-0 text-foreground" style={{ clipPath: index === 0 ? `inset(0 ${(1 - share) * 100}% 0 0)` : `inset(0 0 0 ${(1 - share) * 100}%)` }}>{label}</span>
+                      <span className="absolute inset-x-0 bottom-0 h-px overflow-hidden rounded-full bg-foreground/10">
+                      <span className="absolute inset-0 bg-foreground/60" style={{ transform: `scaleX(${share})`, transformOrigin: index === 0 ? "left" : "right" }} />
+                      </span>
+                    </button>
+                  </span>
+                ))}
+              </p>
+              <p className="text-[14px] leading-relaxed text-muted-foreground sm:hidden">{description}</p>
+            </>
+          ) : (
+            <p className="text-[14px] leading-relaxed text-muted-foreground">{description}</p>
+          )}
         </div>
       ) : null}
 
@@ -255,4 +302,3 @@ export function CompareView({
     </div>
   );
 }
-

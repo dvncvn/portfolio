@@ -14,7 +14,7 @@
 .panel:focus { outline: none; }
 .panel[open] { display: flex; flex-direction: column; }
 .panel::backdrop { background: transparent; }
-.studioBody { flex: 1; display: grid; grid-template-columns: 220px minmax(0, 1fr) 340px; min-height: 0; }
+.studioBody { flex: 1; display: grid; grid-template-columns: 300px minmax(0, 1fr) 340px; min-height: 0; }
 .stage { display: flex; flex-direction: column; min-width: 0; min-height: 0; padding: 24px 8px; }
 .canvasArea { flex: 1; min-height: 0; display: flex; justify-content: center; align-items: center; padding: 16px 16px 80px; }
 .photoFrame { position: relative; width: min(100%, max(260px, min(85%, calc((100dvh - 192px) * .68)))); max-width: 612px; }
@@ -220,7 +220,7 @@
 .layerGrip { cursor: grab; touch-action: none; }
 .layerGrip:active { cursor: grabbing; }
 .layerName { flex: 1; min-width: 0; display: inline-flex; align-items: center; gap: 6px; transition: color 180ms ease-out; padding: 6px 0; margin-right: auto; border-radius: var(--control-radius); font-size: 14px; line-height: 20px; text-align: left; cursor: pointer; }
-.layerName > span { white-space: normal; overflow-wrap: anywhere; }
+.layerName > span { white-space: nowrap; }
 .layerList li[data-enabled="false"] .layerName { color: #888; }
 @media (prefers-reduced-motion: reduce) { .layerName { transition: none; } }
 .layerRemove { opacity: 0; pointer-events: none; }

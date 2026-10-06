@@ -24,18 +24,22 @@ export function ProfilePhoto() {
   const tilt = usePhotoTilt();
   const reducedMotion = useReducedMotion();
   const guideMaskId = useId();
-  const addLayerTooltipId = useId();
-  const [addTooltipPosition, setAddTooltipPosition] = useState<{ left: number; top: number } | null>(null);
-  const showAddTooltip = (element: HTMLElement) => {
-    const anchor = element.getBoundingClientRect();
+  const layerTooltipId = useId();
+  const [layerTooltip, setLayerTooltip] = useState<{ left: number; top: number; text: string; shortcut?: string } | null>(null);
+  const showLayerTooltip = (target: EventTarget) => {
+    const element = (target as HTMLElement).closest<HTMLElement>("[data-layer-tooltip]");
     const panel = panelRef.current?.getBoundingClientRect();
-    if (panel) {
-      const fitsRight = anchor.right + 140 <= panel.right;
-      setAddTooltipPosition({
-        left: fitsRight ? anchor.right - panel.left + 8 : Math.max(16, panel.width - 132),
-        top: fitsRight ? anchor.top - panel.top + anchor.height / 2 : anchor.bottom - panel.top + 24,
-      });
-    }
+    if (!element || !panel || closingRef.current) return;
+    const anchor = element.getBoundingClientRect();
+    const text = element.dataset.layerTooltip!;
+    const shortcut = element.dataset.tooltipShortcut;
+    const width = Math.min(panel.width - 32, text.length * 7 + (shortcut ? 66 : 18));
+    const fitsRight = anchor.right + width + 8 <= panel.right;
+    setLayerTooltip({
+      text, shortcut,
+      left: fitsRight ? anchor.right - panel.left + 8 : Math.max(16, panel.width - width - 16),
+      top: fitsRight ? anchor.top - panel.top + anchor.height / 2 : Math.min(panel.height - 24, anchor.bottom - panel.top + 24),
+    });
   };
   const [guidesReady, setGuidesReady] = useState(false);
   const photoRef = useRef<HTMLDivElement>(null);
@@ -126,12 +130,12 @@ export function ProfilePhoto() {
     if (closingRef.current) return;
     changeLayers(() => []);
     setSelectedLayerId(null);
-    setAddTooltipPosition(null);
+    setLayerTooltip(null);
     browseEffects("add");
   };
   const openFromPhoto = (event: MouseEvent<HTMLButtonElement>) => {
     openedWithPointer.current = event.detail > 0;
-    setAddTooltipPosition(null);
+    setLayerTooltip(null);
     setGuidesReady(false);
     setEffectPicker(layers.length === 0 ? "add" : null);
     entryRecipe.current = shared.recipe;
@@ -146,7 +150,7 @@ export function ProfilePhoto() {
     panel.showModal();
     flushSync(() => { setPreviewWidth(source.clientWidth); setShowControls(true); });
     panel.focus({ preventScroll: true });
-    setAddTooltipPosition(null);
+    setLayerTooltip(null);
     if (previewRef.current) void transitionStudio(panel, source, previewRef.current, true, () => {
       if (!closingRef.current) setGuidesReady(true);
     });
@@ -154,7 +158,7 @@ export function ProfilePhoto() {
   const closeStudio = async () => {
     if (closingRef.current) return;
     closingRef.current = true;
-    setAddTooltipPosition(null);
+    setLayerTooltip(null);
     const panel = panelRef.current;
     const target = photoRef.current?.querySelector<HTMLElement>("[data-photo-surface]");
     const actions = panel?.querySelector<HTMLElement>(`.${styles.saveActions}`);
@@ -212,7 +216,7 @@ export function ProfilePhoto() {
     changeLayers(() => next);
     setSelectedLayerId(next[0].id);
     setEffectPicker(null);
-    setAddTooltipPosition(null);
+    setLayerTooltip(null);
   };
 
   return (
@@ -251,7 +255,7 @@ export function ProfilePhoto() {
               aria-label="Edit photo"
               tabIndex={-1}
               autoFocus
-              onScrollCapture={() => setAddTooltipPosition(null)}
+              onScrollCapture={() => setLayerTooltip(null)}
               onKeyDown={(event) => {
                 if (event.defaultPrevented || event.repeat || !event.shiftKey || event.ctrlKey || event.metaKey || event.altKey || event.key.toLowerCase() !== "n") return;
                 if ((event.target as HTMLElement).closest('textarea, select, input:not([type="range"]):not([type="checkbox"]):not([type="radio"]):not([type="button"]), [contenteditable]:not([contenteditable="false"])')) return;
@@ -268,23 +272,24 @@ export function ProfilePhoto() {
               className={styles.panel}
             >
               <div className={styles.studioBody}>
-                <motion.aside layoutScroll className={styles.layersPanel} aria-label="Effect layers">
+                <motion.aside layoutScroll className={styles.layersPanel} aria-label="Effect layers"
+                  onPointerOver={(event) => { if (event.pointerType !== "touch" && event.buttons === 0) showLayerTooltip(event.target); }}
+                  onPointerOut={() => setLayerTooltip(null)}
+                  onPointerDown={() => setLayerTooltip(null)}
+                  onFocusCapture={(event) => { if (event.target.matches(":focus-visible")) showLayerTooltip(event.target); }}
+                  onBlurCapture={() => setLayerTooltip(null)}>
                   <div className={styles.layersHeading}>
                     <h2>Layers</h2>
                     <div className={styles.layerHeaderActions}>
-                    <button type="button" className={styles.layerAdd} aria-label="Randomize design" title="Randomize design · 6 layers" onClick={randomizeDesign}><Dices size={14} aria-hidden="true" /></button>
-                    <button type="button" className={styles.layerAdd} aria-label="New design" title="New design" disabled={layers.length === 0} onClick={newDesign}><RotateCcw size={14} aria-hidden="true" /></button>
-                    <span className={styles.layerAddWrap}
-                      onPointerEnter={(event) => { if (event.pointerType !== "touch") showAddTooltip(event.currentTarget); }}
-                      onPointerLeave={() => setAddTooltipPosition(null)}
-                      onFocus={(event) => { if (event.target.matches(":focus-visible")) showAddTooltip(event.currentTarget); }}
-                      onBlur={() => setAddTooltipPosition(null)}>
-                      <button type="button" className={styles.layerAdd} aria-label="Add layer" aria-describedby={addLayerTooltipId} aria-keyshortcuts="Shift+N" disabled={layers.length >= PHOTO_LAYER_LIMIT || effectPicker === "add"} onClick={() => browseEffects("add")}><Plus size={16} aria-hidden="true" /></button>
+                    <button type="button" className={styles.layerAdd} aria-label="Randomize design" data-layer-tooltip="Randomize design" data-tooltip-shortcut="1–6 layers" aria-describedby={layerTooltipId} onClick={randomizeDesign}><Dices size={14} aria-hidden="true" /></button>
+                    <button type="button" className={styles.layerAdd} aria-label="New design" data-layer-tooltip="New design" aria-describedby={layerTooltipId} disabled={layers.length === 0} onClick={newDesign}><RotateCcw size={14} aria-hidden="true" /></button>
+                    <span className={styles.layerAddWrap} data-layer-tooltip={layers.length >= PHOTO_LAYER_LIMIT ? "6 layer limit" : effectPicker === "add" ? "Choose an effect" : "Add layer"} data-tooltip-shortcut={layers.length >= PHOTO_LAYER_LIMIT || effectPicker === "add" ? undefined : "⇧ N"}>
+                      <button type="button" className={styles.layerAdd} aria-label="Add layer" aria-describedby={layerTooltipId} aria-keyshortcuts="Shift+N" disabled={layers.length >= PHOTO_LAYER_LIMIT || effectPicker === "add"} onClick={() => browseEffects("add")}><Plus size={16} aria-hidden="true" /></button>
 
                     </span>
                     </div>
                   </div>
-                  <LayerList key={showControls ? "editing" : "closed"} layers={layers} selectedId={effectPicker === "add" ? undefined : selectedLayer?.id}
+                  <LayerList tooltipId={layerTooltipId} key={showControls ? "editing" : "closed"} layers={layers} selectedId={effectPicker === "add" ? undefined : selectedLayer?.id}
                     onSelect={(id) => { setSelectedLayerId(id); setEffectPicker(null); }}
                     onToggle={(id) => changeLayers((current) => current.map((item) => item.id === id ? { ...item, enabled: !item.enabled } : item))}
                     onReorder={(ids) => {
@@ -305,7 +310,7 @@ export function ProfilePhoto() {
                   {effectPicker === "add" && <div className={styles.pendingLayer}>
                     <Plus size={14} aria-hidden="true" />
                     <button type="button" className={styles.pendingLayerLabel} onClick={() => focusPanel("[data-effect-chooser] button")}>Choose effect</button>
-                    <button type="button" className={styles.layerRemove} aria-label="Cancel new layer" onClick={cancelEffectPicker}><X size={14} aria-hidden="true" /></button>
+                    <button type="button" className={styles.layerRemove} aria-label="Cancel new layer" data-layer-tooltip="Cancel new layer" aria-describedby={layerTooltipId} onClick={cancelEffectPicker}><X size={14} aria-hidden="true" /></button>
                   </div>}
                 </motion.aside>
                 <section className={styles.stage} aria-label="Photo preview">
@@ -450,8 +455,8 @@ export function ProfilePhoto() {
 
                 </aside>
               </div>
-              {addTooltipPosition && showControls && <span id={addLayerTooltipId} role="tooltip" className={styles.layerAddTooltip} style={addTooltipPosition}>
-                {layers.length >= PHOTO_LAYER_LIMIT ? "6 layer limit" : effectPicker === "add" ? "Choose an effect" : <>Add layer <kbd>⇧ N</kbd></>}
+              {layerTooltip && showControls && <span id={layerTooltipId} role="tooltip" className={styles.layerAddTooltip} style={{ left: layerTooltip.left, top: layerTooltip.top }}>
+                {layerTooltip.text}{layerTooltip.shortcut && <kbd>{layerTooltip.shortcut}</kbd>}
               </span>}
             </dialog>
           </div>

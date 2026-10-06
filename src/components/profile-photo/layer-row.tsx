@@ -7,7 +7,8 @@ import type { PhotoLayer } from "@/lib/shared-photo";
 import { EFFECT_LABELS } from "@/lib/photo-effects";
 import styles from "./controls.module.css";
 
-export function LayerRow({ layer, index, selected, onSelect, onToggle, onRemove, onMove, constraints, releaseListenersRef, onStart, onFinish }: {
+export function LayerRow({ tooltipId, layer, index, selected, onSelect, onToggle, onRemove, onMove, constraints, releaseListenersRef, onStart, onFinish }: {
+  tooltipId: string;
   releaseListenersRef: RefObject<(() => void) | null>;
   constraints: RefObject<HTMLOListElement | null>; onStart: () => void; onFinish: (cancelled: boolean, pointerY?: number) => void;
   layer: PhotoLayer; index: number; selected: boolean;
@@ -31,7 +32,7 @@ export function LayerRow({ layer, index, selected, onSelect, onToggle, onRemove,
       transition={reduced ? { duration: 0 } : { type: "spring", stiffness: 500, damping: 40 }}>
       <button type="button" className={styles.layerSelect} data-layer-id={layer.id} aria-label={`Edit layer ${index + 1}: ${name}`} aria-pressed={selected} onClick={onSelect} />
       <button type="button" className={styles.layerGrip} aria-label={`Reorder layer ${index + 1}: ${name}`}
-        title="Drag to reorder, or use the up and down arrow keys"
+        data-layer-tooltip="Drag to reorder" data-tooltip-shortcut="↑ ↓" aria-describedby={tooltipId}
         onPointerDown={(event) => {
           if (event.button !== 0) return;
           event.preventDefault();
@@ -86,10 +87,10 @@ export function LayerRow({ layer, index, selected, onSelect, onToggle, onRemove,
         <span>{name}</span>
       </button>
       <button type="button" className={styles.layerVisibility} aria-label={`${layer.enabled ? "Hide" : "Show"} layer ${index + 1}: ${name}`}
-        title={layer.enabled ? "Hide layer" : "Show layer"} onClick={onToggle}>
+        data-layer-tooltip={layer.enabled ? "Hide layer" : "Show layer"} aria-describedby={tooltipId} onClick={onToggle}>
         {layer.enabled ? <Eye size={14} aria-hidden="true" /> : <EyeClosed size={14} aria-hidden="true" />}
       </button>
-      <button type="button" className={styles.layerRemove} aria-label={`Remove layer ${index + 1}: ${name}`} onClick={onRemove}>
+      <button type="button" className={styles.layerRemove} aria-label={`Remove layer ${index + 1}: ${name}`} data-layer-tooltip="Remove layer" aria-describedby={tooltipId} onClick={onRemove}>
         <X size={14} aria-hidden="true" />
       </button>
     </Reorder.Item>

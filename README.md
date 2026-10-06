@@ -44,7 +44,7 @@ public/assets/    Images and media
 
 ### Shared photo edits
 
-The info-page photo loads the last visitor's effect settings. Edit opens a full-screen studio with a live preview and up to six effect layers. Drag to reorder; select a layer to edit it and use its eye button to toggle visibility. The plus button or Shift+N adds a layer, the reset icon starts a new design, and the dice icon generates six different effects with randomized settings and opacity. Empty designs open with a Choose effect placeholder.
+The info-page photo loads the last visitor's effect settings. Edit opens a full-screen studio with a live preview and up to six effect layers. Drag to reorder; select a layer to edit it and use its eye button to toggle visibility. The plus button or Shift+N adds a layer, the reset icon starts a new design, and the dice icon generates one to six different effects with randomized settings and opacity. Empty designs open with a Choose effect placeholder.
 
 Effects include Dither, Pixelate, ASCII, Gradient map, Slice, Scanlines, Offset, Chromatic aberration, VHS, and Digital decay. Click the current effect name to choose a different effect. Each layer supports opacity, randomization, and reset. Rendering runs on demand, caches unchanged layers, and uses seeded patterns rather than continuous animation. Legacy single-effect recipes still load.
 

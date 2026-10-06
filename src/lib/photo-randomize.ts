@@ -36,7 +36,8 @@ export function randomPhotoLayers(random = Math.random): PhotoLayer[] {
     const j = Math.floor(random() * (i + 1));
     [effects[i], effects[j]] = [effects[j], effects[i]];
   }
-  return effects.slice(0, PHOTO_LAYER_LIMIT).map((effect) => ({
+  const count = 1 + Math.floor(random() * PHOTO_LAYER_LIMIT);
+  return effects.slice(0, count).map((effect) => ({
     id: createPhotoEditId(), effect, enabled: true,
     // Partial opacity lets earlier layers survive the more destructive effects.
     opacity: ['ascii', 'pixelate', 'dither'].includes(effect) ? 25 + Math.floor(random() * 36) : 40 + Math.floor(random() * 46),

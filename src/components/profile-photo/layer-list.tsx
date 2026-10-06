@@ -6,7 +6,8 @@ import type { PhotoLayer } from "@/lib/shared-photo";
 import { LayerRow } from "./layer-row";
 import styles from "./controls.module.css";
 
-export function LayerList({ layers, selectedId, onSelect, onToggle, onRemove, onReorder, onMove }: {
+export function LayerList({ tooltipId, layers, selectedId, onSelect, onToggle, onRemove, onReorder, onMove }: {
+  tooltipId: string;
   layers: PhotoLayer[]; selectedId?: string;
   onSelect: (id: string) => void; onToggle: (id: string) => void; onRemove: (id: string) => void;
   onReorder: (ids: string[]) => void; onMove: (id: string, direction: number) => void;
@@ -47,7 +48,7 @@ export function LayerList({ layers, selectedId, onSelect, onToggle, onRemove, on
       {ids.map((id, index) => {
         const layer = layers.find((item) => item.id === id);
         if (!layer) return null;
-        return <LayerRow key={id} layer={layer} index={index} selected={selectedId === id} constraints={list} releaseListenersRef={releaseListenersRef}
+        return <LayerRow tooltipId={tooltipId} key={id} layer={layer} index={index} selected={selectedId === id} constraints={list} releaseListenersRef={releaseListenersRef}
           onSelect={() => onSelect(id)} onToggle={() => onToggle(id)} onRemove={() => onRemove(id)} onMove={(direction) => onMove(id, direction)}
           onStart={() => { pending.current = layers.map((item) => item.id); setOrder(pending.current); }}
           onFinish={(cancelled, pointerY) => finish(id, cancelled, pointerY)} />;

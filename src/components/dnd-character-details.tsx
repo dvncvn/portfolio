@@ -11,6 +11,7 @@ import { CharacterRollPicker } from "./character-roll-picker";
 import { CharacterDie, type CharacterDieHandle } from "./character-die";
 
 const pixelPaths = {
+  banner: "M3 1h2v14H3V1zm3 1h8v2h-2v2h-2v2h2v2h2v2H6V2z",
   lantern: "M6 1h4v2h2v2h1v9H3V5h1V3h2V1zm0 2v2h4V3H6zM5 7v5h6V7H5zm1 8h4v1H6z",
   shield: "M2 2h12v8h-2v2h-2v2H6v-2H4v-2H2V2zm2 2v5h2v2h4V9h2V4H4z",
   heart: "M2 3h4v2h4V3h4v2h2v5h-2v2h-2v2h-2v2H6v-2H4v-2H2v-2H0V5h2V3z",

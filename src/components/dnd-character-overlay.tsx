@@ -176,8 +176,10 @@ function CharacterTakeover({ onClose }: Pick<DndCharacterOverlayProps, "onClose"
                   >
                     Perrin Burrowfen
                   </h1>
-                  <p className={`mt-1 text-muted-foreground ${styles.classLine}`}><CharacterIcon kind="lantern" glow /> Jerbeen Twilight Cleric</p>
-                  <p className={styles.campaign}>Turn of Fortune’s Fate</p>
+                  <div className={styles.characterMeta}>
+                    <p className={`text-muted-foreground ${styles.classLine}`}><CharacterIcon kind="lantern" glow /> Jerbeen Twilight Cleric</p>
+                    <p className={styles.campaign}><CharacterIcon kind="banner" /><span className="sr-only">Campaign: </span>Turn of Fortune’s Fate</p>
+                  </div>
                 </div>
 
                 <section>

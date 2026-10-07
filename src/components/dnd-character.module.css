@@ -97,13 +97,18 @@
 .sheet h2 { color: #c5b5d0; font-size: 32px; }
 /* Text shimmer temporarily makes list text transparent; markers keep their ink. */
 .sheet li::marker { color: var(--muted-foreground); }
+.characterMeta { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 20px; margin-top: 8px; }
+.characterMeta > p { white-space: nowrap; }
 .campaign {
-  margin-top: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
   color: #b5a17f;
   font-size: 11px;
   font-family: var(--font-geist-mono), monospace;
   letter-spacing: 0.04em;
 }
+.campaign .pixelIcon { color: inherit; }
 .characterStats { max-width: 320px; margin: 0 auto; width: 100%; }
 .statGrid { position: relative; margin-top: 20px; }
 .statGridLines {

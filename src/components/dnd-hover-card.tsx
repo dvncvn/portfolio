@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useRef, useCallback } from "react";
-import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
+import { motion, AnimatePresence, useReducedMotion, useIsPresent } from "framer-motion";
 import { createPortal } from "react-dom";
 import { DndCharacterOverlay } from "./dnd-character-overlay";
 import styles from "./dnd-character.module.css";
@@ -16,14 +16,48 @@ const POPOVER_HEIGHT = 332;
 const POPOVER_WIDTH = 264;
 const GAP = 12;
 
-export function DndHoverCard({ children, zIndex = 50, position = "above" }: DndHoverCardProps) {
+// An exiting preview must stop hit-testing immediately, even while it fades.
+function PreviewSurface({ children, style, position, onEnter, onLeave }: {
+  children: React.ReactNode;
+  style: React.CSSProperties;
+  position: "above" | "below";
+  onEnter: () => void;
+  onLeave: () => void;
+}) {
+  const present = useIsPresent();
   const reducedMotion = useReducedMotion();
+  return <motion.div
+    initial={{ opacity: 0, y: reducedMotion ? 0 : position === "above" ? 6 : -6 }}
+    animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
+    transition={{ duration: reducedMotion ? 0 : 0.2, ease: [0.22, 1, 0.36, 1] }}
+    style={{ ...style, pointerEvents: present ? 'auto' : 'none' }}
+    inert={!present}
+    onPointerEnter={onEnter} onPointerLeave={onLeave}>
+    {children}
+  </motion.div>;
+}
+
+export function DndHoverCard({ children, zIndex = 50, position = "above" }: DndHoverCardProps) {
   const [isHovered, setIsHovered] = useState(false);
   const [overlayOpen, setOverlayOpen] = useState(false);
   const [popoverStyles, setPopoverStyles] = useState<React.CSSProperties>({});
-  const triggerRef = useRef<HTMLSpanElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
   const suppressHoverRef = useRef(false);
-  const closeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const pointerRef = useRef<{ x: number; y: number } | null>(null);
+  const closeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const openTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const previewOpen = useRef(false);
+  const clearTimers = useCallback(() => {
+    if (closeTimeoutRef.current) clearTimeout(closeTimeoutRef.current);
+    if (openTimeoutRef.current) clearTimeout(openTimeoutRef.current);
+    closeTimeoutRef.current = null;
+    openTimeoutRef.current = null;
+  }, []);
+  const closePreview = useCallback(() => {
+    clearTimers();
+    previewOpen.current = false;
+    setIsHovered(false);
+  }, [clearTimers]);
 
   // Measure on hover, before displaying the preview.
   const getStyles = useCallback((): React.CSSProperties => {
@@ -43,70 +77,85 @@ export function DndHoverCard({ children, zIndex = 50, position = "above" }: DndH
     };
   }, [position, zIndex]);
 
-  const handleMouseEnter = useCallback(() => {
-    if (suppressHoverRef.current) return;
-    if (closeTimeoutRef.current) {
-      clearTimeout(closeTimeoutRef.current);
-      closeTimeoutRef.current = null;
-    }
-    setPopoverStyles(getStyles());
-    setIsHovered(true);
-  }, [getStyles]);
+  const enterTrigger = () => {
+    if (overlayOpen || suppressHoverRef.current) return;
+    clearTimers();
+    openTimeoutRef.current = setTimeout(() => {
+      openTimeoutRef.current = null;
+      setPopoverStyles(getStyles());
+      previewOpen.current = true;
+      setIsHovered(true);
+    }, 100);
+  };
 
-  const handleMouseLeave = useCallback(() => {
-    // Generous delay to allow moving between trigger and popover
-    closeTimeoutRef.current = setTimeout(() => {
-      setIsHovered(false);
-    }, 150);
-  }, []);
+  const enterPreview = () => {
+    // Keeping an open preview alive must never resurrect an exiting one.
+    if (previewOpen.current && !suppressHoverRef.current) clearTimers();
+  };
+  const leavePreview = () => {
+    clearTimers();
+    closeTimeoutRef.current = setTimeout(closePreview, 200);
+  };
 
-  // Cleanup timeout on unmount
   useEffect(() => {
-    return () => {
-      if (closeTimeoutRef.current) {
-        clearTimeout(closeTimeoutRef.current);
+    const dismiss = () => closePreview();
+    const trackPointer = (event: PointerEvent) => {
+      pointerRef.current = { x: event.clientX, y: event.clientY };
+    };
+    const escape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape' && previewOpen.current) {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        suppressHoverRef.current = true;
+        closePreview();
       }
     };
-  }, []);
+    window.addEventListener('scroll', dismiss, true);
+    window.addEventListener('pointermove', trackPointer, { passive: true });
+    window.addEventListener('resize', dismiss);
+    window.addEventListener('blur', dismiss);
+    window.addEventListener('keydown', escape, true);
+    document.addEventListener('visibilitychange', dismiss);
+    return () => {
+      clearTimers();
+      window.removeEventListener('scroll', dismiss, true);
+      window.removeEventListener('pointermove', trackPointer);
+      window.removeEventListener('resize', dismiss);
+      window.removeEventListener('blur', dismiss);
+      window.removeEventListener('keydown', escape, true);
+      document.removeEventListener('visibilitychange', dismiss);
+    };
+  }, [clearTimers, closePreview]);
 
   const handleClick = () => {
     suppressHoverRef.current = true;
-    if (closeTimeoutRef.current) {
-      clearTimeout(closeTimeoutRef.current);
-      closeTimeoutRef.current = null;
-    }
-    setIsHovered(false);
+    closePreview();
     setOverlayOpen(true);
   };
 
   return (
     <>
-      <span
+      <button
+        type="button"
         ref={triggerRef}
-        className="cursor-pointer border-b border-dashed border-muted-foreground/50 transition-colors hover:border-foreground hover:text-foreground"
-        onMouseEnter={() => {
-          if (!overlayOpen) {
-            suppressHoverRef.current = false;
-            handleMouseEnter();
-          }
+        className="cursor-pointer border-b border-dashed border-muted-foreground/50 bg-transparent p-0 text-inherit [font:inherit] transition-colors hover:border-foreground hover:text-foreground focus-visible:outline focus-visible:outline-offset-4"
+        aria-label="D&D player: view Perrin Burrowfen"
+        onClick={handleClick}
+        onPointerEnter={event => { if (event.pointerType !== 'touch') enterTrigger(); }}
+        onPointerLeave={() => {
+          if (!overlayOpen) suppressHoverRef.current = false;
+          leavePreview();
         }}
-        onMouseLeave={handleMouseLeave}
+        onPointerCancel={closePreview}
       >
         {children}
-      </span>
+      </button>
       {typeof document !== "undefined" &&
         createPortal(
           <AnimatePresence>
             {isHovered && !overlayOpen && (
-              <motion.div
-                initial={{ opacity: 0, y: reducedMotion ? 0 : position === "above" ? 6 : -6 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: reducedMotion ? 0 : 0.3, ease: [0.22, 1, 0.36, 1] }}
-                style={popoverStyles}
-                onMouseEnter={handleMouseEnter}
-                onMouseLeave={handleMouseLeave}
-              >
+              <PreviewSurface style={popoverStyles} position={position}
+                onEnter={enterPreview} onLeave={leavePreview}>
                 <button
                   type="button"
                   onClick={handleClick}
@@ -135,20 +184,21 @@ export function DndHoverCard({ children, zIndex = 50, position = "above" }: DndH
                     </span>
                   </div>
                 </button>
-                {/* Invisible bridge for easier hover navigation */}
-                {position === "above" ? (
-                  <div className="absolute left-1/2 top-full h-[24px] w-[80px] -translate-x-1/2" />
-                ) : (
-                  <div className="absolute bottom-full left-1/2 h-[24px] w-[80px] -translate-x-1/2" />
-                )}
-              </motion.div>
+              </PreviewSurface>
             )}
           </AnimatePresence>,
           document.body
         )}
       
       {/* Character overlay */}
-      <DndCharacterOverlay isOpen={overlayOpen} onClose={() => setOverlayOpen(false)} />
+      <DndCharacterOverlay isOpen={overlayOpen} onClose={() => {
+        const rect = triggerRef.current?.getBoundingClientRect();
+        const pointer = pointerRef.current;
+        // Closing a layer beneath a stationary pointer isn't a fresh hover.
+        suppressHoverRef.current = !!(rect && pointer && pointer.x >= rect.left &&
+          pointer.x <= rect.right && pointer.y >= rect.top && pointer.y <= rect.bottom);
+        setOverlayOpen(false);
+      }} />
     </>
   );
 }

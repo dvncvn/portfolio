@@ -1,9 +1,10 @@
 "use client";
 
 import { useEffect, useState, useRef, useCallback } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { createPortal } from "react-dom";
 import { DndCharacterOverlay } from "./dnd-character-overlay";
+import styles from "./dnd-character.module.css";
 
 type DndHoverCardProps = {
   children: React.ReactNode;
@@ -11,11 +12,12 @@ type DndHoverCardProps = {
   position?: "above" | "below";
 };
 
-const POPOVER_HEIGHT = 300;
-const POPOVER_WIDTH = 232; // 200px image + 32px padding
+const POPOVER_HEIGHT = 332;
+const POPOVER_WIDTH = 264;
 const GAP = 12;
 
 export function DndHoverCard({ children, zIndex = 50, position = "above" }: DndHoverCardProps) {
+  const reducedMotion = useReducedMotion();
   const [isHovered, setIsHovered] = useState(false);
   const [overlayOpen, setOverlayOpen] = useState(false);
   const [popoverStyles, setPopoverStyles] = useState<React.CSSProperties>({});
@@ -27,22 +29,18 @@ export function DndHoverCard({ children, zIndex = 50, position = "above" }: DndH
   const getStyles = useCallback((): React.CSSProperties => {
     if (!triggerRef.current) return { position: "fixed", opacity: 0 };
     const rect = triggerRef.current.getBoundingClientRect();
-    
-    if (position === "above") {
-      return {
-        position: "fixed",
-        top: rect.top - POPOVER_HEIGHT - GAP,
-        left: rect.left + rect.width / 2 - POPOVER_WIDTH / 2,
-        zIndex,
-      };
-    } else {
-      return {
-        position: "fixed",
-        top: rect.bottom + GAP,
-        left: rect.left + rect.width / 2 - POPOVER_WIDTH / 2,
-        zIndex,
-      };
-    }
+
+    const above = rect.top - POPOVER_HEIGHT - GAP;
+    const below = rect.bottom + GAP;
+    const preferredTop = position === "above"
+      ? (above >= 12 ? above : below)
+      : (below + POPOVER_HEIGHT <= window.innerHeight - 12 ? below : above);
+    return {
+      position: "fixed",
+      top: Math.max(12, Math.min(preferredTop, window.innerHeight - POPOVER_HEIGHT - 12)),
+      left: Math.max(12, Math.min(rect.left + rect.width / 2 - POPOVER_WIDTH / 2, window.innerWidth - POPOVER_WIDTH - 12)),
+      zIndex,
+    };
   }, [position, zIndex]);
 
   const handleMouseEnter = useCallback(() => {
@@ -101,10 +99,10 @@ export function DndHoverCard({ children, zIndex = 50, position = "above" }: DndH
           <AnimatePresence>
             {isHovered && !overlayOpen && (
               <motion.div
-                initial={{ opacity: 0, y: position === "above" ? 8 : -8, scale: 0.95 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, y: position === "above" ? 8 : -8, scale: 0.95 }}
-                transition={{ duration: 0.15, ease: "easeOut" }}
+                initial={{ opacity: 0, y: reducedMotion ? 0 : position === "above" ? 6 : -6 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: reducedMotion ? 0 : 0.3, ease: [0.22, 1, 0.36, 1] }}
                 style={popoverStyles}
                 onMouseEnter={handleMouseEnter}
                 onMouseLeave={handleMouseLeave}
@@ -112,33 +110,28 @@ export function DndHoverCard({ children, zIndex = 50, position = "above" }: DndH
                 <button
                   type="button"
                   onClick={handleClick}
-                  className="dnd-card group relative block cursor-pointer overflow-hidden rounded-xl border border-white/10 bg-[#151413]/95 p-4 shadow-2xl backdrop-blur-xl"
+                  className={styles.card}
+                  aria-label="View Perrin Burrowfen"
                 >
                   {/* Character art */}
-                  <div className="relative h-[200px] w-[200px] overflow-hidden rounded-lg bg-[#1a1918]">
+                  <div className={styles.portrait}>
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src="/assets/dnd-character.png"
                       alt="Perrin Burrowfen"
                       className="h-full w-full object-cover"
                     />
-                    {/* Hover overlay */}
-                    <div className="absolute inset-0 flex items-center justify-center bg-black/0 transition-colors duration-200 group-hover:bg-black/40">
-                      <span className="-translate-y-1.5 font-mono text-[10px] uppercase tracking-widest text-white opacity-0 transition-all duration-200 ease-out group-hover:translate-y-0 group-hover:opacity-100">
-                        View character info
-                      </span>
-                    </div>
                   </div>
                   {/* Character info */}
-                  <div className="mt-3 text-center">
+                  <div className={styles.caption}>
                     <span
-                      className="block text-[22px] text-foreground"
+                      className={styles.name}
                       style={{ fontFamily: "var(--font-jacquard-24)" }}
                     >
                       Perrin Burrowfen
                     </span>
-                    <span className="mt-1 block font-mono text-[11px] text-muted-foreground">
-                      Level 7 Twilight Cleric
+                    <span className={styles.subtitle}>
+                      Level 7 · Twilight Cleric
                     </span>
                   </div>
                 </button>

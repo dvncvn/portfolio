@@ -1,8 +1,11 @@
 "use client";
 
-import { useEffect } from "react";
-import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
+import { motion, useReducedMotion } from "framer-motion";
 import { createPortal } from "react-dom";
+import styles from "./dnd-character.module.css";
+import { CharacterDetails, CharacterIcon } from "./dnd-character-details";
+import { CharacterGridRipple } from "./character-grid-ripple";
 
 type DndCharacterOverlayProps = {
   isOpen: boolean;
@@ -19,6 +22,8 @@ export function DndCharacterOverlay({ isOpen, onClose }: DndCharacterOverlayProp
 }
 
 function CharacterTakeover({ onClose }: Pick<DndCharacterOverlayProps, "onClose">) {
+  const reducedMotion = useReducedMotion();
+  const [ripple, setRipple] = useState<{ x: number; y: number; id: number } | null>(null);
   // Restore the page scroll state when the takeover is dismissed.
   useEffect(() => {
     const originalOverflow = document.body.style.overflow;
@@ -31,6 +36,7 @@ function CharacterTakeover({ onClose }: Pick<DndCharacterOverlayProps, "onClose"
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
+        if (e.target instanceof Element && e.target.closest('[data-roll-picker][data-open="true"]')) return;
         e.preventDefault();
         e.stopImmediatePropagation();
         onClose();
@@ -47,9 +53,10 @@ function CharacterTakeover({ onClose }: Pick<DndCharacterOverlayProps, "onClose"
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 0.2 }}
-          className="fixed inset-0 z-[100] bg-background"
+          transition={{ duration: reducedMotion ? 0 : 0.3 }}
+          className={`fixed inset-0 z-[10000] ${styles.takeover}`}
         >
+          {ripple && !reducedMotion ? <CharacterGridRipple key={ripple.id} x={ripple.x} y={ripple.y} /> : null}
           {/* Close button - fixed to top right */}
           <button
             onClick={onClose}
@@ -74,14 +81,14 @@ function CharacterTakeover({ onClose }: Pick<DndCharacterOverlayProps, "onClose"
 
           {/* Scrollable content */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: reducedMotion ? 0 : 8 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3, delay: 0.1 }}
-            className="h-full overflow-y-auto px-6 pb-24 pt-12 scrollbar-none"
+            transition={{ duration: reducedMotion ? 0 : 0.45, delay: reducedMotion ? 0 : 0.08 }}
+            className="relative h-full overflow-y-auto px-6 pb-24 pt-12 scrollbar-none"
           >
-            <div className="mx-auto max-w-[900px]">
+            <div className={styles.sheet}>
               {/* Two column layout */}
-              <div className="grid gap-8 md:grid-cols-[1fr_280px]">
+              <div className="grid gap-10 md:grid-cols-[1fr_320px]">
               {/* Left column - content */}
               <div className="space-y-8 font-mono text-[14px] leading-relaxed">
                 {/* Header */}
@@ -92,10 +99,10 @@ function CharacterTakeover({ onClose }: Pick<DndCharacterOverlayProps, "onClose"
                   >
                     Perrin Burrowfen
                   </h1>
-                  <p className="mt-1 text-muted-foreground">Jerbeen Twilight Cleric</p>
+                  <p className={`mt-1 text-muted-foreground ${styles.classLine}`}><CharacterIcon kind="lantern" glow /> Jerbeen Twilight Cleric</p>
+                  <p className={styles.campaign}>Turn of Fortune’s Fate</p>
                 </div>
 
-                {/* About */}
                 <section>
                   <h2
                     className="mb-3 text-[18px] text-foreground"
@@ -103,15 +110,21 @@ function CharacterTakeover({ onClose }: Pick<DndCharacterOverlayProps, "onClose"
                   >
                     About
                   </h2>
+
                   <p className="text-muted-foreground">
-                    Perrin Burrowfen is a Jerbeen cleric who walks the spaces between places. He is a guardian of liminal moments — dusk, night roads, quiet crossings — where fear spreads faster than danger. He does not banish darkness. He makes it survivable.
+                    Perrin Burrowfen is a Jerbeen cleric who spent much of his life looking after the Duskwalks, a network of paths used by Jerbeen communities after dark.
                   </p>
+
                   <p className="mt-4 text-muted-foreground">
-                    He leads by presence, not command.
+                    He’s used to traveling at night, keeping watch, and helping nervous travelers get where they’re going safely. He doesn’t see darkness as something inherently threatening. Usually, the fear of what might be out there is worse than what actually is.
                   </p>
+
+                  <p className="mt-4 text-muted-foreground">
+                    Perrin is quiet, patient, and not much of a leader in the traditional sense. He tends to help by being reliable and staying calm when other people aren’t.
+                  </p>
+
                 </section>
 
-                {/* Description */}
                 <section>
                   <h2
                     className="mb-3 text-[18px] text-foreground"
@@ -119,38 +132,59 @@ function CharacterTakeover({ onClose }: Pick<DndCharacterOverlayProps, "onClose"
                   >
                     Description
                   </h2>
+
                   <p className="text-muted-foreground">
-                    A small Jerbeen wrapped in layered, travel-worn robes, with heavy, well cared for but aged armor peeking beneath cloth. His ears are enormous and expressive, his movements unhurried. He carries a lantern at his side, holding a <span className="text-foreground">steady blue flame</span> that casts comfort more than light.
+                    Perrin is a small Jerbeen with enormous, expressive ears. He wears layered, well-used traveling robes over old but carefully maintained armor.
                   </p>
+
                   <p className="mt-4 text-muted-foreground">
-                    He stands beside others rather than ahead of them.
+                    A lantern hangs at his side, burning with a steady blue flame. It isn’t especially bright, but Perrin takes very good care of it and rarely goes anywhere without it.
                   </p>
+
+                  <p className="mt-4 text-muted-foreground">
+                    He tends to move slowly and deliberately, and would usually rather stand beside someone than put himself at the front of the group.
+                  </p>
+
                 </section>
 
-                {/* Duskwalks */}
                 <section>
                   <h2
                     className="mb-3 text-[18px] text-foreground"
                     style={{ fontFamily: "var(--font-jacquard-24)" }}
                   >
-                    Duskwalks
+                    The Duskwalks
                   </h2>
+
                   <p className="text-muted-foreground">
-                    The <span className="text-foreground">Duskwalks</span> are a network of Jerbeen paths, tunnels, and surface roads safest at dusk and in low light. They are maintained through habit rather than fortification.
+                    The Duskwalks are a loose network of Jerbeen tunnels, paths, and surface roads traditionally traveled around dusk and at night.
                   </p>
-                  <p className="mt-4 text-muted-foreground">Perrin&apos;s role was to:</p>
-                  <ul className="mt-2 space-y-1 text-muted-foreground">
-                    <li>• Walk and verify Duskwalk routes</li>
-                    <li>• Escort travelers between dwellings</li>
-                    <li>• Relight or reinforce lantern-flames</li>
-                    <li>• Notice when a path felt <span className="text-foreground">wrong</span></li>
-                  </ul>
+
                   <p className="mt-4 text-muted-foreground">
-                    The Duskwalks are safe because they are walked. When neglected, they grow dangerous.
+                    They aren’t protected by walls or guards. Instead, Jerbeen keep them safe by regularly walking the routes, maintaining their markers, checking the lanterns, and noticing when something has changed.
                   </p>
+
+                  <p className="mt-4 text-muted-foreground">
+                    Perrin’s work involved:
+                  </p>
+
+                  <ul className="mt-2 list-disc space-y-1 pl-5 text-muted-foreground">
+
+                    <li>Walking the routes and checking that they were still safe</li>
+
+                    <li>Escorting travelers between settlements</li>
+
+                    <li>Maintaining and relighting lanterns along the way</li>
+
+                    <li>Investigating anything unusual he found on the road</li>
+
+                  </ul>
+
+                  <p className="mt-4 text-muted-foreground">
+                    A neglected route can quickly become an unsafe one, so simply being there was a large part of the job.
+                  </p>
+
                 </section>
 
-                {/* Faith */}
                 <section>
                   <h2
                     className="mb-3 text-[18px] text-foreground"
@@ -158,24 +192,31 @@ function CharacterTakeover({ onClose }: Pick<DndCharacterOverlayProps, "onClose"
                   >
                     Faith
                   </h2>
+
                   <p className="text-muted-foreground">
-                    Perrin&apos;s faith is personal and practical.
+                    Perrin’s religion is fairly personal. He isn’t interested in converting anyone, and he rarely talks about his beliefs unless someone asks.
                   </p>
-                  <p className="mt-4 text-muted-foreground">He believes:</p>
-                  <ul className="mt-2 space-y-1 text-muted-foreground">
-                    <li>• Darkness is not evil, only uncertain</li>
-                    <li>• Fear spreads faster than danger</li>
-                    <li>• Light matters most when it is steady</li>
+
+                  <p className="mt-4 text-muted-foreground">
+                    At the heart of them are a few simple ideas:
+                  </p>
+
+                  <ul className="mt-2 list-disc space-y-1 pl-5 text-muted-foreground">
+
+                    <li>Darkness isn’t evil. It just makes things harder to understand.</li>
+
+                    <li>People frightened by uncertainty can be more dangerous than the thing they’re frightened of.</li>
+
+                    <li>A small, dependable light is often more useful than a brilliant one that doesn’t last.</li>
+
                   </ul>
+
                   <p className="mt-4 text-muted-foreground">
-                    He does not preach. If asked, he answers briefly and honestly.
+                    For Perrin, his lantern is partly religious and partly practical. Keeping it lit is an act of care, not a declaration that everything is going to be alright.
                   </p>
-                  <p className="mt-4 text-muted-foreground">
-                    Light is not approval. It is witness.
-                  </p>
+
                 </section>
 
-                {/* Roleplay */}
                 <section>
                   <h2
                     className="mb-3 text-[18px] text-foreground"
@@ -183,40 +224,97 @@ function CharacterTakeover({ onClose }: Pick<DndCharacterOverlayProps, "onClose"
                   >
                     Roleplay
                   </h2>
+
                   <p className="text-muted-foreground">
-                    <span className="text-foreground">Voice:</span> soft, steady, conversational
+                    <strong className="text-foreground">Voice:</strong> Quiet, steady, conversational. He rarely raises his voice.
                   </p>
-                  <p className="text-muted-foreground">
-                    <span className="text-foreground">Body Language:</span> kneels, adjusts lantern, stands beside others
-                  </p>
-                  <p className="mt-4 text-muted-foreground">Common phrases:</p>
-                  <ul className="mt-2 space-y-1 text-muted-foreground">
-                    <li>• &quot;It&apos;s alright. We&apos;ve time.&quot;</li>
-                    <li>• &quot;I&apos;ll keep watch.&quot;</li>
-                    <li>• &quot;Let&apos;s stand here a moment.&quot;</li>
-                  </ul>
-                  <p className="mt-6 text-muted-foreground">Backstory Hooks:</p>
-                  <ul className="mt-2 space-y-1 text-muted-foreground">
-                    <li>• Lanterns he once lit may have gone dark</li>
-                    <li>• Paths once safe may no longer be</li>
-                    <li>• Dreams of his flame alone in heavy rain</li>
-                  </ul>
+
                   <p className="mt-4 text-muted-foreground">
-                    He hasn&apos;t asked what they mean — yet.
+                    <strong className="text-foreground">Mannerisms:</strong> Tends to crouch or kneel when speaking to someone smaller or frightened. Fiddles with his lantern when thinking. Usually takes up a position beside someone rather than at the head of the group.
                   </p>
+
+                  <p className="mt-4 text-muted-foreground">
+                    <strong className="text-foreground">Things he might say:</strong>
+                  </p>
+
+                  <ul className="mt-2 list-disc space-y-1 pl-5 text-muted-foreground">
+
+                    <li>“It’s alright. We’ve got time.”</li>
+
+                    <li>“I’ll keep watch.”</li>
+
+                    <li>“Something’s different here.”</li>
+
+                    <li>“Give your eyes a moment.”</li>
+
+                    <li>“We can stay here until you’re ready.”</li>
+
+                  </ul>
+
+                </section>
+
+                <section>
+                  <h2
+                    className="mb-3 text-[18px] text-foreground"
+                    style={{ fontFamily: "var(--font-jacquard-24)" }}
+                  >
+                    Backstory Hooks
+                  </h2>
+
+                  <ul className="mt-2 list-disc space-y-1 pl-5 text-muted-foreground">
+
+                    <li>Some of the lanterns along his old routes have started going out.</li>
+
+                    <li>A Duskwalk that Perrin remembers as safe has become dangerous.</li>
+
+                    <li>He occasionally dreams about seeing his lantern burning by itself in heavy rain.</li>
+
+                    <li>He doesn’t know whether the dreams mean anything, and so far he hasn’t gone looking for an answer.</li>
+
+                  </ul>
+
                 </section>
               </div>
 
               {/* Right column - image */}
-              <div className="hidden md:block">
-                <div className="sticky top-0">
+              <div className="order-first md:order-last">
+                <div className={styles.characterStats}>
+                  <div className={styles.fullPortrait}>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src="/assets/dnd-character.png"
                     alt="Perrin Burrowfen"
-                    className="w-full rounded-lg"
+                    className="w-full"
                     style={{ imageRendering: "auto" }}
                   />
+                  </div>
+                  <dl className={styles.essentials} aria-label="Character essentials">
+                    {[['Level', 7], ['AC', 17], ['Max HP', 52]].map(([label, score]) => (
+                      <div key={label}>
+                        <dt>{label === 'AC' ? <CharacterIcon kind="shield" /> : label === 'Max HP' ? <CharacterIcon kind="heart" /> : null}{label}</dt>
+                        <dd>{score}</dd>
+                      </div>
+                    ))}
+                  </dl>
+                  <dl className={styles.abilities} aria-label="Ability scores">
+                    {[
+                      { label: 'STR', name: 'Strength', score: 10 },
+                      { label: 'DEX', name: 'Dexterity', score: 15 },
+                      { label: 'CON', name: 'Constitution', score: 14 },
+                      { label: 'INT', name: 'Intelligence', score: 8 },
+                      { label: 'WIS', name: 'Wisdom', score: 17 },
+                      { label: 'CHA', name: 'Charisma', score: 13 },
+                    ].map(({ label, name, score }) => (
+                      <div key={label}>
+                        <dt><abbr title={name}>{label}</abbr></dt>
+                        <dd aria-label={`${name} modifier ${Math.floor((score - 10) / 2)}, score ${score}`}>
+                          {score >= 10 ? '+' : '−'}{Math.abs(Math.floor((score - 10) / 2))}
+                          <span className={styles.abilityScore}>{score}</span>
+                        </dd>
+                      </div>
+                    ))}
+                  </dl>
+                  <CharacterDetails onNaturalTwenty={origin => setRipple(previous => ({ ...origin, id: (previous?.id ?? 0) + 1 }))} />
                 </div>
               </div>
             </div>

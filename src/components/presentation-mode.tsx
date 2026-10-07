@@ -111,7 +111,7 @@ function generateSlides(projects: WorkProject[], introText: { name: string; bio:
     slides.push({
       type: "personal",
       content: {
-        title: "Outside of Work",
+        title: "Outside of work",
         body: introText.personal,
       },
     });

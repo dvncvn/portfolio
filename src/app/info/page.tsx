@@ -109,11 +109,11 @@ export default function InfoPage() {
             </div>
           </BlurFade>
 
-          {/* Ways of Working */}
+          {/* Ways of working */}
           <BlurFade delay={0.1}>
             <div className="space-y-4">
               <h2 className="text-[20px] font-medium leading-tight text-foreground">
-                Ways of Working
+                Ways of working
               </h2>
               <ul className="list-disc space-y-2 pl-5 text-base leading-relaxed text-muted-foreground">
                 <li>I care a lot about craft, but I also like to move. I’m comfortable making calls with incomplete information, putting something in front of people, and learning from it.</li>
@@ -127,11 +127,11 @@ export default function InfoPage() {
             </div>
           </BlurFade>
 
-          {/* Outside of Work */}
+          {/* Outside of work */}
           <BlurFade delay={0.15}>
             <div className="space-y-4">
               <h2 className="text-[20px] font-medium leading-tight text-foreground">
-                Outside of Work
+                Outside of work
               </h2>
               <p className="text-base leading-relaxed text-muted-foreground">
                 I&apos;m a parent, husband, runner, musician, and{" "}

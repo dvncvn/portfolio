@@ -225,7 +225,7 @@ I’m a Staff Product Designer and builder with a high bar for craft and a bias 
 - Contributed to securing $115M Series E funding through product narrative and demos
 - Recipient of the Ellis Award for outstanding business impact
 
-## Ways of Working
+## Ways of working
 
 - I care a lot about craft, but I also like to move. I’m comfortable making calls with incomplete information, putting something in front of people, and learning from it.
 - I like owning problems end-to-end, from figuring out what we should be doing through to the details of what actually ships.
@@ -246,7 +246,7 @@ Product strategy, problem framing, information architecture, interaction design,
 - Midjourney and image tooling for concept exploration
 - Prompting, agent-assisted workflows, and AI-enabled prototyping
 
-## Outside of Work
+## Outside of work
 
 I'm a parent, husband, runner, musician, and D&D player.
 

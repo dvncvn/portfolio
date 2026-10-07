@@ -170,8 +170,8 @@ export function CompareView({
           >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src={beforeSrc}
-            alt={beforeAlt}
+            src={afterSrc}
+            alt={afterAlt}
             className="absolute inset-0 h-full w-full select-none object-cover"
             draggable={false}
             onLoad={handleImageLoad}
@@ -183,8 +183,8 @@ export function CompareView({
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src={afterSrc}
-              alt={afterAlt}
+              src={beforeSrc}
+              alt={beforeAlt}
               className="absolute inset-0 h-full w-full select-none object-cover"
               draggable={false}
             />
@@ -223,7 +223,7 @@ export function CompareView({
               aria-valuemin={0}
               aria-valuemax={100}
               aria-valuenow={Math.round(value * 100)}
-              aria-valuetext={`${Math.round((1 - value) * 100)}% before, ${Math.round(value * 100)}% after`}
+              aria-valuetext={`${Math.round(value * 100)}% before, ${Math.round((1 - value) * 100)}% after`}
               className={`pointer-events-auto absolute left-1/2 top-0 h-full w-10 -translate-x-1/2 ${isDragging ? "cursor-grabbing" : "cursor-grab"}`}
               onPointerDown={handleHandlePointerDown}
               onPointerMove={handleHandlePointerMove}
@@ -269,7 +269,7 @@ export function CompareView({
       {/* Mobile/small: static before/after frames */}
       <BlurFade delay={0.1} inView inViewMargin="-100px" className="sm:hidden">
         <div className="space-y-4">
-        {[{ src: afterSrc, alt: afterAlt }, { src: beforeSrc, alt: beforeAlt }].map(
+        {[{ src: beforeSrc, alt: beforeAlt }, { src: afterSrc, alt: afterAlt }].map(
           (image) => (
             <button
               key={image.src}
@@ -298,13 +298,13 @@ export function CompareView({
           {isComparisonCaption ? (
             <>
               <p className="hidden items-center justify-center gap-2 text-[14px] leading-relaxed text-muted-foreground sm:flex">
-                {[{ label: "Before", share: 1 - value }, { label: "After", share: value }].map(({ label, share }, index) => (
+                {[{ label: "Before", share: value }, { label: "After", share: 1 - value }].map(({ label, share }, index) => (
                   <span key={label} className="contents">
                     {index > 0 ? <span className="opacity-40">/</span> : null}
                     <button
                       type="button"
                       className="relative cursor-pointer rounded-sm pb-1 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-highlight"
-                      onClick={() => showImage(index === 0 ? 0 : 1)}
+                      onClick={() => showImage(index === 0 ? 1 : 0)}
                       aria-label={`Show all of ${label.toLowerCase()}`}
                       aria-pressed={share === 1}
                     >

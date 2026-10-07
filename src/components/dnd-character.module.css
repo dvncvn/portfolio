@@ -325,3 +325,21 @@
   opacity: 0;
   font-family: "Apple Color Emoji", "Segoe UI Emoji", sans-serif;
 }
+
+.hoverPreview {
+  width: 264px;
+  max-width: calc(100vw - 24px);
+  max-height: var(--radix-hover-card-content-available-height);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  border-radius: 2px;
+}
+.hoverPreview[data-state="open"] { animation: previewEnter 140ms ease-out; }
+/* No closed-state animation: closing unmounts the interactive surface. */
+.hoverPreview[data-state="closed"] { pointer-events: none; }
+.hoverPreview .card { width: 100%; }
+.hoverPreview .portrait { width: 100%; }
+@keyframes previewEnter { from { opacity: 0; } to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) {
+  .hoverPreview[data-state="open"] { animation: none; }
+}

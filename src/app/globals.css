@@ -289,6 +289,12 @@ html {
   }
 }
 
+@property --dnd-edge-angle {
+  syntax: '<angle>';
+  inherits: true;
+  initial-value: -70deg;
+}
+
 /* Also used by the welcome screen. */
 @keyframes rainbow-shift {
   0%, 100% { background-position: 0% 50%; }

@@ -1,10 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { motion, useReducedMotion } from "framer-motion";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { createPortal } from "react-dom";
 import styles from "./dnd-character.module.css";
-import { CharacterDetails, CharacterIcon } from "./dnd-character-details";
+import { CharacterDetails, CharacterIcon, type CharacterDetailsHandle } from "./dnd-character-details";
+import { CharacterCriticalFailure } from "./character-critical-failure";
+import { CharacterConfetti } from "./character-confetti";
 import { CharacterGridRipple } from "./character-grid-ripple";
 
 type DndCharacterOverlayProps = {
@@ -23,7 +25,70 @@ export function DndCharacterOverlay({ isOpen, onClose }: DndCharacterOverlayProp
 
 function CharacterTakeover({ onClose }: Pick<DndCharacterOverlayProps, "onClose">) {
   const reducedMotion = useReducedMotion();
+  const characterRoll = useRef<CharacterDetailsHandle>(null);
+  const [rolling, setRolling] = useState(false);
   const [ripple, setRipple] = useState<{ x: number; y: number; id: number } | null>(null);
+  const [failure, setFailure] = useState(false);
+  const dismissFailure = useCallback(() => setFailure(false), []);
+  const sheet = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!ripple || reducedMotion || !sheet.current) return;
+    const animations: Animation[] = [];
+    const surfaces = [sheet.current, ...sheet.current.querySelectorAll<HTMLElement>(
+      `.${styles.fullPortrait}, .${styles.essentials} > div, .${styles.abilities} > div, .${styles.rollPanel}`
+    )];
+    const visible = (element: HTMLElement) => {
+      const rect = element.getBoundingClientRect();
+      return rect.width > 0 && rect.height > 0 && rect.bottom > 0 &&
+        rect.top < window.innerHeight && rect.right > 0 && rect.left < window.innerWidth;
+    };
+    const timing = (element: HTMLElement) => {
+      const rect = element.getBoundingClientRect();
+      const dx = rect.left + rect.width / 2 - ripple.x;
+      const dy = rect.top + rect.height / 2 - ripple.y;
+      return { delay: Math.hypot(dx, dy) * 1.25, dx, dy };
+    };
+
+    for (const element of surfaces.filter(visible)) {
+      const { delay, dx, dy } = timing(element);
+      // Begin on the edge facing the die, then carry the light around the frame.
+      const angle = Math.atan2(-dx, dy) * 180 / Math.PI - 52;
+      animations.push(element.animate([
+        { '--dnd-edge-angle': `${angle}deg` },
+        { '--dnd-edge-angle': `${angle + 360}deg` },
+      ], { duration: 3600, delay, easing: 'cubic-bezier(0.2, 0, 0.3, 1)', pseudoElement: '::after' }));
+      animations.push(element.animate([
+        { opacity: '0', offset: 0 },
+        { opacity: '0.8', offset: 0.2 },
+        { opacity: '0.5', offset: 0.65 },
+        { opacity: '0', offset: 1 },
+      ], { duration: 3600, delay, easing: 'ease-in-out', pseudoElement: '::after' }));
+    }
+
+    // Only paint visible text blocks, without animating overlapping descendants.
+    const textElements = sheet.current.querySelectorAll<HTMLElement>(
+      'h1, h2, p, li, dt, dd'
+    );
+    for (const element of textElements) {
+      if (!visible(element) || element.closest(`.${styles.rollPanel}`) || element.querySelector('button') ||
+          element.classList.contains('sr-only') || !element.textContent?.trim()) continue;
+      const { delay, dx, dy } = timing(element);
+      const color = getComputedStyle(element).color;
+      const angle = Math.atan2(dx, -dy) * 180 / Math.PI;
+      const paint = {
+        color: 'transparent',
+        backgroundClip: 'text',
+        backgroundImage: `linear-gradient(${angle}deg, ${color} 35%, #ecf5ff 50%, ${color} 65%)`,
+        backgroundSize: '300% 300%',
+      };
+      animations.push(element.animate([
+        { ...paint, backgroundPosition: '100% 100%' },
+        { ...paint, backgroundPosition: '0% 0%' },
+      ], { duration: 2200, delay, easing: 'cubic-bezier(0.4, 0, 0.2, 1)' }));
+    }
+    return () => animations.forEach(animation => animation.cancel());
+  }, [ripple, reducedMotion]);
   // Restore the page scroll state when the takeover is dismissed.
   useEffect(() => {
     const originalOverflow = document.body.style.overflow;
@@ -36,7 +101,13 @@ function CharacterTakeover({ onClose }: Pick<DndCharacterOverlayProps, "onClose"
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
-        if (e.target instanceof Element && e.target.closest('[data-roll-picker][data-open="true"]')) return;
+        if (failure) {
+          e.preventDefault();
+          e.stopImmediatePropagation();
+          dismissFailure();
+          return;
+        }
+        if (e.target instanceof Element && e.target.closest('[data-roll-picker][data-open="true"], [data-die-menu]')) return;
         e.preventDefault();
         e.stopImmediatePropagation();
         onClose();
@@ -46,7 +117,7 @@ function CharacterTakeover({ onClose }: Pick<DndCharacterOverlayProps, "onClose"
     // Intercept Escape before the page or a parent presentation handles it.
     window.addEventListener("keydown", handleKeyDown, true);
     return () => window.removeEventListener("keydown", handleKeyDown, true);
-  }, [onClose]);
+  }, [onClose, failure, dismissFailure]);
 
   // Dismiss immediately: fading this opaque surface crossfades two pages of text.
   return (
@@ -57,10 +128,15 @@ function CharacterTakeover({ onClose }: Pick<DndCharacterOverlayProps, "onClose"
           className={`fixed inset-0 z-[10000] ${styles.takeover}`}
         >
           {ripple && !reducedMotion ? <CharacterGridRipple key={ripple.id} x={ripple.x} y={ripple.y} /> : null}
+          {ripple && !reducedMotion ? <CharacterConfetti key={`confetti-${ripple.id}`} x={ripple.x} y={ripple.y} seed={ripple.id} /> : null}
+          <AnimatePresence>
+            {failure ? <CharacterCriticalFailure key="critical-failure" onDismiss={dismissFailure} /> : null}
+          </AnimatePresence>
           {/* Close button - fixed to top right */}
           <button
             onClick={onClose}
-            className="fixed right-6 top-6 z-10 rounded-md p-2 text-muted-foreground transition-colors hover:bg-white/[0.06] hover:text-foreground"
+            inert={failure}
+            className="fixed right-6 top-6 z-10 cursor-pointer rounded-md p-2 text-muted-foreground transition-colors hover:bg-white/[0.06] hover:text-foreground"
             aria-label="Close"
           >
             <svg
@@ -84,17 +160,18 @@ function CharacterTakeover({ onClose }: Pick<DndCharacterOverlayProps, "onClose"
             initial={{ opacity: 0, y: reducedMotion ? 0 : 8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: reducedMotion ? 0 : 0.45, delay: reducedMotion ? 0 : 0.08 }}
+            inert={failure}
             className="relative h-full overflow-y-auto px-6 pb-24 pt-12 scrollbar-none"
           >
-            <div className={styles.sheet}>
+            <div ref={sheet} className={styles.sheet}>
               {/* Two column layout */}
               <div className="grid gap-10 md:grid-cols-[1fr_320px]">
               {/* Left column - content */}
-              <div className="space-y-8 font-mono text-[14px] leading-relaxed">
+              <div className="space-y-8 font-sans text-[14px] leading-relaxed">
                 {/* Header */}
                 <div>
                   <h1
-                    className="text-[42px] text-foreground"
+                    className="text-[48px] text-foreground"
                     style={{ fontFamily: "var(--font-jacquard-24)" }}
                   >
                     Perrin Burrowfen
@@ -288,6 +365,16 @@ function CharacterTakeover({ onClose }: Pick<DndCharacterOverlayProps, "onClose"
                     style={{ imageRendering: "auto" }}
                   />
                   </div>
+                  <div className={styles.statGrid}>
+                  <svg className={styles.statGridLines} viewBox="0 0 300 288" preserveAspectRatio="none" aria-hidden="true">
+                    {[0, 1, 2, 3].map(row => <g key={`row-${row}`}>
+                      {[0, 1, 2].map(column => <path key={column} d={`M${column * 100 + 13} ${row * 96}h74`} />)}
+                    </g>)}
+                    {[0, 1, 2, 3].map(column => <g key={`column-${column}`}>
+                      {[0, 1, 2].map(row => <path key={row} d={`M${column * 100} ${row * 96 + 13}v70`} />)}
+                      {[0, 1, 2, 3].map(row => <path key={`join-${row}`} d={`M${column * 100 - 5} ${row * 96}h10 M${column * 100} ${row * 96 - 5}v10`} />)}
+                    </g>)}
+                  </svg>
                   <dl className={styles.essentials} aria-label="Character essentials">
                     {[['Level', 7], ['AC', 17], ['Max HP', 52]].map(([label, score]) => (
                       <div key={label}>
@@ -308,13 +395,18 @@ function CharacterTakeover({ onClose }: Pick<DndCharacterOverlayProps, "onClose"
                       <div key={label}>
                         <dt><abbr title={name}>{label}</abbr></dt>
                         <dd aria-label={`${name} modifier ${Math.floor((score - 10) / 2)}, score ${score}`}>
+                          <button type="button" className={styles.abilityRoll} disabled={rolling}
+                            aria-label={`Roll ${name} check (${Math.floor((score - 10) / 2) >= 0 ? '+' : ''}${Math.floor((score - 10) / 2)})`}
+                            title={`Roll ${name.toLowerCase()} check`}
+                            onClick={() => characterRoll.current?.rollAbility(name)} />
                           {score >= 10 ? '+' : '−'}{Math.abs(Math.floor((score - 10) / 2))}
                           <span className={styles.abilityScore}>{score}</span>
                         </dd>
                       </div>
                     ))}
                   </dl>
-                  <CharacterDetails onNaturalTwenty={origin => setRipple(previous => ({ ...origin, id: (previous?.id ?? 0) + 1 }))} />
+                  </div>
+                  <CharacterDetails onNaturalOne={() => { setRipple(null); setFailure(true); }} rollRef={characterRoll} onRollingChange={setRolling} onNaturalTwenty={origin => setRipple(previous => ({ ...origin, id: (previous?.id ?? 0) + 1 }))} />
                 </div>
               </div>
             </div>

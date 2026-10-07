@@ -6,9 +6,7 @@ import { characterRolls, rollFormula, type CharacterRoll } from "@/lib/character
 import styles from "./dnd-character.module.css";
 
 const groups = [...new Set(characterRolls.map(roll => roll.group))];
-const symbols: Record<string, string> = {
-  Dice: '◇', 'Ability checks': '✦', 'Saving throws': '⛨', Skills: '✧', Combat: '⚔', Damage: '✷',
-};
+
 
 export function CharacterRollPicker({ selected, disabled, onSelect }: {
   selected: CharacterRoll;
@@ -55,8 +53,8 @@ export function CharacterRollPicker({ selected, disabled, onSelect }: {
       aria-label={`Choose roll: ${selected.label}`} aria-haspopup="listbox" aria-expanded={open} aria-controls={open ? id : undefined}
       onClick={() => { if (open) setOpen(false); else show(); }}
       onKeyDown={event => { if (event.key === 'ArrowDown' || event.key === 'ArrowUp') { event.preventDefault(); show(); } }}>
-      <span className={styles.rollGlyph} aria-hidden="true">{symbols[selected.group]}</span>
-      <span className={styles.rollChoice}><span>{selected.label}</span><small>{rollFormula(selected)}</small></span>
+      <span className={styles.rollChoice}>{selected.label}</span>
+      <small className={styles.rollFormula}>{rollFormula(selected)}</small>
       <svg aria-hidden="true" width="12" height="12" viewBox="0 0 12 12" fill="currentColor"><path d={open ? 'M2 7h2V5h4v2h2v2H8V7H4v2H2z' : 'M2 3h2v2h4V3h2v2H8v2H4V5H2z'} /></svg>
     </button>
     {open ? <motion.div className={styles.rollMenu} id={id} role="listbox" aria-label="Choose a roll"
@@ -72,13 +70,14 @@ export function CharacterRollPicker({ selected, disabled, onSelect }: {
         if (next !== undefined) { event.preventDefault(); options.current[next]?.focus({ preventScroll: true }); options.current[next]?.scrollIntoView({ block: 'nearest' }); }
       }}>
       {groups.map((group, groupIndex) => <div role="group" aria-labelledby={`${id}-${groupIndex}`} key={group}>
-        <div id={`${id}-${groupIndex}`} className={styles.rollGroup}><span aria-hidden="true">{symbols[group]}</span>{group}</div>
+        <div id={`${id}-${groupIndex}`} className={styles.rollGroup}>{group}</div>
         {characterRolls.filter(roll => roll.group === group).map(roll => <button
           key={roll.id} ref={el => { options.current[characterRolls.indexOf(roll)] = el; }}
           type="button" role="option" aria-selected={roll.id === selected.id} tabIndex={-1} className={styles.rollOption}
           onClick={() => { onSelect(roll); close(); }}>
-          <span className={styles.selectionMark} aria-hidden="true">{roll.id === selected.id ? '◆' : '·'}</span>
-          <span>{roll.label}</span><small>{rollFormula(roll)}</small>
+          <span>{roll.label}</span>
+          {roll.id === selected.id ? <svg aria-hidden="true" className={styles.rollCheck} width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="m3 8 3 3 7-7" /></svg> : null}
+          <small>{rollFormula(roll)}</small>
         </button>)}
       </div>)}
     </motion.div> : null}

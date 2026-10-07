@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { createPortal } from "react-dom";
 import styles from "./dnd-character.module.css";
 import { CharacterDetails, CharacterIcon, type CharacterDetailsHandle } from "./dnd-character-details";
@@ -28,8 +28,11 @@ function CharacterTakeover({ onClose }: Pick<DndCharacterOverlayProps, "onClose"
   const characterRoll = useRef<CharacterDetailsHandle>(null);
   const [rolling, setRolling] = useState(false);
   const [ripple, setRipple] = useState<{ x: number; y: number; id: number } | null>(null);
-  const [failure, setFailure] = useState(false);
-  const dismissFailure = useCallback(() => setFailure(false), []);
+  const [failurePhase, setFailurePhase] = useState<'idle' | 'showing' | 'closing'>('idle');
+  const failure = failurePhase !== 'idle';
+  const dismissFailure = useCallback(() => {
+    setFailurePhase(phase => phase === 'showing' ? 'closing' : phase);
+  }, []);
   const sheet = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -129,9 +132,8 @@ function CharacterTakeover({ onClose }: Pick<DndCharacterOverlayProps, "onClose"
         >
           {ripple && !reducedMotion ? <CharacterGridRipple key={ripple.id} x={ripple.x} y={ripple.y} /> : null}
           {ripple && !reducedMotion ? <CharacterConfetti key={`confetti-${ripple.id}`} x={ripple.x} y={ripple.y} seed={ripple.id} /> : null}
-          <AnimatePresence>
-            {failure ? <CharacterCriticalFailure key="critical-failure" onDismiss={dismissFailure} /> : null}
-          </AnimatePresence>
+          {failure ? <CharacterCriticalFailure closing={failurePhase === 'closing'}
+            onDismiss={dismissFailure} onExited={() => setFailurePhase('idle')} /> : null}
           {/* Close button - fixed to top right */}
           <button
             onClick={onClose}
@@ -408,7 +410,7 @@ function CharacterTakeover({ onClose }: Pick<DndCharacterOverlayProps, "onClose"
                     ))}
                   </dl>
                   </div>
-                  <CharacterDetails onNaturalOne={() => { setRipple(null); setFailure(true); }} rollRef={characterRoll} onRollingChange={setRolling} onNaturalTwenty={origin => setRipple(previous => ({ ...origin, id: (previous?.id ?? 0) + 1 }))} />
+                  <CharacterDetails onNaturalOne={() => { setRipple(null); setFailurePhase('showing'); }} rollRef={characterRoll} onRollingChange={setRolling} onNaturalTwenty={origin => setRipple(previous => ({ ...origin, id: (previous?.id ?? 0) + 1 }))} />
                 </div>
               </div>
             </div>

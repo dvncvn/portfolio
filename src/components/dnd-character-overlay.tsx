@@ -30,7 +30,12 @@ export function DndCharacterOverlay({ isOpen, onClose, origin }: DndCharacterOve
 function CharacterTakeover({ onClose, origin }: Pick<DndCharacterOverlayProps, "onClose" | "origin">) {
   const reducedMotion = useReducedMotion();
   const portraitTarget = useRef<HTMLImageElement>(null);
+  const takeover = useRef<HTMLDivElement>(null);
+  const closingRef = useRef(false);
+  const exitAnimations = useRef<Animation[]>([]);
+  const [closing, setClosing] = useState(false);
   const [opening, setOpening] = useState(true);
+  const [contentRevealing, setContentRevealing] = useState(false);
   const expanding = !!origin && !reducedMotion;
   useLayoutEffect(() => {
     const originalOverflow = document.body.style.overflow;
@@ -51,15 +56,52 @@ function CharacterTakeover({ onClose, origin }: Pick<DndCharacterOverlayProps, "
       { transform: `translate(${from.left - target.left}px, ${from.top - target.top}px) scale(${from.width / target.width}, ${from.height / target.height})` },
       { transform: 'translate(0, 0) scale(1, 1)' },
     ], { duration: 620, easing: 'cubic-bezier(0.45, 0, 0.2, 1)', fill: 'none' });
+    // Let the expanding card lead, then overlap only the portrait's final settle.
+    const revealTimer = window.setTimeout(() => {
+      if (!closingRef.current) setContentRevealing(true);
+    }, 500);
     void animation.finished.then(() => { if (active) setOpening(false); }).catch(() => {});
-    return () => { active = false; animation.cancel(); };
+    return () => { active = false; window.clearTimeout(revealTimer); animation.cancel(); };
   }, [origin, reducedMotion]);
-  const revealed = !expanding || !opening;
+  const revealed = !expanding || contentRevealing;
   const reveal = (order: number) => ({
+    'data-character-reveal': true,
     initial: { opacity: 0, y: reducedMotion ? 0 : 10 },
     animate: { opacity: revealed ? 1 : 0, y: revealed || reducedMotion ? 0 : 10 },
-    transition: { duration: reducedMotion ? 0 : 0.45, delay: reducedMotion || !revealed ? 0 : 0.08 + order * 0.075, ease: [0.22, 1, 0.36, 1] as [number, number, number, number] },
+    transition: { duration: reducedMotion ? 0 : 0.45, delay: reducedMotion || !revealed ? 0 : order * 0.075, ease: [0.22, 1, 0.36, 1] as [number, number, number, number] },
   });
+  const requestClose = useCallback(() => {
+    if (closingRef.current) return;
+    closingRef.current = true;
+    setClosing(true);
+    const surface = takeover.current;
+    if (!surface) { onClose(); return; }
+    const duration = reducedMotion ? 120 : 200;
+    const animations = exitAnimations.current;
+    // Clear the sheet copy before revealing the underlying page.
+    surface.querySelectorAll<HTMLElement>('[data-character-reveal]').forEach(element => {
+      animations.push(element.animate([
+        { opacity: getComputedStyle(element).opacity }, { opacity: 0 },
+      ], { duration: 80, easing: 'ease-out', fill: 'forwards' }));
+    });
+    const portrait = portraitTarget.current;
+    if (portrait && !reducedMotion) {
+      // Capture an interrupted entrance before cancelling it to avoid a snap.
+      const transform = getComputedStyle(portrait).transform;
+      portrait.getAnimations().forEach(animation => animation.cancel());
+      animations.push(portrait.animate([
+        { transform },
+        { transform: `${transform === 'none' ? '' : transform} translateY(6px) scale(0.98)` },
+      ], { duration, easing: 'cubic-bezier(0.4, 0, 0.2, 1)', fill: 'forwards' }));
+    }
+    const fade = surface.animate([{ opacity: 1 }, { opacity: 0 }], {
+      delay: reducedMotion ? 0 : 60, duration: reducedMotion ? duration : 140,
+      easing: 'ease-in-out', fill: 'forwards',
+    });
+    animations.push(fade);
+    void fade.finished.then(onClose).catch(() => {});
+  }, [onClose, reducedMotion]);
+  useEffect(() => () => exitAnimations.current.forEach(animation => animation.cancel()), []);
   const characterRoll = useRef<CharacterDetailsHandle>(null);
   const [rolling, setRolling] = useState(false);
   const [ripple, setRipple] = useState<{ x: number; y: number; id: number } | null>(null);
@@ -143,18 +185,17 @@ function CharacterTakeover({ onClose, origin }: Pick<DndCharacterOverlayProps, "
         if (e.target instanceof Element && e.target.closest('[data-roll-picker][data-open="true"], [data-die-menu]')) return;
         e.preventDefault();
         e.stopImmediatePropagation();
-        onClose();
+        requestClose();
       }
     };
 
     // Intercept Escape before the page or a parent presentation handles it.
     window.addEventListener("keydown", handleKeyDown, true);
     return () => window.removeEventListener("keydown", handleKeyDown, true);
-  }, [onClose, failure, dismissFailure]);
+  }, [requestClose, failure, dismissFailure]);
 
-  // Dismiss immediately: fading this opaque surface crossfades two pages of text.
   return (
-        <div className={`fixed inset-0 z-[10000] ${styles.takeover}`}>
+        <div ref={takeover} inert={closing} className={`fixed inset-0 z-[10000] ${styles.takeover}`}>
           {/* Keep an opaque, stationary backdrop throughout. Only this decorative
               surface expands; clipping the whole sheet exposed the info page. */}
           {expanding && opening ? <motion.div aria-hidden="true"
@@ -162,8 +203,9 @@ function CharacterTakeover({ onClose, origin }: Pick<DndCharacterOverlayProps, "
             style={{ transformOrigin: 'top left' }}
             initial={{ x: origin.card.left, y: origin.card.top,
               scaleX: origin.card.width / window.innerWidth, scaleY: origin.card.height / window.innerHeight, opacity: 1 }}
-            animate={{ x: 0, y: 0, scaleX: 1, scaleY: 1, opacity: 0 }}
-            transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1] }} /> : null}
+            animate={{ x: 0, y: 0, scaleX: 1, scaleY: 1, opacity: [1, 1, 0] }}
+            transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1],
+              opacity: { duration: 0.6, times: [0, 0.65, 1], ease: 'easeInOut' } }} /> : null}
           {ripple && !reducedMotion ? <CharacterGridRipple key={ripple.id} x={ripple.x} y={ripple.y} /> : null}
           {ripple && !reducedMotion ? <CharacterConfetti key={`confetti-${ripple.id}`} x={ripple.x} y={ripple.y} seed={ripple.id} /> : null}
           {failure ? <CharacterCriticalFailure closing={failurePhase === 'closing'}
@@ -171,7 +213,7 @@ function CharacterTakeover({ onClose, origin }: Pick<DndCharacterOverlayProps, "
           {/* Close button - fixed to top right */}
           <motion.button
             {...reveal(0)}
-            onClick={onClose}
+            onClick={requestClose}
             inert={failure}
             className="fixed right-6 top-6 z-10 cursor-pointer rounded-md p-2 text-muted-foreground transition-colors hover:bg-white/[0.06] hover:text-foreground"
             aria-label="Close"
@@ -396,7 +438,7 @@ function CharacterTakeover({ onClose, origin }: Pick<DndCharacterOverlayProps, "
               {/* Right column - image */}
               <div className="order-first md:order-last">
                 <div className={styles.characterStats}>
-                  <div className={styles.fullPortrait} data-opening={!revealed}>
+                  <div className={styles.fullPortrait} data-opening={expanding && opening}>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     ref={portraitTarget}

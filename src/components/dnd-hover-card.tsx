@@ -52,9 +52,12 @@ export function DndHoverCard({ children, zIndex = 50, position = "above" }: DndH
           {children}
         </button>
       </HoverCard.Trigger>
-      <HoverCard.Portal>
-        <HoverCard.Content side={position === 'above' ? 'top' : 'bottom'}
+      {/* Keep the hidden card laid out so direct clicks and touch activation
+          have the same measured animation origin as clicking the preview. */}
+      <HoverCard.Portal forceMount>
+        <HoverCard.Content forceMount side={position === 'above' ? 'top' : 'bottom'}
           align="center" sideOffset={8} collisionPadding={12} hideWhenDetached
+          inert={!previewOpen || overlayOpen} aria-hidden={!previewOpen || overlayOpen}
           className={styles.hoverPreview} style={{ zIndex }}>
           <button ref={cardRef} type="button" onClick={showCharacter} className={styles.card}
             aria-label="View Perrin Burrowfen">

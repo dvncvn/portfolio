@@ -345,8 +345,8 @@
   border-radius: 2px;
 }
 .hoverPreview[data-state="open"] { animation: previewEnter 140ms ease-out; }
-/* No closed-state animation: closing unmounts the interactive surface. */
-.hoverPreview[data-state="closed"] { pointer-events: none; }
+/* Hidden but measurable for direct-link transitions; never interactive while closed. */
+.hoverPreview[data-state="closed"] { visibility: hidden; pointer-events: none; }
 .hoverPreview .card { width: 100%; }
 .hoverPreview .portrait { width: 100%; }
 @keyframes previewEnter { from { opacity: 0; } to { opacity: 1; } }

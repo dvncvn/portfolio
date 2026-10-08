@@ -45,7 +45,12 @@ export function CharacterRollPicker({ selected, disabled, onSelect }: {
   };
 
   return <div ref={root} className={styles.rollPicker} data-roll-picker data-open={open}
-    onBlur={event => { if (!event.currentTarget.contains(event.relatedTarget)) setOpen(false); }}
+    onBlur={event => {
+      // Touch browsers can blur an option with no relatedTarget before sending
+      // the trigger's click. Closing here would make that click reopen it.
+      // Outside taps are handled by pointerdown; keyboard focus has a target.
+      if (event.relatedTarget && !event.currentTarget.contains(event.relatedTarget)) setOpen(false);
+    }}
     onKeyDown={event => {
       if (event.key === 'Escape' && open) { event.preventDefault(); event.stopPropagation(); close(); }
     }}>

@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import * as HoverCard from "@radix-ui/react-hover-card";
-import { DndCharacterOverlay } from "./dnd-character-overlay";
+import { DndCharacterOverlay, type CharacterOpenOrigin } from "./dnd-character-overlay";
 import styles from "./dnd-character.module.css";
 
 type DndHoverCardProps = {
@@ -12,6 +12,8 @@ type DndHoverCardProps = {
 };
 
 export function DndHoverCard({ children, zIndex = 50, position = "above" }: DndHoverCardProps) {
+  const cardRef = useRef<HTMLButtonElement>(null);
+  const [origin, setOrigin] = useState<CharacterOpenOrigin | undefined>();
   const [previewOpen, setPreviewOpen] = useState(false);
   const [overlayOpen, setOverlayOpen] = useState(false);
 
@@ -27,6 +29,12 @@ export function DndHoverCard({ children, zIndex = 50, position = "above" }: DndH
   }, [previewOpen]);
 
   const showCharacter = () => {
+    const card = cardRef.current;
+    const picture = card?.querySelector('img');
+    setOrigin(card && picture ? {
+      card: card.getBoundingClientRect().toJSON(),
+      portrait: picture.getBoundingClientRect().toJSON(),
+    } : undefined);
     setPreviewOpen(false);
     setOverlayOpen(true);
   };
@@ -48,7 +56,7 @@ export function DndHoverCard({ children, zIndex = 50, position = "above" }: DndH
         <HoverCard.Content side={position === 'above' ? 'top' : 'bottom'}
           align="center" sideOffset={8} collisionPadding={12} hideWhenDetached
           className={styles.hoverPreview} style={{ zIndex }}>
-          <button type="button" onClick={showCharacter} className={styles.card}
+          <button ref={cardRef} type="button" onClick={showCharacter} className={styles.card}
             aria-label="View Perrin Burrowfen">
             <div className={styles.portrait}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -65,7 +73,7 @@ export function DndHoverCard({ children, zIndex = 50, position = "above" }: DndH
         </HoverCard.Content>
       </HoverCard.Portal>
     </HoverCard.Root>
-    <DndCharacterOverlay isOpen={overlayOpen} onClose={() => {
+    <DndCharacterOverlay origin={origin} isOpen={overlayOpen} onClose={() => {
       setPreviewOpen(false);
       setOverlayOpen(false);
     }} />

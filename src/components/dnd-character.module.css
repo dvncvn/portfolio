@@ -24,7 +24,7 @@
 .gridRipple { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
 
 .card::before,
-.sheet::before {
+.sheetFrame::before {
   content: "";
   position: absolute;
   inset: 4px;
@@ -62,8 +62,9 @@
   max-width: 1040px;
   margin: 16px auto 0;
   padding: 40px;
-  border: 1px solid #aa95af40;
+  border: 1px solid transparent;
 }
+.sheetFrame { position: absolute; inset: -1px; border: 1px solid #aa95af40; pointer-events: none; }
 .sheet h1 { color: #e5dfce; line-height: 1.1; }
 .sheet section, .fullPortrait, .rollPanel { position: relative; }
 .sheet::after,
@@ -245,7 +246,14 @@
 .diceButton:hover { color: #e5dfce; }
 .diceButton:focus-visible { outline: 1px solid #c5b5d0; outline-offset: 3px; }
 .diceButton:disabled { cursor: default; }
-.die { display: grid; place-items: center; position: relative; }
+.die {
+  display: grid; place-items: center; position: relative;
+  transform: translateY(0) scale(1);
+  transition: transform 320ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .diceButton:hover:not(:disabled) .die { transform: translateY(-6px) scale(1.06); }
+}
 .die > span { position: absolute; top: 96px; font-family: var(--font-geist-mono), monospace; font-size: 24px; line-height: 1; color: #e5dfce; }
 .die[data-natural="twenty"] > canvas { animation: naturalTwenty 900ms ease-out both; }
 .die[data-natural="one"] > canvas { animation: naturalOne 650ms ease-out both; }
@@ -278,7 +286,7 @@
   .fullPortrait { max-width: 320px; margin: 0 auto; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .card, .rollTrigger, .abilityRoll { transition: none; }
+  .card, .rollTrigger, .abilityRoll, .die { transition: none; }
   .lantern, .die[data-natural] > canvas { animation: none; }
   .sheet::after, .sheet *::after { opacity: 0 !important; }
 }
@@ -286,14 +294,16 @@
 .criticalFailure {
   position: fixed;
   inset: 0;
-  z-index: 20;
+  z-index: 30;
+  isolation: isolate;
+  opacity: 0;
   display: grid;
   place-items: center;
   width: 100%;
   height: 100%;
   padding: 24px;
   border: 0;
-  background: radial-gradient(ellipse at center, #080102eb 0%, #000000f7 75%);
+  background: radial-gradient(ellipse at center, #080102 0%, #000 75%);
   cursor: pointer;
   overflow: hidden;
 }
@@ -343,3 +353,7 @@
 @media (prefers-reduced-motion: reduce) {
   .hoverPreview[data-state="open"] { animation: none; }
 }
+
+.fullPortrait { transition: border-color 600ms ease-in-out, outline-color 600ms ease-in-out; }
+.fullPortrait[data-opening="true"] { border-color: transparent; outline-color: transparent; }
+@media (prefers-reduced-motion: reduce) { .fullPortrait { transition: none; } }

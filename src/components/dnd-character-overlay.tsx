@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { createPortal } from "react-dom";
 import styles from "./dnd-character.module.css";
@@ -9,26 +9,62 @@ import { CharacterCriticalFailure } from "./character-critical-failure";
 import { CharacterConfetti } from "./character-confetti";
 import { CharacterGridRipple } from "./character-grid-ripple";
 
+type TransitionRect = { left: number; top: number; right: number; bottom: number; width: number; height: number };
+export type CharacterOpenOrigin = { card: TransitionRect; portrait: TransitionRect };
+
 type DndCharacterOverlayProps = {
+  origin?: CharacterOpenOrigin;
   isOpen: boolean;
   onClose: () => void;
 };
 
-export function DndCharacterOverlay({ isOpen, onClose }: DndCharacterOverlayProps) {
+export function DndCharacterOverlay({ isOpen, onClose, origin }: DndCharacterOverlayProps) {
   if (!isOpen || typeof window === "undefined") return null;
 
   return createPortal(
-    <CharacterTakeover onClose={onClose} />,
+    <CharacterTakeover onClose={onClose} origin={origin} />,
     document.body
   );
 }
 
-function CharacterTakeover({ onClose }: Pick<DndCharacterOverlayProps, "onClose">) {
+function CharacterTakeover({ onClose, origin }: Pick<DndCharacterOverlayProps, "onClose" | "origin">) {
   const reducedMotion = useReducedMotion();
+  const portraitTarget = useRef<HTMLImageElement>(null);
+  const [opening, setOpening] = useState(true);
+  const expanding = !!origin && !reducedMotion;
+  useLayoutEffect(() => {
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = originalOverflow;
+    };
+  }, []);
+  // Measure after scroll locking; animate the final image itself.
+  useLayoutEffect(() => {
+    if (!origin || reducedMotion || !portraitTarget.current) return;
+    const target = portraitTarget.current.getBoundingClientRect();
+    const from = origin.portrait;
+    let active = true;
+    // Move the real portrait from the card bounds into its own layout position.
+    // There is no duplicate image to swap out at the end of the animation.
+    const animation = portraitTarget.current.animate([
+      { transform: `translate(${from.left - target.left}px, ${from.top - target.top}px) scale(${from.width / target.width}, ${from.height / target.height})` },
+      { transform: 'translate(0, 0) scale(1, 1)' },
+    ], { duration: 620, easing: 'cubic-bezier(0.45, 0, 0.2, 1)', fill: 'none' });
+    void animation.finished.then(() => { if (active) setOpening(false); }).catch(() => {});
+    return () => { active = false; animation.cancel(); };
+  }, [origin, reducedMotion]);
+  const revealed = !expanding || !opening;
+  const reveal = (order: number) => ({
+    initial: { opacity: 0, y: reducedMotion ? 0 : 10 },
+    animate: { opacity: revealed ? 1 : 0, y: revealed || reducedMotion ? 0 : 10 },
+    transition: { duration: reducedMotion ? 0 : 0.45, delay: reducedMotion || !revealed ? 0 : 0.08 + order * 0.075, ease: [0.22, 1, 0.36, 1] as [number, number, number, number] },
+  });
   const characterRoll = useRef<CharacterDetailsHandle>(null);
   const [rolling, setRolling] = useState(false);
   const [ripple, setRipple] = useState<{ x: number; y: number; id: number } | null>(null);
   const [failurePhase, setFailurePhase] = useState<'idle' | 'showing' | 'closing'>('idle');
+  const finishFailure = useCallback(() => setFailurePhase('idle'), []);
   const failure = failurePhase !== 'idle';
   const dismissFailure = useCallback(() => {
     setFailurePhase(phase => phase === 'showing' ? 'closing' : phase);
@@ -92,14 +128,8 @@ function CharacterTakeover({ onClose }: Pick<DndCharacterOverlayProps, "onClose"
     }
     return () => animations.forEach(animation => animation.cancel());
   }, [ripple, reducedMotion]);
-  // Restore the page scroll state when the takeover is dismissed.
-  useEffect(() => {
-    const originalOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.body.style.overflow = originalOverflow;
-    };
-  }, []);
+
+
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -124,18 +154,23 @@ function CharacterTakeover({ onClose }: Pick<DndCharacterOverlayProps, "onClose"
 
   // Dismiss immediately: fading this opaque surface crossfades two pages of text.
   return (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: reducedMotion ? 0 : 0.3 }}
-          className={`fixed inset-0 z-[10000] ${styles.takeover}`}
-        >
+        <div className={`fixed inset-0 z-[10000] ${styles.takeover}`}>
+          {/* Keep an opaque, stationary backdrop throughout. Only this decorative
+              surface expands; clipping the whole sheet exposed the info page. */}
+          {expanding && opening ? <motion.div aria-hidden="true"
+            className="pointer-events-none absolute inset-0 bg-[#211827]"
+            style={{ transformOrigin: 'top left' }}
+            initial={{ x: origin.card.left, y: origin.card.top,
+              scaleX: origin.card.width / window.innerWidth, scaleY: origin.card.height / window.innerHeight, opacity: 1 }}
+            animate={{ x: 0, y: 0, scaleX: 1, scaleY: 1, opacity: 0 }}
+            transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1] }} /> : null}
           {ripple && !reducedMotion ? <CharacterGridRipple key={ripple.id} x={ripple.x} y={ripple.y} /> : null}
           {ripple && !reducedMotion ? <CharacterConfetti key={`confetti-${ripple.id}`} x={ripple.x} y={ripple.y} seed={ripple.id} /> : null}
           {failure ? <CharacterCriticalFailure closing={failurePhase === 'closing'}
-            onDismiss={dismissFailure} onExited={() => setFailurePhase('idle')} /> : null}
+            onDismiss={dismissFailure} onExited={finishFailure} /> : null}
           {/* Close button - fixed to top right */}
-          <button
+          <motion.button
+            {...reveal(0)}
             onClick={onClose}
             inert={failure}
             className="fixed right-6 top-6 z-10 cursor-pointer rounded-md p-2 text-muted-foreground transition-colors hover:bg-white/[0.06] hover:text-foreground"
@@ -155,23 +190,24 @@ function CharacterTakeover({ onClose }: Pick<DndCharacterOverlayProps, "onClose"
               <line x1="18" y1="6" x2="6" y2="18" />
               <line x1="6" y1="6" x2="18" y2="18" />
             </svg>
-          </button>
+          </motion.button>
 
           {/* Scrollable content */}
           <motion.div
-            initial={{ opacity: 0, y: reducedMotion ? 0 : 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: reducedMotion ? 0 : 0.45, delay: reducedMotion ? 0 : 0.08 }}
-            inert={failure}
-            className="relative h-full overflow-y-auto px-6 pb-24 pt-12 scrollbar-none"
+            inert={failure || !revealed}
+            className="relative z-0 isolate h-full overflow-y-auto px-6 pb-24 pt-12 scrollbar-none"
           >
             <div ref={sheet} className={styles.sheet}>
+              <motion.div className={styles.sheetFrame} aria-hidden="true"
+                initial={{ clipPath: 'inset(0 0 100% 0)', opacity: 0 }}
+                animate={{ clipPath: revealed ? 'inset(0 0 0% 0)' : 'inset(0 0 100% 0)', opacity: revealed ? 1 : 0 }}
+                transition={{ duration: reducedMotion ? 0 : 0.7, ease: [0.4, 0, 0.2, 1] }} />
               {/* Two column layout */}
               <div className="grid gap-10 md:grid-cols-[1fr_320px]">
               {/* Left column - content */}
               <div className="space-y-8 font-sans text-[14px] leading-relaxed">
                 {/* Header */}
-                <div>
+                <motion.div {...reveal(0)}>
                   <h1
                     className="text-[48px] text-foreground"
                     style={{ fontFamily: "var(--font-jacquard-24)" }}
@@ -182,9 +218,9 @@ function CharacterTakeover({ onClose }: Pick<DndCharacterOverlayProps, "onClose"
                     <p className={`text-muted-foreground ${styles.classLine}`}><CharacterIcon kind="lantern" glow /> Jerbeen Twilight Cleric</p>
                     <p className={styles.campaign}><CharacterIcon kind="banner" /><span className="sr-only">Campaign: </span>Turn of Fortune’s Fate</p>
                   </div>
-                </div>
+                </motion.div>
 
-                <section>
+                <motion.section {...reveal(1)}>
                   <h2
                     className="mb-3 text-[18px] text-foreground"
                     style={{ fontFamily: "var(--font-jacquard-24)" }}
@@ -204,9 +240,9 @@ function CharacterTakeover({ onClose }: Pick<DndCharacterOverlayProps, "onClose"
                     Perrin is quiet, patient, and not much of a leader in the traditional sense. He tends to help by being reliable and staying calm when other people aren’t.
                   </p>
 
-                </section>
+                </motion.section>
 
-                <section>
+                <motion.section {...reveal(2)}>
                   <h2
                     className="mb-3 text-[18px] text-foreground"
                     style={{ fontFamily: "var(--font-jacquard-24)" }}
@@ -226,9 +262,9 @@ function CharacterTakeover({ onClose }: Pick<DndCharacterOverlayProps, "onClose"
                     He tends to move slowly and deliberately, and would usually rather stand beside someone than put himself at the front of the group.
                   </p>
 
-                </section>
+                </motion.section>
 
-                <section>
+                <motion.section {...reveal(3)}>
                   <h2
                     className="mb-3 text-[18px] text-foreground"
                     style={{ fontFamily: "var(--font-jacquard-24)" }}
@@ -264,9 +300,9 @@ function CharacterTakeover({ onClose }: Pick<DndCharacterOverlayProps, "onClose"
                     A neglected route can quickly become an unsafe one, so simply being there was a large part of the job.
                   </p>
 
-                </section>
+                </motion.section>
 
-                <section>
+                <motion.section {...reveal(4)}>
                   <h2
                     className="mb-3 text-[18px] text-foreground"
                     style={{ fontFamily: "var(--font-jacquard-24)" }}
@@ -296,9 +332,9 @@ function CharacterTakeover({ onClose }: Pick<DndCharacterOverlayProps, "onClose"
                     For Perrin, his lantern is partly religious and partly practical. Keeping it lit is an act of care, not a declaration that everything is going to be alright.
                   </p>
 
-                </section>
+                </motion.section>
 
-                <section>
+                <motion.section {...reveal(5)}>
                   <h2
                     className="mb-3 text-[18px] text-foreground"
                     style={{ fontFamily: "var(--font-jacquard-24)" }}
@@ -332,9 +368,9 @@ function CharacterTakeover({ onClose }: Pick<DndCharacterOverlayProps, "onClose"
 
                   </ul>
 
-                </section>
+                </motion.section>
 
-                <section>
+                <motion.section {...reveal(6)}>
                   <h2
                     className="mb-3 text-[18px] text-foreground"
                     style={{ fontFamily: "var(--font-jacquard-24)" }}
@@ -354,22 +390,24 @@ function CharacterTakeover({ onClose }: Pick<DndCharacterOverlayProps, "onClose"
 
                   </ul>
 
-                </section>
+                </motion.section>
               </div>
 
               {/* Right column - image */}
               <div className="order-first md:order-last">
                 <div className={styles.characterStats}>
-                  <div className={styles.fullPortrait}>
+                  <div className={styles.fullPortrait} data-opening={!revealed}>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
+                    ref={portraitTarget}
                     src="/assets/dnd-character.png"
                     alt="Perrin Burrowfen"
-                    className="w-full"
-                    style={{ imageRendering: "auto" }}
+                    className="relative z-20 block aspect-square w-full object-cover"
+                    width={304} height={304}
+                    style={{ imageRendering: "auto", transformOrigin: "top left" }}
                   />
                   </div>
-                  <div className={styles.statGrid}>
+                  <motion.div {...reveal(2)} className={styles.statGrid}>
                   <svg className={styles.statGridLines} viewBox="0 0 300 288" preserveAspectRatio="none" aria-hidden="true">
                     {[0, 1, 2, 3].map(row => <g key={`row-${row}`}>
                       {[0, 1, 2].map(column => <path key={column} d={`M${column * 100 + 13} ${row * 96}h74`} />)}
@@ -409,13 +447,15 @@ function CharacterTakeover({ onClose }: Pick<DndCharacterOverlayProps, "onClose"
                       </div>
                     ))}
                   </dl>
-                  </div>
+                  </motion.div>
+                  <motion.div {...reveal(4)}>
                   <CharacterDetails onNaturalOne={() => { setRipple(null); setFailurePhase('showing'); }} rollRef={characterRoll} onRollingChange={setRolling} onNaturalTwenty={origin => setRipple(previous => ({ ...origin, id: (previous?.id ?? 0) + 1 }))} />
+                  </motion.div>
                 </div>
               </div>
             </div>
             </div>
           </motion.div>
-        </motion.div>
+        </div>
   );
 }
